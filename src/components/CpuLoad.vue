@@ -1,5 +1,5 @@
 <template>
-	<div class="cpufreq">
+	<div class="cpuload">
 		<LineChart :chartdata="datacollection" :chartseries="chartSeries" />
 	</div>
 </template>
@@ -8,7 +8,7 @@
 import LineChart from '@/components/LineChart'
 
 export default {
-	name: 'cpufreq',
+	name: 'cpuload',
 	props: ['uuid'],
 	connection: null,
 	components: {
@@ -21,15 +21,31 @@ export default {
 			chartSeries: [
 				{},
 				{
-					label: "Y",
+					label: "load1",
 					stroke: "red",
+					points: {
+						show: false
+					},
+				},
+				{
+					label: "load5",
+					stroke: "green",
+					points: {
+						show: false
+					},
+				},
+				{
+					label: "load15",
+					stroke: "blue",
 					points: {
 						show: false
 					},
 				}
 			],
 			chartLabels: [],
-			chartDataObj: [],
+			chartDataObjOne: [],
+			chartDataObjFive: [],
+			chartDataObjFitheen: [],
 		}
 	},
 
@@ -38,26 +54,33 @@ export default {
 		
 		if (vm.connection == null) {
 			console.log("[CPU] Starting connection to WebSocket Server");
-			vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=cpu_info&specific_filter=host_uuid.eq." + vm.uuid);
+			vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=load_avg&specific_filter=host_uuid.eq." + vm.uuid);
 		}
 
 		this.connection.onmessage = function(event) {
 			let json = JSON.parse(event.data);
 			let newValues = json["columnvalues"];
 
-			let date_obj = new Date(newValues[3]).valueOf() / 1000;
+			let date_obj = new Date(newValues[5]).valueOf() / 1000;
+			
 			vm.chartLabels.push(date_obj);
-			vm.chartDataObj.push(newValues[1]);
+			vm.chartDataObjOne.push(newValues[1]);
+			vm.chartDataObjFive.push(newValues[2]);
+			vm.chartDataObjFitheen.push(newValues[3]);
 
 			// 5 mins history
-			if (vm.chartDataObj.length > (60 * 5)) {
+			if (vm.chartDataObjOne.length > (60 * 5)) {
 				vm.chartLabels.shift();
-				vm.chartDataObj.shift();
+				vm.chartDataObjOne.shift();
+				vm.chartDataObjFive.shift();
+				vm.chartDataObjFitheen.shift();
 			}
 
 			vm.datacollection = [
 				vm.chartLabels,
-				vm.chartDataObj,
+				vm.chartDataObjOne,
+				vm.chartDataObjFive,
+				vm.chartDataObjFitheen,
 			];
 		}
 	},

@@ -5,24 +5,30 @@
 
 		<div role="section" class="mt-8">
 			<h3 class="text-2xl">CPU</h3>
+			<h4 class="text-lg">Cpu Freq</h4>
 			<CpuFreq :uuid="this.$route.params.uuid"/>
+			<h4 class="text-lg">Cpu Load</h4>
+			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl">Disks</h3>
-			<DisksThroughput :uuid="this.$route.params.uuid"/>
+			<h4 class="text-lg">Throughput</h4>
+			<DiskThroughput :uuid="this.$route.params.uuid"/>
 		</div>
 	</div>
 </template>
 
 <script>
 import CpuFreq from '../components/CpuFreq';
-import DisksThroughput from '../components/DisksThroughput';
+import CpuLoad from '../components/CpuLoad';
+import DiskThroughput from '../components/DiskThroughput';
 
 export default {
 	name: 'Details',
 	components: {
     	CpuFreq,
-		DisksThroughput
+		CpuLoad,
+		DiskThroughput
   	},
 
 	beforeRouteUpdate (to, from, next) {

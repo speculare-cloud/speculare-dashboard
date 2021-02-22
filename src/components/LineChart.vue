@@ -12,6 +12,7 @@ export default {
 			type: Array,
 			default: null
     	},
+		chartseries: Array
   	},
 
 	data () {
@@ -31,7 +32,7 @@ export default {
 				// https://medium.com/coding-at-dawn/the-fastest-way-to-find-minimum-and-maximum-values-in-an-array-in-javascript-2511115f8621
 				let max = Math.max.apply(null, newData[1]);
 				if (this.max != max) {
-					this.chart.setScale('y', { min: 0, max: (max + (max / 10) + 10) });
+					this.chart.setScale('y', { min: 0, max: (max + (max / 10) + 5) });
 				}
 				this.chart.setData(newData);
 			}
@@ -51,10 +52,11 @@ export default {
 				...this.getSize(),
 				cursor: {
 					points: {
-						size: (u, seriesIdx) => u.series[seriesIdx].points.size * 1.1,
+						size: (u, seriesIdx) => u.series[seriesIdx].points.size * 0.85,
 						width: (_u, _seriesIdx, size) => size / 4,
-						fill: "red",
-					}
+					},
+					x: false,
+					y: false
 				},
 				legend: {
 					live: true,
@@ -62,14 +64,7 @@ export default {
 				select: {
 					show: false,
 				},
-				series: [
-					{},
-					{
-						label: "Y",
-						stroke: "red",
-						fill: "rgba(255,0,0,0.05)",
-					}
-				],
+				series: this.$props.chartseries,
 				scales: {
 					x: {
 						time: true,

@@ -35,7 +35,26 @@ export default {
 	margin-right: 8px;
 }
 
+.u-series {
+	vertical-align: bottom;
+}
+
 .u-label {
-	font-size: 10px;
+	font-size: 11px;
+}
+
+.u-legend .u-marker {
+	width: 14px;
+	height: 7px;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.u-legend .u-value {
+	font-size: 11px;
+}
+
+.u-inline.u-live th::after {
+	content: none;
 }
 </style>
