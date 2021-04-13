@@ -33,7 +33,7 @@
 					<router-link to="/alerts" v-slot="{ href, navigate, isActive }">
 						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
 							<span class="h-6 w-6 mr-2 material-icons">
-								notifications_important
+								notifications
 							</span>
 							<div>Alerts</div>
 						</a>

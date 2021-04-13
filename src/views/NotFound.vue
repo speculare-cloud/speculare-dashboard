@@ -4,12 +4,14 @@
 			<h1 class="text-gray-200">404</h1>
 			<h2 class="text-gray-200">Oops! Page Not Found</h2>
 			<p class="text-gray-400">Sorry but the page you are looking for does not exist, have been removed, name changed or is temporarily unavailable</p>
-			<a class="flex items-center py-2" href="/">
-				<span class="h-6 w-6 mr-2 material-icons">
-					arrow_back
-				</span>
-				<div>Back to homepage</div>
-			</a>
+			<router-link to="/" v-slot="{ href, navigate }">
+				<a :href="href" @click="navigate" class="flex items-center py-2">
+					<span class="h-6 w-6 mr-2 material-icons">
+						arrow_back
+					</span>
+					<div>Back to homepage</div>
+				</a>
+			</router-link>
 		</div>
 	</div>
 </template>
