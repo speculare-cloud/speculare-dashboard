@@ -14,22 +14,38 @@
 					</button>
 				</div>
 				<nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block px-4 pb-4 md:pb-0 md:overflow-y-auto">
-					<a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-900 bg-gray-200 rounded-lg dark-mode:bg-gray-700 dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-						href="#">
-						Home
-					</a>
-					<a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-900 bg-transparent rounded-lg dark-mode:bg-transparent dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-						href="#">
-						Hosts list
-					</a>
-					<a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-900 bg-transparent rounded-lg dark-mode:bg-transparent dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-						href="#">
-						Alerts
-					</a>
-					<a class="block px-4 py-2 mt-2 text-sm font-semibold text-gray-900 bg-transparent rounded-lg dark-mode:bg-transparent dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
-						href="#">
-						Settings
-					</a>
+					<router-link to="/" v-slot="{ href, navigate, isActive }">
+						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-2 material-icons">
+								home
+							</span>
+							<div>Home</div>
+						</a>
+					</router-link>
+					<router-link to="/hosts" v-slot="{ href, navigate, isActive }">
+						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-2 material-icons">
+								format_list_bulleted
+							</span>
+							<div>Hosts list</div>
+						</a>
+					</router-link>
+					<router-link to="/alerts" v-slot="{ href, navigate, isActive }">
+						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-2 material-icons">
+								notifications_important
+							</span>
+							<div>Alerts</div>
+						</a>
+					</router-link>
+					<router-link to="/settings" v-slot="{ href, navigate, isActive }">
+						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-2 material-icons">
+								settings
+							</span>
+							<div>Settings</div>
+						</a>
+					</router-link>
 				</nav>
 			</div>
 
