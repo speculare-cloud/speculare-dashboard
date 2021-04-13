@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import LineChart from '@/components/LineChart'
+import LineChart from '@/components/Graphs/LineChart'
 
 export default {
 	name: 'cpuload',

@@ -19,9 +19,9 @@
 </template>
 
 <script>
-import CpuFreq from '../components/CpuFreq';
-import CpuLoad from '../components/CpuLoad';
-import DiskThroughput from '../components/DiskThroughput';
+import CpuFreq from '@/components/Graphs/CpuFreq';
+import CpuLoad from '@/components/Graphs/CpuLoad';
+import DiskThroughput from '@/components/Graphs/DiskThroughput';
 
 export default {
 	name: 'Details',
