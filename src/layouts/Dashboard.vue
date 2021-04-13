@@ -2,7 +2,7 @@
 	<div id="dashvue" class="antialiased bg-gray-100 dark-mode:bg-gray-900">
 		<div class="md:flex flex-col md:flex-row md:min-h-screen w-full">
 			<div class="flex flex-col w-full md:w-48 text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 flex-shrink-0">
-				<div class="flex-shrink-0 px-8 py-4 flex flex-row items-center justify-between">
+				<div class="flex-shrink-0 px-8 md:px-0 py-4 flex flex-row items-center justify-between md:justify-center">
 					<a href="#" class="text-lg font-semibold tracking-widest text-gray-900 uppercase rounded-lg dark-mode:text-white focus:outline-none focus:shadow-outline">
 						Speculare
 					</a>
@@ -13,34 +13,34 @@
 						</svg>
 					</button>
 				</div>
-				<nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block px-4 pb-4 md:pb-0 md:overflow-y-auto">
-					<router-link to="/" v-slot="{ href, navigate, isActive }">
-						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-2 material-icons">
+				<nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block pl-4 pr-4 md:pr-0 pb-4 md:pb-0 md:overflow-y-auto">
+					<router-link to="/" v-slot="{ href, navigate, isExactActive }" custom>
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
 								home
 							</span>
 							<div>Home</div>
 						</a>
 					</router-link>
-					<router-link to="/hosts" v-slot="{ href, navigate, isActive }">
-						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-2 material-icons">
+					<router-link to="/hosts" v-slot="{ href, navigate, isExactActive }" custom>
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
 								format_list_bulleted
 							</span>
 							<div>Hosts list</div>
 						</a>
 					</router-link>
-					<router-link to="/alerts" v-slot="{ href, navigate, isActive }">
-						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-2 material-icons">
+					<router-link to="/alerts" v-slot="{ href, navigate, isExactActive }" custom>
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
 								notifications
 							</span>
 							<div>Alerts</div>
 						</a>
 					</router-link>
-					<router-link to="/settings" v-slot="{ href, navigate, isActive }">
-						<a :href="href" @click="navigate" class="flex items-center px-4 pl-2 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-2 material-icons">
+					<router-link to="/settings" v-slot="{ href, navigate, isExactActive }" custom>
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
 								settings
 							</span>
 							<div>Settings</div>

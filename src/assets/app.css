@@ -2,3 +2,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+html,
+body,
+#app,
+#dashvue {
+    min-height: 100vh;
+}

@@ -12,11 +12,22 @@ const routes = [{
     },
     {
         path: '/',
-        name: 'Home',
         component: Dashboard,
         children: [{
             path: '/',
             component: Home
+        }, {
+            path: '/hosts',
+            component: () =>
+                import ('@/views/Hosts.vue')
+        }, {
+            path: '/alerts',
+            component: () =>
+                import ('@/views/Alerts.vue')
+        }, {
+            path: '/settings',
+            component: () =>
+                import ('@/views/Settings.vue')
         }, {
             path: '/h/:uuid',
             // route level code-splitting
