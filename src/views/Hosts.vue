@@ -108,21 +108,17 @@ export default {
 	},
 
 	methods: {
-		// TODO - Rework
-		secondsToDhms: function(s) {
-			const d = Math.floor(s / (3600 * 24));
-			s  -= d * 3600 * 24;
-			const h = Math.floor(s / 3600);
-			s  -= h * 3600;
-			const m = Math.floor(s / 60);
-			s  -= m * 60;
-			const tmp = [];
-			
-			(d) && tmp.push(d + 'd');
-			(d || h) && tmp.push(h + 'h');
-			(d || h || m) && tmp.push(m + 'm');
-			tmp.push(s + 's');
-			return tmp.join(' ');
+		secondsToDhms: function(seconds) {
+			const d = Math.floor(seconds / (3600*24));
+			const h = Math.floor(seconds % (3600*24) / 3600);
+			const m = Math.floor(seconds % 3600 / 60);
+			const s = Math.floor(seconds % 60);
+
+			const dDisplay = d > 0 ? d + "d " : "";
+			const hDisplay = h > 0 ? h + "h " : "";
+			const mDisplay = m > 0 ? m + "m " : "";
+			const sDisplay = s > 0 ? s + "s" : "";
+			return dDisplay + hDisplay + mDisplay + sDisplay;
 		}
 	},
 
