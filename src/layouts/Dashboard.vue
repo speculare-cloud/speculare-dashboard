@@ -49,7 +49,7 @@
 				</nav>
 			</div>
 
-			<div class="container mx-auto md:pl-4">
+			<div class="w-full px-4 pt-4 md:px-12 md:pt-12">
 				<router-view/>
 			</div>
         </div>

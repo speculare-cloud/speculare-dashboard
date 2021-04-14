@@ -1,25 +1,69 @@
 <template>
 	<div class="hosts">
-		<h1 class="text-6xl font-normal leading-normal mt-0 mb-2 text-gray-800">Hosts</h1>
-		<table class="overflow-x-auto w-full bg-white">
-	        <thead class="bg-blue-100 border-b border-gray-300">
-	            <tr>
-					<th class="p-4 text-left text-sm font-medium text-gray-500 w-1/4" v-for="key in hosts_keys" v-bind:key="key">{{ key }}</th>
-	            </tr>
-	        </thead>
-	        <tbody class="text-gray-600 text-sm divide-y divide-gray-300">
-				<tr class="bg-white font-medium text-sm divide-y divide-gray-200" v-for="item in this.$store.state.hosts_values" v-bind:key="item.uuid">
-          			<td class="p-4 whitespace-nowrap">{{ item.hostname }}</td>
-					<td class="p-4 whitespace-nowrap">{{ item.os }}</td>
-					<td class="p-4 whitespace-nowrap">{{ item.uptime }}</td>
-					<td class="p-4 whitespace-nowrap">
-						<router-link :to="'/h/' + item.uuid" class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-4 py-2 rounded-md border-0">
-							Details
-						</router-link>
-					</td>
-        		</tr>
-	        </tbody>
-	    </table>
+		<h2 class="text-lg font-medium leading-normal mb-4 text-gray-200">Groups</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:xl:grid-cols-5 gap-4 mb-8">
+			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
+				<div class="flex justify-center items-center bg-red-400 rounded-full w-12 h-12">
+					<span class="h-6 w-6 material-icons cursor-default">
+						dns
+					</span>
+				</div>
+				<div class="py-1 ml-4">
+					<h3 class="font-medium">Proxy-servers</h3>
+					<p class="text-sm text-gray-400">1 Hosts</p>
+				</div>
+			</div>
+			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
+				<div class="flex justify-center items-center bg-yellow-400 rounded-full w-12 h-12">
+					<span class="h-6 w-6 material-icons cursor-default">
+						games
+					</span>
+				</div>
+				<div class="py-1 ml-4">
+					<h3 class="font-medium">Game-servers</h3>
+					<p class="text-sm text-gray-400">3 Hosts</p>
+				</div>
+			</div>
+			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
+				<div class="flex justify-center items-center bg-green-400 rounded-full w-12 h-12">
+					<span class="h-6 w-6 material-icons cursor-default">
+						leak_add
+					</span>
+				</div>
+				<div class="py-1 ml-4">
+					<h3 class="font-medium">Vpn-servers</h3>
+					<p class="text-sm text-gray-400">1 Hosts</p>
+				</div>
+			</div>
+			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
+				<div class="flex justify-center items-center bg-blue-400 rounded-full w-12 h-12">
+					<span class="h-6 w-6 material-icons cursor-default">
+						extension
+					</span>
+				</div>
+				<div class="py-1 ml-4">
+					<h3 class="font-medium">App-servers</h3>
+					<p class="text-sm text-gray-400">2 Hosts</p>
+				</div>
+			</div>
+		</div>
+
+		<h2 class="text-lg font-medium leading-normal mb-4 text-gray-200">Hosts</h2>
+		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:xl:grid-cols-5 gap-4 mb-8">
+			<router-link v-for="item in this.$store.state.hosts_values" v-bind:key="item.uuid" :to="'/h/' + item.uuid" v-slot="{ href, navigate }" custom>
+				<a :href="href" @click="navigate">
+					<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
+						<div class="flex justify-center items-center bg-green-400 rounded-full w-12 h-12">
+							<img src="../assets/imgs/os/ubuntu.svg" class="w-10 h-10" />
+						</div>
+						<div class="py-1 ml-4">
+							<h3 class="font-medium">{{ item.hostname }}</h3>
+							<p class="text-sm text-gray-400">{{ item.uptime }}</p>
+						</div>
+					</div>
+				</a>
+			</router-link>
+		</div>
 	</div>
 </template>
 
@@ -27,12 +71,6 @@
 export default {
 	name: 'Hosts',
 	connection: null,
-
-	data() {
-		return {
-			hosts_keys: ["Hostname", "OS", "Uptime", ""]
-		};
-	},
 
 	created: function() {		
 		let vm = this;

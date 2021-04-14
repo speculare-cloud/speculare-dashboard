@@ -19,7 +19,7 @@ const routes = [{
         }, {
             path: '/hosts',
             component: () =>
-                import ('@/views/Hosts.vue')
+                import ('@/views/Hosts.vue'),
         }, {
             path: '/alerts',
             component: () =>
@@ -30,7 +30,7 @@ const routes = [{
                 import ('@/views/Settings.vue')
         }, {
             path: '/h/:uuid',
-            // route level code-splitting
+            name: 'hosts_details',
             component: () =>
                 import ('@/views/Details.vue')
         }]
