@@ -8,3 +8,27 @@ body,
 #dashvue {
     min-height: 100vh;
 }
+
+.shimming:after {
+    animation: shine 4s ease-in-out infinite;
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background: rgba(255, 255, 255, 0.075) 77%;
+}
+
+@keyframes shine {
+    40% {
+        opacity: 0.75;
+        transition-property: left, top, opacity;
+        transition-duration: 0.7s, 0.7s, 0.15s;
+        transition-timing-function: ease;
+    }
+    100% {
+        opacity: 0;
+        transition-property: left, top, opacity;
+    }
+}
