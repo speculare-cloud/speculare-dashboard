@@ -5,7 +5,6 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        hosts_loading: true,
         hosts_values: [],
     },
     mutations: {

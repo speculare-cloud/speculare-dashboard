@@ -79,43 +79,46 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
 	name: 'Hosts',
 	connection: null,
 
-	created: function() {		
+	mounted: function() {		
 		let vm = this;
-		let store = vm.$store;
-		
-		if (vm.connection == null) {
-			console.log("[HOSTS] Starting connection to WebSocket Server");
-			vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=hosts");
-		}
 
-		vm.connection.onmessage = function(event) {
-			let json = JSON.parse(event.data);
-			let newValues = json["columnvalues"];
-			// Construct the newObj from the values (it's the hosts table)
-			let newObj = {
-				os: newValues[0],
-				hostname: newValues[1],
-				uptime: vm.secondsToDhms(newValues[2]),
-				uuid: newValues[3],
-				created_at: newValues[4],
-			};
-			// Find at which position the UUID is currently present
-			let objIndex = store.state.hosts_values.findIndex((obj => obj.uuid == newObj.uuid));
-			// If not found, we push it
-			if (objIndex == -1) {
-				store.commit({type: 'pushHosts', newdata: newObj});
-			// Else we update the value
-			} else {
-				store.commit({type: 'updateHosts', index: objIndex, newdata: newObj});
-			}
-			if (store.state.hosts_loading) {
-				store.state.hosts_loading = false;
-			}
-		}
+		vm.$nextTick(function () {
+			// Get initial list of hosts (don't wait for websocket to add them at first)
+			// If we wait for the websocket this would take a long time...
+			axios
+				.get('https://server.speculare.cloud:9640/api/hosts')
+				.then(resp => {
+					resp.data.forEach(elem => {
+						// Construct newObj to add to the list
+						let newObj = {
+							os: elem.os,
+							hostname: elem.hostname,
+							uptime: vm.secondsToDhms(elem.uptime),
+							uuid: elem.uuid,
+							created_at: elem.created_at,
+						};
+						vm.addOrUpdateHost(newObj, vm.$store)
+					});
+				})
+				.catch(error => {
+					console.log("[HOSTS] Failed to fetch list of HOSTS", error);
+				});
+			
+			// Init and listen to websocket
+			vm.handleWebSocket();
+		});
+	},
+
+	beforeDestroy: function() {
+		console.log("[HOSTS] Closing the WebSocket connection");
+		this.connection.close();
+		this.connection = null;
 	},
 
 	methods: {
@@ -130,13 +133,41 @@ export default {
 			const mDisplay = m > 0 ? m + "m " : "";
 			const sDisplay = s > 0 ? s + "s" : "";
 			return dDisplay + hDisplay + mDisplay + sDisplay;
+		},
+		handleWebSocket: function() {
+			let vm = this;
+			// Init the websocket for changes in the hosts list
+			if (vm.connection == null) {
+				console.log("[HOSTS] Starting connection to WebSocket Server");
+				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=hosts");
+			}
+			vm.connection.addEventListener('message', vm.wsMessageHandle);
+		},
+		wsMessageHandle: function(event) {
+			let vm = this;
+			let json = JSON.parse(event.data);
+			let newValues = json["columnvalues"];
+			// Construct the newObj from the values (it's the hosts table)
+			let newObj = {
+				os: newValues[0],
+				hostname: newValues[1],
+				uptime: vm.secondsToDhms(newValues[2]),
+				uuid: newValues[3],
+				created_at: newValues[4],
+			};
+			vm.addOrUpdateHost(newObj, vm.$store)
+		},
+		addOrUpdateHost: function(newObj, store) {
+			// Find at which position the UUID is currently present
+			let objIndex = store.state.hosts_values.findIndex((obj => obj.uuid == newObj.uuid));
+			// If not found, we push it
+			if (objIndex == -1) {
+				store.commit({type: 'pushHosts', newdata: newObj});
+			// Else we update the value
+			} else {
+				store.commit({type: 'updateHosts', index: objIndex, newdata: newObj});
+			}
 		}
-	},
-
-	beforeDestroy: function() {
-		console.log("[HOSTS] Closing the WebSocket connection");
-		this.connection.close();
-		this.connection = null;
 	}
 }
 </script>
