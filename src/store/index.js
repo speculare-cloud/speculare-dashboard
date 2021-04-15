@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+        category: [],
         hosts_values: [],
     },
     mutations: {
@@ -13,6 +14,12 @@ export default new Vuex.Store({
         },
         pushHosts(state, payload) {
             state.hosts_values.push(payload.newdata);
+        },
+        updateCategory(state, payload) {
+            Vue.set(state.category, payload.index, payload.newdata);
+        },
+        pushCategory(state, payload) {
+            state.category.push(payload.newdata);
         }
     },
     actions: {},

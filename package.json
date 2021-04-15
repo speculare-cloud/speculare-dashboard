@@ -10,6 +10,7 @@
         "axios": "^0.21.1",
         "core-js": "^3.6.5",
         "material-design-icons": "^3.0.1",
+        "pluralize": "^8.0.0",
         "uplot": "^1.6.5",
         "vue": "^2.6.11",
         "vue-router": "^3.2.0",

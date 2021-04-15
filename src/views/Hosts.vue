@@ -1,50 +1,16 @@
 <template>
 	<div class="hosts">
-		<h2 class="text-lg font-medium leading-normal mb-4 text-gray-200">Groups</h2>
-		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:xl:grid-cols-5 gap-4 mb-8">
-			<!-- Dummy items for now, need to integrate category -->
-			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-				<div class="flex justify-center items-center bg-red-400 rounded-full w-12 h-12">
+		<h2 v-if="this.$store.state.category.length" class="text-lg font-medium leading-normal mb-4 text-gray-200">Groups</h2>
+		<div v-if="this.$store.state.category.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:xl:grid-cols-5 gap-4 mb-8">
+			<div v-for="item in this.$store.state.category" v-bind:key="item.id" class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
+				<div class="flex justify-center items-center rounded-full w-12 h-12" v-bind:style="{ backgroundColor: item.color }">
 					<span class="h-6 w-6 material-icons cursor-default">
-						dns
+						{{ item.icon }}
 					</span>
 				</div>
 				<div class="py-1 ml-4">
-					<h3 class="font-medium">Proxy-servers</h3>
-					<p class="text-sm text-gray-400">1 Hosts</p>
-				</div>
-			</div>
-			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-				<div class="flex justify-center items-center bg-yellow-400 rounded-full w-12 h-12">
-					<span class="h-6 w-6 material-icons cursor-default">
-						games
-					</span>
-				</div>
-				<div class="py-1 ml-4">
-					<h3 class="font-medium">Game-servers</h3>
-					<p class="text-sm text-gray-400">3 Hosts</p>
-				</div>
-			</div>
-			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-				<div class="flex justify-center items-center bg-green-400 rounded-full w-12 h-12">
-					<span class="h-6 w-6 material-icons cursor-default">
-						leak_add
-					</span>
-				</div>
-				<div class="py-1 ml-4">
-					<h3 class="font-medium">Vpn-servers</h3>
-					<p class="text-sm text-gray-400">1 Hosts</p>
-				</div>
-			</div>
-			<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-				<div class="flex justify-center items-center bg-blue-400 rounded-full w-12 h-12">
-					<span class="h-6 w-6 material-icons cursor-default">
-						extension
-					</span>
-				</div>
-				<div class="py-1 ml-4">
-					<h3 class="font-medium">App-servers</h3>
-					<p class="text-sm text-gray-400">2 Hosts</p>
+					<h3 class="font-medium">{{ item.name }}</h3>
+					<p class="text-sm text-gray-400">{{ item.nhosts }} {{ 'Host' | pluralize(item.nhosts) }}</p>
 				</div>
 			</div>
 		</div>

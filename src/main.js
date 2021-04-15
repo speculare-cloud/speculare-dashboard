@@ -8,6 +8,11 @@ import '@/assets/uPlot.css';
 
 Vue.config.productionTip = false
 
+import pluralize from 'pluralize';
+Vue.filter('pluralize', function(value, number) {
+    return pluralize(value, number)
+})
+
 new Vue({
     router,
     store,
