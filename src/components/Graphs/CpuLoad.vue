@@ -53,7 +53,7 @@ export default {
 		let vm = this;
 		
 		if (vm.connection == null) {
-			console.log("[CPU] Starting connection to WebSocket Server");
+			console.log("[DISKSTHROUGHPUT] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=load_avg&specific_filter=host_uuid.eq." + vm.uuid);
 		}
 
@@ -86,7 +86,7 @@ export default {
 	},
 
 	beforeDestroy: function() {
-		console.log("[CPU] Closing the WebSocket connection");
+		console.log("[CPULOAD] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
 		this.connection.close();
 		this.connection = null;
 	}

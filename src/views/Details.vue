@@ -30,9 +30,5 @@ export default {
 		CpuLoad,
 		DiskThroughput
   	},
-
-	beforeRouteUpdate (to, from, next) {
-		next();
-  	}
 }
 </script>

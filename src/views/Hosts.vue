@@ -125,7 +125,7 @@ export default {
 		let vm = this;
 		
 		// Close the webSocket connection
-		console.log("[HOSTS] Closing the WebSocket connection");
+		console.log("[HOSTS] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
 		vm.connection.close();
 		vm.connection = null;
 	},
@@ -147,7 +147,7 @@ export default {
 			let vm = this;
 
 			// Init the websocket for changes in the hosts list
-			console.log("[HOSTS] Starting connection to WebSocket Server");
+			console.log("[HOSTS] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (vm.connection == null) {
 				console.log("[HOSTS] > Setting a new webSocket");
 				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=hosts");
