@@ -22,8 +22,8 @@
 				<div class="ml-4 bg-gray-700 rounded-full w-12 h-12">
 				</div>
 				<div class="py-1 ml-4">
-					<div class="w-24 h-4 rounded-sm bg-gray-700"></div>
-					<div class="w-16 h-3 rounded-sm bg-gray-700 mt-2"></div>
+					<div class="w-28 h-5 rounded-sm bg-gray-700"></div>
+					<div class="w-16 h-4 rounded-sm bg-gray-700 mt-2"></div>
 				</div>
 			</div>
 			<!-- Real data, will take the lead once loaded -->
