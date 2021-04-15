@@ -8,22 +8,22 @@
     },
     "dependencies": {
         "axios": "^0.21.1",
-        "core-js": "^3.6.5",
+        "core-js": "^3.10.1",
         "material-design-icons": "^3.0.1",
         "pluralize": "^8.0.0",
-        "uplot": "^1.6.5",
-        "vue": "^2.6.11",
-        "vue-router": "^3.2.0",
-        "vuex": "^3.4.0"
+        "uplot": "^1.6.8",
+        "vue": "^2.6.12",
+        "vue-router": "^3.5.1",
+        "vuex": "^3.6.2"
     },
     "devDependencies": {
-        "@vue/cli-plugin-babel": "~4.5.0",
-        "@vue/cli-plugin-router": "~4.5.0",
-        "@vue/cli-plugin-vuex": "~4.5.0",
-        "@vue/cli-service": "~4.5.0",
-        "autoprefixer": "^9.8.6",
-        "postcss": "^7.0.35",
-        "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.3",
-        "vue-template-compiler": "^2.6.11"
+        "@vue/cli-plugin-babel": "~4.5.12",
+        "@vue/cli-plugin-router": "~4.5.12",
+        "@vue/cli-plugin-vuex": "~4.5.12",
+        "@vue/cli-service": "^4.5.12",
+        "autoprefixer": "9.8.6",
+        "postcss": "^8.2.10",
+        "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.1",
+        "vue-template-compiler": "^2.6.12"
     }
 }
