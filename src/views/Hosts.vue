@@ -83,11 +83,17 @@ import axios from 'axios';
 
 export default {
 	name: 'Hosts',
-	connection: null,
+
+	data: function() {
+		return {
+			connection: null
+		}
+	},
 
 	mounted: function() {		
 		let vm = this;
 
+		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
 			// Get initial list of hosts (don't wait for websocket to add them at first)
 			// If we wait for the websocket this would take a long time...
@@ -103,7 +109,7 @@ export default {
 							uuid: elem.uuid,
 							created_at: elem.created_at,
 						};
-						vm.addOrUpdateHost(newObj, vm.$store)
+						vm.addOrUpdateHost(newObj)
 					});
 				})
 				.catch(error => {
@@ -116,9 +122,12 @@ export default {
 	},
 
 	beforeDestroy: function() {
+		let vm = this;
+		
+		// Close the webSocket connection
 		console.log("[HOSTS] Closing the WebSocket connection");
-		this.connection.close();
-		this.connection = null;
+		vm.connection.close();
+		vm.connection = null;
 	},
 
 	methods: {
@@ -136,15 +145,19 @@ export default {
 		},
 		handleWebSocket: function() {
 			let vm = this;
+
 			// Init the websocket for changes in the hosts list
+			console.log("[HOSTS] Starting connection to WebSocket Server");
 			if (vm.connection == null) {
-				console.log("[HOSTS] Starting connection to WebSocket Server");
+				console.log("[HOSTS] > Setting a new webSocket");
 				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=hosts");
 			}
 			vm.connection.addEventListener('message', vm.wsMessageHandle);
 		},
 		wsMessageHandle: function(event) {
 			let vm = this;
+
+			// Parse the data and extract newValue
 			let json = JSON.parse(event.data);
 			let newValues = json["columnvalues"];
 			// Construct the newObj from the values (it's the hosts table)
@@ -155,9 +168,12 @@ export default {
 				uuid: newValues[3],
 				created_at: newValues[4],
 			};
-			vm.addOrUpdateHost(newObj, vm.$store)
+			vm.addOrUpdateHost(newObj)
 		},
-		addOrUpdateHost: function(newObj, store) {
+		addOrUpdateHost: function(newObj) {
+			let vm = this;
+			let store = vm.$store;
+
 			// Find at which position the UUID is currently present
 			let objIndex = store.state.hosts_values.findIndex((obj => obj.uuid == newObj.uuid));
 			// If not found, we push it
