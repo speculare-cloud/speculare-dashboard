@@ -32,7 +32,12 @@ const routes = [{
             path: '/h/:uuid',
             name: 'hosts_details',
             component: () =>
-                import ('@/views/Details.vue')
+                import ('@/views/Details.vue'),
+            meta: {
+                breadcrumb: [
+                    { name: 'Hosts', link: 'hosts' }
+                ]
+            }
         }]
     }
 ]
