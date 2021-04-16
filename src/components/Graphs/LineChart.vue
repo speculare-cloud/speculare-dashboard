@@ -47,7 +47,7 @@ export default {
 
 	methods: {
 		createChart: function(data) {
-			this.max = Math.max.apply(null, data);
+			this.max = Math.max.apply(null, data[1]);
 			let opts = {
 				...this.getSize(),
 				cursor: {
@@ -71,7 +71,7 @@ export default {
 					},
 					y: {
 						auto: false,
-						range: [0, this.max + (this.max / 10)]
+						range: [0, this.max + (this.max / 10) + 5]
 					},
 				}
 			};

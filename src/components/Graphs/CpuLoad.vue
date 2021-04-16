@@ -64,6 +64,7 @@ export default {
 			let date_obj = new Date(newValues[5]).valueOf() / 1000;
 			
 			vm.chartLabels.push(date_obj);
+			console.log(newValues);
 			vm.chartDataObjOne.push(newValues[1]);
 			vm.chartDataObjFive.push(newValues[2]);
 			vm.chartDataObjFitheen.push(newValues[3]);

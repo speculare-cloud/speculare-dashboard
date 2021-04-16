@@ -29,15 +29,15 @@
 		</nav>
 
 		<div role="section" class="mt-8">
-			<h3 class="text-2xl">CPU</h3>
-			<h4 class="text-lg">Cpu Freq</h4>
+			<h3 class="text-2xl text-gray-100">CPU</h3>
+			<h4 class="text-lg text-gray-200">Cpu Freq</h4>
 			<CpuFreq :uuid="this.$route.params.uuid"/>
-			<h4 class="text-lg">Cpu Load</h4>
+			<h4 class="text-lg text-gray-200">Cpu Load</h4>
 			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4">
-			<h3 class="text-2xl">Disks</h3>
-			<h4 class="text-lg">Throughput</h4>
+			<h3 class="text-2xl text-gray-100">Disks</h3>
+			<h4 class="text-lg text-gray-200">Throughput</h4>
 			<DiskThroughput :uuid="this.$route.params.uuid"/>
 		</div>
 	</div>

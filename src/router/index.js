@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Dashboard from '@/layouts/Dashboard.vue'
-import Home from '@/views/Home.vue'
 
 Vue.use(VueRouter)
 
@@ -15,15 +14,15 @@ const routes = [{
         component: Dashboard,
         children: [{
             path: '/',
-            component: Home
+            redirect: '/hosts'
         }, {
             path: '/hosts',
             component: () =>
                 import ('@/views/Hosts.vue'),
         }, {
-            path: '/alerts',
+            path: '/alarms',
             component: () =>
-                import ('@/views/Alerts.vue')
+                import ('@/views/Alarms.vue')
         }, {
             path: '/settings',
             component: () =>
