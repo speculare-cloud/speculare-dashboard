@@ -53,7 +53,7 @@ export default {
 		let vm = this;
 		
 		if (vm.connection == null) {
-			console.log("[DISKSTHROUGHPUT] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
+			console.log("[CPULOAD] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=load_avg&specific_filter=host_uuid.eq." + vm.uuid);
 		}
 

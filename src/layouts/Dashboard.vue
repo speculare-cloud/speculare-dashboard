@@ -43,7 +43,7 @@
 				</nav>
 			</div>
 
-			<div class="w-full px-4 pt-4 md:px-12 md:pt-12">
+			<div class="w-full px-4 pt-4 md:px-12 md:pt-12 overflow-x-auto">
 				<router-view/>
 			</div>
         </div>

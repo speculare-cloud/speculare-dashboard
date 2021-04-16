@@ -35,7 +35,7 @@
 			<h4 class="text-lg text-gray-200">Cpu Load</h4>
 			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
-		<div role="section" class="mt-4">
+		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100">Disks</h3>
 			<h4 class="text-lg text-gray-200">Throughput</h4>
 			<DiskThroughput :uuid="this.$route.params.uuid"/>
