@@ -65,6 +65,30 @@ export default {
 					show: false,
 				},
 				series: this.$props.chartseries,
+				axes: [
+					{
+						stroke: "#c7d0d9",
+						grid: {
+							width: 1 / devicePixelRatio,
+							stroke: "#2c3235",
+						},
+						ticks: {
+							width: 1 / devicePixelRatio,
+							stroke: "#2c3235",
+						}
+					},
+					{
+						stroke: "#c7d0d9",
+						grid: {
+							width: 1 / devicePixelRatio,
+							stroke: "#2c3235",
+						},
+						ticks: {
+							width: 1 / devicePixelRatio,
+							stroke: "#2c3235",
+						}
+					},
+				],
 				scales: {
 					x: {
 						time: true,

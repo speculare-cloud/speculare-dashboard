@@ -164,8 +164,13 @@
     overflow: hidden;
 }
 
+.u-legend .u-label {
+    color: rgb(229, 231, 235);
+}
+
 .u-legend .u-value {
     font-size: 11px;
+    color: rgb(229, 231, 235);
 }
 
 .u-inline.u-live th::after {
