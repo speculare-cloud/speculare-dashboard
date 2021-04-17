@@ -3,7 +3,7 @@
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 229px">
 			<h3>Loading</h3>
 		</div>
-		<LineChart v-if="datacollection != null" :chartdata="datacollection" :chartseries="chartSeries" />
+		<LineChart :chartdata="datacollection" :chartseries="chartSeries" />
 	</div>
 </template>
 
