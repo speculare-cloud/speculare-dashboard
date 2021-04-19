@@ -10,6 +10,9 @@
 <script>
 import LineChart from '@/components/Graphs/LineChart'
 import axios from 'axios';
+import uPlot from 'uplot';
+
+const _spline = uPlot.paths.spline();
 
 export default {
 	name: 'cpuload',
@@ -25,27 +28,54 @@ export default {
 			datacollection: null,
 			chartSeries: [
 				{},
-				{
+				Object.assign({
 					label: "load1",
-					stroke: "red",
+					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
 					points: {
 						show: false
 					},
-				},
-				{
+					width: 1 / devicePixelRatio,
+					drawStyle: 2,
+					lineInterpolation: null,
+					paths: this.splineGraph,
+				}, {
+					drawStyle:         0,
+					lineInterpolation: 1,
+					stroke:            "#7EB26D",
+					fill:              "#7EB26D1A",
+				}),
+				Object.assign({
 					label: "load5",
-					stroke: "green",
+					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
 					points: {
 						show: false
 					},
-				},
-				{
+					width: 1 / devicePixelRatio,
+					drawStyle: 2,
+					lineInterpolation: null,
+					paths: this.splineGraph,
+				}, {
+					drawStyle:         0,
+					lineInterpolation: 1,
+					stroke:            "#008080",
+					fill:              "#0080801A",
+				}),
+				Object.assign({
 					label: "load15",
-					stroke: "blue",
+					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
 					points: {
 						show: false
 					},
-				}
+					width: 1 / devicePixelRatio,
+					drawStyle: 2,
+					lineInterpolation: null,
+					paths: this.splineGraph,
+				}, {
+					drawStyle:         0,
+					lineInterpolation: 1,
+					stroke:            "#DA70D6",
+					fill:              "#DA70D61A",
+				})
 			],
 			chartLabels: new Array(this.scaleTime),
 			chartDataObjOne: new Array(this.scaleTime),
@@ -89,11 +119,16 @@ export default {
 
 		// Close the webSocket connection
 		console.log("[CPULOAD] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
-		vm.connection.close();
-		vm.connection = null;
+		if (vm.connection != null) {
+			vm.connection.close();
+			vm.connection = null;
+		}
 	},
 
 	methods: {
+		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
+			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+		},
 		handleWebSocket: function() {
 			let vm = this;
 

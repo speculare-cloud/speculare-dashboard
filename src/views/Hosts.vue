@@ -69,7 +69,8 @@ export default {
 					resp.data.forEach(elem => {
 						// Construct newObj to add to the list
 						let newObj = {
-							os: elem.os,
+							system: elem.system,
+							os_version: elem.os_version,
 							hostname: elem.hostname,
 							uptime: vm.secondsToDhms(elem.uptime),
 							uuid: elem.uuid,
@@ -128,11 +129,12 @@ export default {
 			let newValues = json["columnvalues"];
 			// Construct the newObj from the values (it's the hosts table)
 			let newObj = {
-				os: newValues[0],
-				hostname: newValues[1],
-				uptime: vm.secondsToDhms(newValues[2]),
-				uuid: newValues[3],
-				created_at: newValues[4],
+				system: newValues[0],
+				os_version: newValues[1],
+				hostname: newValues[2],
+				uptime: vm.secondsToDhms(newValues[3]),
+				uuid: newValues[4],
+				created_at: newValues[5],
 			};
 			vm.addOrUpdateHost(newObj)
 		},

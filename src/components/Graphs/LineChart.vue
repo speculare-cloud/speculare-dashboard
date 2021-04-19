@@ -1,5 +1,5 @@
 <template>
-	<div ref="uniqueName" class="w-100" @mouseover="hover=true" @mouseleave="hover=false"></div>
+	<div ref="uniqueName" class="w-100"></div>
 </template>
 
 <script>
@@ -12,13 +12,13 @@ export default {
 			type: Array,
 			default: null
     	},
-		chartseries: Array
+		chartseries: Array,
   	},
 
 	data () {
 		return {
 			chart: null,
-			hover: false,
+			hovered: false,
 			max: 0
 		}
 	},
@@ -27,25 +27,43 @@ export default {
 		chartdata: function (newData, oldData) {
 			if (oldData == null || !this.chart) {
 				this.createChart(newData);
-			} else if (!this.hover && this.chart) {
+			} else if (!this.hovered && this.chart) {
 				// If the newData[1] contains more than 4000 items, use a for loop
 				// https://medium.com/coding-at-dawn/the-fastest-way-to-find-minimum-and-maximum-values-in-an-array-in-javascript-2511115f8621
 				let max = Math.max.apply(null, newData[1]);
 				if (this.max != max) {
-					this.chart.setScale('y', { min: 0, max: (max + (max / 10) + 5) });
+					//this.chart.setScale('y', { min: 0, max: (max + (max / 10) + 5) });
 				}
 				this.chart.setData(newData);
 			}
+			// Update the legend to the lastest value
+			this.chart.setLegend({idx: newData[1].length - 1}, false);
 		}
 	},
 
 	mounted () {
+		// Add the event after the page has been rendered
 		this.$nextTick(function() {
 			window.addEventListener('resize', this.setChartSize);
 		});
 	},
 
 	methods: {
+		initMouseEvent: function() {
+			let vm = this;
+
+			// get the over part of the Graph as per uPlot doc
+			let elems = this.$el.getElementsByClassName("u-over");
+			// Add mouseleave event
+			elems.item(0).addEventListener("mouseleave", () => {
+				vm.hovered = false;
+				this.chart.setLegend({idx: this.chartdata[1].length - 1}, false);
+			});
+			// Add mouseenter event
+			elems.item(0).addEventListener("mouseenter", () => {
+				vm.hovered = true;
+			});
+		},
 		createChart: function(data) {
 			this.max = Math.max.apply(null, data[1]);
 			let opts = {
@@ -94,12 +112,14 @@ export default {
 						time: true,
 					},
 					y: {
-						auto: false,
-						range: [0, this.max + (this.max / 10) + 5]
+						auto: true,
 					},
 				}
 			};
 			this.chart = new uPlot(opts, data, this.$refs.uniqueName);
+			// Init mouseenter and mouseleave event for freezing the charts
+			// and setting the legend correctly
+			this.initMouseEvent();
 		},
 		getSize: function() {
 			return {
