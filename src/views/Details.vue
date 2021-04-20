@@ -32,13 +32,13 @@
 			<h3 class="text-2xl text-gray-100 mb-4">CPU</h3>
 			<h4 class="text-lg text-gray-200">Utilization</h4>
 			<CpuStats :uuid="this.$route.params.uuid"/>
-			<h4 class="text-lg text-gray-200 mt-4">Average Load</h4>
+			<h4 class="text-lg text-gray-200 mt-4">Load</h4>
 			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">Disks</h3>
-			<h4 class="text-lg text-gray-200">Throughput</h4>
-			<DiskThroughput :uuid="this.$route.params.uuid"/>
+			<h4 class="text-lg text-gray-200">Io</h4>
+			<DisksIoOverall :uuid="this.$route.params.uuid"/>
 		</div>
 	</div>
 </template>
@@ -46,14 +46,14 @@
 <script>
 import CpuLoad from '@/components/Graphs/CpuLoad';
 import CpuStats from '@/components/Graphs/CpuStats';
-import DiskThroughput from '@/components/Graphs/DiskThroughput';
+import DisksIoOverall from '@/components/Graphs/DisksIoOverall';
 
 export default {
 	name: 'Details',
 	components: {
 		CpuLoad,
 		CpuStats,
-		DiskThroughput
+		DisksIoOverall
   	},
 }
 </script>

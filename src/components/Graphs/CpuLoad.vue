@@ -93,8 +93,7 @@ export default {
 				.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime)
 				.then(resp => {
 					resp.data.forEach((elem, index) => {
-						let date_obj = new Date(elem.created_at).valueOf() / 1000;
-						vm.fastAddNewData(date_obj, elem.one, elem.five, elem.fifteen, index);
+						vm.fastAddNewData(elem, index);
 					});
 
 					// Update onscreen values
@@ -155,15 +154,16 @@ export default {
 			// Add the new data to the graph
 			vm.addNewData(date_obj, valueOne, valueFive, valueFitheen);
 		},
-		fastAddNewData: function(date_obj, valueOne, valueFive, valueFitheen, index) {
+		fastAddNewData: function(elem, index) {
 			let vm = this;
 			
+			let date_obj = new Date(elem.created_at).valueOf() / 1000;
 			// Add the new value to the Array
 			// starting by the end -> start
 			vm.chartLabels[vm.scaleTime - 1 - index] = date_obj;
-			vm.chartDataObjOne[vm.scaleTime - 1 - index] = valueOne;
-			vm.chartDataObjFive[vm.scaleTime - 1 - index] = valueFive;
-			vm.chartDataObjFitheen[vm.scaleTime - 1 - index] = valueFitheen;
+			vm.chartDataObjOne[vm.scaleTime - 1 - index] = elem.one;
+			vm.chartDataObjFive[vm.scaleTime - 1 - index] = elem.five;
+			vm.chartDataObjFitheen[vm.scaleTime - 1 - index] = elem.fifteen;
 		},
 		addNewData: function(date_obj, valueOne, valueFive, valueFitheen) {
 			let vm = this;

@@ -29,7 +29,7 @@ export default {
 			chartSeries: [
 				{},
 				Object.assign({
-					label: "%",
+					label: "use",
 					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
 					points: {
 						show: false

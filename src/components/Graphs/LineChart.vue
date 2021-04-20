@@ -36,8 +36,11 @@ export default {
 				}
 				this.chart.setData(newData);
 			}
-			// Update the legend to the lastest value
-			this.chart.setLegend({idx: newData[1].length - 1}, false);
+			
+			if (!this.hovered) {
+				// Update the legend to the lastest value
+				this.chart.setLegend({idx: newData[1].length - 1}, false);
+			}
 		}
 	},
 
