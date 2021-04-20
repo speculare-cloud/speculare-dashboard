@@ -19,7 +19,6 @@ export default {
 		return {
 			chart: null,
 			hovered: false,
-			max: 0
 		}
 	},
 	
@@ -28,12 +27,6 @@ export default {
 			if (oldData == null || !this.chart) {
 				this.createChart(newData);
 			} else if (!this.hovered && this.chart) {
-				// If the newData[1] contains more than 4000 items, use a for loop
-				// https://medium.com/coding-at-dawn/the-fastest-way-to-find-minimum-and-maximum-values-in-an-array-in-javascript-2511115f8621
-				let max = Math.max.apply(null, newData[1]);
-				if (this.max != max) {
-					//this.chart.setScale('y', { min: 0, max: (max + (max / 10) + 5) });
-				}
 				this.chart.setData(newData);
 			}
 			
@@ -68,7 +61,6 @@ export default {
 			});
 		},
 		createChart: function(data) {
-			this.max = Math.max.apply(null, data[1]);
 			let opts = {
 				...this.getSize(),
 				cursor: {
