@@ -180,7 +180,7 @@ export default {
 			let percent = (totald - idled)/totald*100;
 			vm.chartDataObj.push(percent);
 
-			// 5 mins history
+			// (scaleTime / 60) units of time history
 			if (vm.chartLabels.length > vm.scaleTime) {
 				vm.chartLabels.shift();
 				vm.chartDataObj.shift();

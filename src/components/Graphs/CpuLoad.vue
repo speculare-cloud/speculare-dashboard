@@ -174,8 +174,8 @@ export default {
 			vm.chartDataObjFive.push(valueFive);
 			vm.chartDataObjFitheen.push(valueFitheen);
 
-			// 5 mins history
-			if (vm.chartDataObjOne.length > (60 * 5)) {
+			// (scaleTime / 60) units of time history
+			if (vm.chartDataObjOne.length > vm.scaleTime) {
 				vm.chartLabels.shift();
 				vm.chartDataObjOne.shift();
 				vm.chartDataObjFive.shift();

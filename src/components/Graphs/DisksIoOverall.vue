@@ -225,7 +225,7 @@ export default {
 			// Add the date_obj to the labels
 			vm.chartLabels.push(date_obj);
 
-			// (scaleTime / 60) mins history
+			// (scaleTime / 60) units of time history
 			if (vm.chartLabels.length > vm.scaleTime) {
 				vm.chartLabels.shift();
 				vm.chartDataObjRead.shift();
