@@ -1,7 +1,7 @@
 <template>
 	<div class="disksiooverall">
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 229px">
-			<h3>Loading</h3>
+			<h3>{{ this.loadingMessage }}</h3>
 		</div>
 		<LineChart :chartdata="datacollection" :chartseries="chartSeries" />
 	</div>
@@ -9,16 +9,14 @@
 
 <script>
 import LineChart from '@/components/Graphs/LineChart'
-import nowUtc from '@/mixins/nowUtc'
+import graphHelper from '@/mixins/graphHelper';
 import axios from 'axios';
-import uPlot from 'uplot';
-
-const _spline = uPlot.paths.spline();
+import moment from 'moment';
 
 export default {
 	name: 'disksiooverall',
 	props: ['uuid'],
-	mixins: [nowUtc],
+	mixins: [graphHelper],
 	components: {
 		LineChart
 	},
@@ -29,6 +27,7 @@ export default {
 			disksNumber: 0,
 			connection: null,
 			datacollection: null,
+			loadingMessage: "Loading",
 			chartSeries: [
 				{},
 				Object.assign({
@@ -37,7 +36,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 1 / devicePixelRatio,
+					width: 2 / devicePixelRatio,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -53,7 +52,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 1 / devicePixelRatio,
+					width: 2 / devicePixelRatio,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -64,11 +63,11 @@ export default {
 					fill:              "#DA70D61A",
 				})
 			],
-			chartLabels: new Array(this.scaleTime),
-			chartDataObjRead: new Array(this.scaleTime),
-			chartDataObjWrite: new Array(this.scaleTime),
-			historyDataRead: new Array(this.scaleTime),
-			historyDataWrite: new Array(this.scaleTime),
+			chartLabels: [],
+			chartDataObjRead: [],
+			chartDataObjWrite: [],
+			historyDataRead: [],
+			historyDataWrite: [],
 			bufferDataWs: null,
 		}
 	},
@@ -85,8 +84,10 @@ export default {
 					vm.bufferDataWs = [];
 
 					// Fetch previous data
+					let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
+					let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
 					axios
-						.get('https://server.speculare.cloud:9640/api/iostats?uuid=' + vm.uuid + '&size=' + (vm.scaleTime * vm.disksNumber))
+						.get('https://server.speculare.cloud:9640/api/iostats?uuid=' + vm.uuid + '&size=' + (vm.scaleTime * vm.disksNumber) + '&min_date=' + min + '&max_date=' + max)
 						.then(resp => {
 							// Add data in reverse order (push_back) and uPlot use last as most recent
 							// And skip disksNumber by disksNumber
@@ -98,14 +99,22 @@ export default {
 							 	vm.fastAddNewData(currentData, vm.scaleTime - 1 - Math.floor(i/vm.disksNumber));
 							}
 
-							vm.sanitizeData();
+							if (resp.data.length > 0) {
+								// Be sure to handle correctly gaps in the graph, ...
+								vm.sanitizeGraphData(
+									vm.chartLabels.length,
+									vm.scaleTime,
+									vm.chartLabels,
+									5,
+									vm.spliceData,
+									vm.nullData
+								);
 
-							// Update onscreen values
-							vm.datacollection = [
-								vm.chartLabels,
-								vm.chartDataObjRead,
-								vm.chartDataObjWrite,
-							];
+								// Update onscreen values
+								vm.updateGraph();
+							} else {
+								vm.loadingMessage = "No Data"
+							}
 						})
 						.catch(error => {
 							console.log("[DISKSIOOVERALL] Failed to fetch previous data", error);
@@ -122,52 +131,41 @@ export default {
 	},
 
 	beforeDestroy: function() {
-		let vm = this;
-
 		// Close the webSocket connection
 		console.log("[DISKSIOOVERALL] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
-		if (vm.connection != null) {
-			vm.connection.close();
-			vm.connection = null;
+		if (this.connection != null) {
+			this.connection.close();
+			this.connection = null;
 		}
 	},
 
 	methods: {
-		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
-			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+		nullData: function(i) {
+			this.chartDataObjRead[i] = null;
+			this.chartDataObjWrite[i] = null;
+			this.historyDataRead[i] = null;
+			this.historyDataWrite[i] = null;
 		},
-		nullingDataIndex: function(index) {
-			let vm = this;
-
-			vm.chartDataObjRead[index] = null;
-			vm.chartDataObjWrite[index] = null;
-			vm.historyDataRead[index] = null;
-			vm.historyDataWrite[index] = null;
+		spliceData: function(i) {
+			this.chartLabels.splice(i, 1);
+			this.chartDataObjRead.splice(i, 1);
+			this.chartDataObjWrite.splice(i, 1);
+			this.historyDataRead.splice(i, 1);
+			this.historyDataWrite.splice(i, 1);
 		},
-		// TODO - Convert it to a mixins
-		sanitizeData: function() {
-			let vm = this;
-
-			// Be sure the date are following in order (by 1s for now)
-			const now = vm.nowUtc();
-			for (let i = vm.scaleTime - 1; i >= 0; i--) {
-				// Iterate in the reverse order, and find if any missing data from the lastest we have
-				// Also compare start against current time, if over 5s, might be some missing data
-				
-				// Plus or minus 5 are for throttleshot
-				if (i == vm.scaleTime - 1) {
-					// Check against now to see if we're missing starting data
-					if (!(now - 5 <= vm.chartLabels[i] && vm.chartLabels[i] <= now + 5)) {
-						vm.chartLabels[i] = now;
-						vm.nullingDataIndex(i);
-					}
-				} else {
-					if (vm.chartLabels[i + 1] > vm.chartLabels[i] + 5) {
-						// Don't need to change the Labels, uPlot already handle this
-						vm.nullingDataIndex(i);
-					}
-				}
-			}
+		updateGraph: function() {
+			this.datacollection = [
+				this.chartLabels,
+				this.chartDataObjRead,
+				this.chartDataObjWrite,
+			];
+		},
+		pushValue: function(date, read, write, histRead, histWrite) {
+			this.chartLabels.push(date);
+			this.chartDataObjRead.push(read);
+			this.chartDataObjWrite.push(write);
+			this.historyDataRead.push(histRead);
+			this.historyDataWrite.push(histWrite);
 		},
 		handleWebSocket: function() {
 			let vm = this;
@@ -193,97 +191,75 @@ export default {
 			} else {
 				// Add current to the buffer for easier loop in the addNewData
 				vm.bufferDataWs.push(newValues);
-				// Prepare the variable, explicitly define them for clarity
-				let date_obj = new Date(newValues[5]).valueOf() / 1000;
-				vm.addNewData(date_obj);
+				// Add the new data to the graph
+				vm.addNewData(moment.utc(newValues[5]).unix());
 				// Clear the array
 				vm.bufferDataWs = [];
 			}
 		},
-		fastAddNewData: function(elem, index) {
-			let vm = this;
-			
+		fastAddNewData: function(elem, index) {			
 			let total_read = 0;
 			let total_write = 0;
 			// Compute total read and write from all disks
-			for (let i = 0; i < vm.disksNumber; i++) {
+			for (let i = 0; i < this.disksNumber; i++) {
 				total_read += elem[i].bytes_read;
 				total_write += elem[i].bytes_wrtn;
 			}
-			
-			// Add values to history
-			vm.historyDataRead[index] = total_read;
-			vm.historyDataWrite[index] = total_write;
 
-			if (index == 0 || vm.historyDataRead[index - 1] == null) {
-				vm.chartDataObjRead[index] = null;
-				vm.chartDataObjWrite[index] = null;
-			} else {
+			let read = null;
+			let write = null;
+			// If first item, we have nothing to compare it against, so null it
+			// Or if the previous does not exist, we can't compute the percent
+			if (!(index == 0 || this.historyDataRead[index - 1] == null)) {
 				// Get the previous values
-				let prevRead = vm.historyDataRead[index - 1];
-				let prevWrite = vm.historyDataWrite[index - 1];
+				let prevRead = this.historyDataRead[index - 1];
+				let prevWrite = this.historyDataWrite[index - 1];
 
 				// Dividing by 1000000 to get mb
-				let diffRead = (total_read - prevRead) / 1000000;
-				let diffWrite = (total_write - prevWrite) / 1000000;
-				vm.chartDataObjRead[index] = diffRead;
-				vm.chartDataObjWrite[index] = -diffWrite;
+				read = (total_read - prevRead) / 1000000;
+				write = -((total_write - prevWrite) / 1000000);
 			}
 
-			// End with adding the time label for the corrsponding value
-			let date_obj = new Date(elem[0].created_at).valueOf() / 1000;
-			vm.chartLabels[index] = date_obj;
+			// Add the new value to the Array
+			this.pushValue(moment.utc(elem[0].created_at).unix(), read, write, total_read, total_write);
 		},
 		addNewData: function(date_obj) {
-			let vm = this;
-
 			let total_read = 0;
 			let total_write = 0;
 			// Compute total read and write from all disks
-			for (let i = 0; i < vm.bufferDataWs.length; i++) {
-				total_read += vm.bufferDataWs[i][2];
-				total_write += vm.bufferDataWs[i][3];
+			for (let i = 0; i < this.bufferDataWs.length; i++) {
+				total_read += this.bufferDataWs[i][2];
+				total_write += this.bufferDataWs[i][3];
 			}
-			
-			// Add current values to history
-			vm.historyDataRead.push(total_read);
-			vm.historyDataWrite.push(total_write);
 
-			if (vm.historyDataRead[vm.scaleTime - 1] == null) {
-				vm.chartDataObjRead.push(null);
-				vm.chartDataObjWrite.push(null);
-			} else {
+			let dataSize = this.chartLabels.length;
+			let read = null;
+			let write = null;
+			if (!(this.historyDataRead[dataSize - 1] == null)) {
 				// Get the previous values
-				let prevRead = vm.historyDataRead[vm.scaleTime - 1];
-				let prevWrite = vm.historyDataWrite[vm.scaleTime - 1];
+				let prevRead = this.historyDataRead[dataSize - 1];
+				let prevWrite = this.historyDataWrite[dataSize - 1];
 
 				// Dividing by 1000000 to get mb
-				let diffRead = (total_read - prevRead) / 1000000;
-				let diffWrite = (total_write - prevWrite) / 1000000;
-				vm.chartDataObjRead.push(diffRead);
-				vm.chartDataObjWrite.push(-diffWrite);
-			}
-			// Add the date_obj to the labels
-			vm.chartLabels.push(date_obj);
-
-			// (scaleTime / 60) units of time history
-			if (vm.chartLabels.length > vm.scaleTime) {
-				vm.chartLabels.shift();
-				vm.chartDataObjRead.shift();
-				vm.chartDataObjWrite.shift();
-				vm.historyDataRead.shift();
-				vm.historyDataWrite.shift();
+				read = (total_read - prevRead) / 1000000;
+				write = -((total_write - prevWrite) / 1000000);
 			}
 
-			// TODO - Might be worth checking if last has been sent less than 5s ago
-			vm.sanitizeData();
+			// Add the new value to the Array
+			this.pushValue(date_obj, read, write, total_read, total_write);
+
+			// Be sure to handle correctly gaps in the graph, ...
+			this.sanitizeGraphData(
+				this.chartLabels.length,
+				this.scaleTime,
+				this.chartLabels,
+				5,
+				this.spliceData,
+				this.nullData
+			);
 
 			// Update onscreen values
-			vm.datacollection = [
-				vm.chartLabels,
-				vm.chartDataObjRead,
-				vm.chartDataObjWrite,
-			];
+			this.updateGraph();
 		}
 	}
 }

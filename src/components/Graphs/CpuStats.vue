@@ -9,7 +9,6 @@
 
 <script>
 import LineChart from '@/components/Graphs/LineChart'
-import nowUtc from '@/mixins/nowUtc'
 import graphHelper from '@/mixins/graphHelper';
 import axios from 'axios';
 import moment from 'moment';
@@ -17,7 +16,7 @@ import moment from 'moment';
 export default {
 	name: 'cpustats',
 	props: ['uuid'],
-	mixins: [nowUtc, graphHelper],
+	mixins: [graphHelper],
 	components: {
 		LineChart
 	},
@@ -36,7 +35,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 1 / devicePixelRatio,
+					width: 2 / devicePixelRatio,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -96,13 +95,11 @@ export default {
 	},
 
 	beforeDestroy: function() {
-		let vm = this;
-
 		// Close the webSocket connection
 		console.log("[CPUSTATS] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
-		if (vm.connection != null) {
-			vm.connection.close();
-			vm.connection = null;
+		if (this.connection != null) {
+			this.connection.close();
+			this.connection = null;
 		}
 	},
 
@@ -153,14 +150,13 @@ export default {
 			// Compute the idling time of the CPU from these params
 			let idle = elem.idle + elem.iowait;
 
-			let dataSize = this.chartLabels.length;
 			let usage = null;
 			// If first item, we have nothing to compare it against, so null it
 			// Or if the previous does not exist, we can't compute the percent
-			if (!(index == 0 || this.historyBusyDataObj[dataSize - 1] == null)) {
+			if (!(index == 0 || this.historyBusyDataObj[index - 1] == null)) {
 				// Get the previous entry
-				let prevBusy = this.historyBusyDataObj[dataSize - 1];
-				let prevIdle = this.historyIdleDataObj[dataSize - 1];
+				let prevBusy = this.historyBusyDataObj[index - 1];
+				let prevIdle = this.historyIdleDataObj[index - 1];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;

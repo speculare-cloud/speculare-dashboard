@@ -9,7 +9,6 @@
 
 <script>
 import LineChart from '@/components/Graphs/LineChart';
-import nowUtc from '@/mixins/nowUtc';
 import graphHelper from '@/mixins/graphHelper';
 import axios from 'axios';
 import moment from 'moment';
@@ -17,7 +16,7 @@ import moment from 'moment';
 export default {
 	name: 'cpuload',
 	props: ['uuid'],
-	mixins: [nowUtc, graphHelper],
+	mixins: [graphHelper],
 	components: {
 		LineChart
 	},
