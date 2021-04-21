@@ -9,6 +9,7 @@
 
 <script>
 import LineChart from '@/components/Graphs/LineChart'
+import nowUtc from '@/mixins/nowUtc'
 import axios from 'axios';
 import uPlot from 'uplot';
 
@@ -17,6 +18,7 @@ const _spline = uPlot.paths.spline();
 export default {
 	name: 'disksiooverall',
 	props: ['uuid'],
+	mixins: [nowUtc],
 	components: {
 		LineChart
 	},
@@ -96,6 +98,8 @@ export default {
 							 	vm.fastAddNewData(currentData, vm.scaleTime - 1 - Math.floor(i/vm.disksNumber));
 							}
 
+							vm.sanitizeData();
+
 							// Update onscreen values
 							vm.datacollection = [
 								vm.chartLabels,
@@ -131,6 +135,39 @@ export default {
 	methods: {
 		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
 			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+		},
+		nullingDataIndex: function(index) {
+			let vm = this;
+
+			vm.chartDataObjRead[index] = null;
+			vm.chartDataObjWrite[index] = null;
+			vm.historyDataRead[index] = null;
+			vm.historyDataWrite[index] = null;
+		},
+		// TODO - Convert it to a mixins
+		sanitizeData: function() {
+			let vm = this;
+
+			// Be sure the date are following in order (by 1s for now)
+			const now = vm.nowUtc();
+			for (let i = vm.scaleTime - 1; i >= 0; i--) {
+				// Iterate in the reverse order, and find if any missing data from the lastest we have
+				// Also compare start against current time, if over 5s, might be some missing data
+				
+				// Plus or minus 5 are for throttleshot
+				if (i == vm.scaleTime - 1) {
+					// Check against now to see if we're missing starting data
+					if (!(now - 5 <= vm.chartLabels[i] && vm.chartLabels[i] <= now + 5)) {
+						vm.chartLabels[i] = now;
+						vm.nullingDataIndex(i);
+					}
+				} else {
+					if (vm.chartLabels[i + 1] > vm.chartLabels[i] + 5) {
+						// Don't need to change the Labels, uPlot already handle this
+						vm.nullingDataIndex(i);
+					}
+				}
+			}
 		},
 		handleWebSocket: function() {
 			let vm = this;
@@ -178,7 +215,7 @@ export default {
 			vm.historyDataRead[index] = total_read;
 			vm.historyDataWrite[index] = total_write;
 
-			if (index == 0) {
+			if (index == 0 || vm.historyDataRead[index - 1] == null) {
 				vm.chartDataObjRead[index] = null;
 				vm.chartDataObjWrite[index] = null;
 			} else {
@@ -212,16 +249,20 @@ export default {
 			vm.historyDataRead.push(total_read);
 			vm.historyDataWrite.push(total_write);
 
-			// Get the previous values
-			let prevRead = vm.historyDataRead[vm.scaleTime - 1];
-			let prevWrite = vm.historyDataWrite[vm.scaleTime - 1];
-			
-			// Dividing by 1000000 to get mb
-			let diffRead = (total_read - prevRead) / 1000000;
-			let diffWrite = (total_write - prevWrite) / 1000000;
-			vm.chartDataObjRead.push(diffRead);
-			vm.chartDataObjWrite.push(-diffWrite);
+			if (vm.historyDataRead[vm.scaleTime - 1] == null) {
+				vm.chartDataObjRead.push(null);
+				vm.chartDataObjWrite.push(null);
+			} else {
+				// Get the previous values
+				let prevRead = vm.historyDataRead[vm.scaleTime - 1];
+				let prevWrite = vm.historyDataWrite[vm.scaleTime - 1];
 
+				// Dividing by 1000000 to get mb
+				let diffRead = (total_read - prevRead) / 1000000;
+				let diffWrite = (total_write - prevWrite) / 1000000;
+				vm.chartDataObjRead.push(diffRead);
+				vm.chartDataObjWrite.push(-diffWrite);
+			}
 			// Add the date_obj to the labels
 			vm.chartLabels.push(date_obj);
 
@@ -233,6 +274,9 @@ export default {
 				vm.historyDataRead.shift();
 				vm.historyDataWrite.shift();
 			}
+
+			// TODO - Might be worth checking if last has been sent less than 5s ago
+			vm.sanitizeData();
 
 			// Update onscreen values
 			vm.datacollection = [

@@ -9,6 +9,7 @@
 
 <script>
 import LineChart from '@/components/Graphs/LineChart'
+import nowUtc from '@/mixins/nowUtc'
 import axios from 'axios';
 import uPlot from 'uplot';
 
@@ -17,6 +18,7 @@ const _spline = uPlot.paths.spline();
 export default {
 	name: 'cpuload',
 	props: ['uuid'],
+	mixins: [nowUtc],
 	components: {
 		LineChart
 	},
@@ -96,6 +98,8 @@ export default {
 						vm.fastAddNewData(elem, index);
 					});
 
+					vm.sanitizeData();
+
 					// Update onscreen values
 					vm.datacollection = [
 						vm.chartLabels,
@@ -127,6 +131,38 @@ export default {
 	methods: {
 		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
 			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+		},
+		nullingDataIndex: function(index) {
+			let vm = this;
+
+			vm.chartDataObjOne[index] = null;
+			vm.chartDataObjFive[index] = null;
+			vm.chartDataObjFitheen[index] = null;
+		},
+		// TODO - Convert it to a mixins
+		sanitizeData: function() {
+			let vm = this;
+
+			// Be sure the date are following in order (by 1s for now)
+			const now = vm.nowUtc();
+			for (let i = vm.scaleTime - 1; i >= 0; i--) {
+				// Iterate in the reverse order, and find if any missing data from the lastest we have
+				// Also compare start against current time, if over 5s, might be some missing data
+
+				// Plus or minus 5 are for throttleshot
+				if (i == vm.scaleTime - 1) {
+					// Check against now to see if we're missing starting data
+					if (!(now - 5 <= vm.chartLabels[i] && vm.chartLabels[i] <= now + 5)) {
+						vm.chartLabels[i] = now;
+						vm.nullingDataIndex(i);
+					}
+				} else {
+					if (vm.chartLabels[i + 1] > vm.chartLabels[i] + 5) {
+						// Don't need to change the Labels, uPlot already handle this
+						vm.nullingDataIndex(i);
+					}
+				}
+			}
 		},
 		handleWebSocket: function() {
 			let vm = this;
@@ -181,6 +217,9 @@ export default {
 				vm.chartDataObjFive.shift();
 				vm.chartDataObjFitheen.shift();
 			}
+
+			// TODO - Might be worth checking if last has been sent less than 5s ago
+			vm.sanitizeData();
 
 			// Update onscreen values
 			vm.datacollection = [
