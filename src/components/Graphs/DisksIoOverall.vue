@@ -173,9 +173,9 @@ export default {
 			let vm = this;
 
 			// Init the websocket for changes in the hosts list
-			console.log("[CPULOAD] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
+			console.log("[DISKSIOOVERALL] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (vm.connection == null) {
-				console.log("[CPULOAD] > Setting a new webSocket");
+				console.log("[DISKSIOOVERALL] > Setting a new webSocket");
 				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=iostats&specific_filter=host_uuid.eq." + vm.uuid);
 			}
 			vm.connection.addEventListener('message', vm.wsMessageHandle);

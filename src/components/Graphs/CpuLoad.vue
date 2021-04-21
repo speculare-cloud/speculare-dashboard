@@ -103,7 +103,6 @@ export default {
 
 					if (resp.data.length > 0) {
 						// Be sure to handle correctly gaps in the graph, ...
-						// vm.sanitizeData();
 						vm.sanitizeGraphData(
 							vm.chartLabels.length,
 							vm.scaleTime,

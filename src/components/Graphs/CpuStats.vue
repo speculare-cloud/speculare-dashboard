@@ -1,7 +1,7 @@
 <template>
 	<div class="cpustats">
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 229px">
-			<h3>Loading</h3>
+			<h3>{{ this.loadingMessage }}</h3>
 		</div>
 		<LineChart :chartdata="datacollection" :chartseries="chartSeries" />
 	</div>
@@ -10,15 +10,14 @@
 <script>
 import LineChart from '@/components/Graphs/LineChart'
 import nowUtc from '@/mixins/nowUtc'
+import graphHelper from '@/mixins/graphHelper';
 import axios from 'axios';
-import uPlot from 'uplot';
-
-const _spline = uPlot.paths.spline();
+import moment from 'moment';
 
 export default {
 	name: 'cpustats',
 	props: ['uuid'],
-	mixins: [nowUtc],
+	mixins: [nowUtc, graphHelper],
 	components: {
 		LineChart
 	},
@@ -28,6 +27,7 @@ export default {
 			scaleTime: 300,
 			connection: null,
 			datacollection: null,
+			loadingMessage: "Loading",
 			chartSeries: [
 				{},
 				Object.assign({
@@ -47,10 +47,10 @@ export default {
 					fill:              "#EAB8391A",
 				})
 			],
-			chartLabels: new Array(this.scaleTime),
-			chartDataObj: new Array(this.scaleTime),
-			historyBusyDataObj: new Array(this.scaleTime),
-			historyIdleDataObj: new Array(this.scaleTime),
+			chartLabels: [],
+			chartDataObj: [],
+			historyBusyDataObj: [],
+			historyIdleDataObj: [],
 		}
 	},
 
@@ -59,21 +59,32 @@ export default {
 
 		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
+			let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
+			let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
 			axios
-				.get('https://server.speculare.cloud:9640/api/cpustats?uuid=' + vm.uuid + '&size=' + vm.scaleTime)
+				.get('https://server.speculare.cloud:9640/api/cpustats?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
 				.then(resp => {
 					// Add data in reverse order (push_back) and uPlot use last as most recent
 					for (let i = resp.data.length - 1; i >= 0; i--) {
 						vm.fastAddNewData(resp.data[i], vm.scaleTime - 1 - i);
 					}
 
-					vm.sanitizeData();
+					if (resp.data.length > 0) {
+						// Be sure to handle correctly gaps in the graph, ...
+						vm.sanitizeGraphData(
+							vm.chartLabels.length,
+							vm.scaleTime,
+							vm.chartLabels,
+							5,
+							vm.spliceData,
+							vm.nullData
+						);
 
-					// Update onscreen values
-					vm.datacollection = [
-						vm.chartLabels,
-						vm.chartDataObj,
-					];
+						// Update onscreen values
+						vm.updateGraph();
+					} else {
+						vm.loadingMessage = "No Data"
+					}
 				})
 				.catch(error => {
 					console.log("[CPUSTATS] Failed to fetch previous data", error);
@@ -96,85 +107,60 @@ export default {
 	},
 
 	methods: {
-		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
-			// Function used to smooth out the line, better visual
-			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+		nullData: function(i) {
+			this.chartDataObj[i] = null;
+			this.historyBusyDataObj[i] = null;
+			this.historyIdleDataObj[i] = null;
 		},
-		nullingDataIndex: function(index) {
-			let vm = this;
-
-			vm.chartDataObj[index] = null;
-			vm.historyBusyDataObj[index] = null;
-			vm.historyIdleDataObj[index] = null;
+		spliceData: function(i) {
+			this.chartLabels.splice(i, 1);
+			this.chartDataObj.splice(i, 1);
+			this.historyBusyDataObj.splice(i, 1);
+			this.historyIdleDataObj.splice(i, 1);
 		},
-		// TODO - Convert it to a mixins
-		sanitizeData: function() {
-			let vm = this;
-
-			// Be sure the date are following in order (by 1s for now)
-			const now = vm.nowUtc();
-			for (let i = vm.scaleTime - 1; i >= 0; i--) {
-				// Iterate in the reverse order, and find if any missing data from the lastest we have
-				// Also compare start against current time, if over 5s, might be some missing data
-				
-				// Plus or minus 5 are for throttleshot
-				if (i == vm.scaleTime - 1) {
-					// Check against now to see if we're missing starting data
-					if (!(now - 5 <= vm.chartLabels[i] && vm.chartLabels[i] <= now + 5)) {
-						vm.chartLabels[i] = now;
-						vm.nullingDataIndex(i);
-					}
-				} else {
-					if (vm.chartLabels[i + 1] > vm.chartLabels[i] + 5) {
-						// Don't need to change the Labels, uPlot already handle this
-						vm.nullingDataIndex(i);
-					}
-				}
-			}
+		updateGraph: function() {
+			this.datacollection = [
+				this.chartLabels,
+				this.chartDataObj,
+			];
+		},
+		pushValue: function(date, usage, busy, idle) {
+			this.chartLabels.push(date);
+			this.chartDataObj.push(usage);
+			this.historyBusyDataObj.push(busy);
+			this.historyIdleDataObj.push(idle);
 		},
 		handleWebSocket: function() {
-			let vm = this;
-
 			// Init the websocket for changes in the hosts list
 			console.log("[CPUSTATS] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
-			if (vm.connection == null) {
+			if (this.connection == null) {
 				console.log("[CPUSTATS] > Setting a new webSocket");
-				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=cpustats&specific_filter=host_uuid.eq." + vm.uuid);
+				this.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=cpustats&specific_filter=host_uuid.eq." + this.uuid);
 			}
-			vm.connection.addEventListener('message', vm.wsMessageHandle);
+			this.connection.addEventListener('message', this.wsMessageHandle);
 		},
 		wsMessageHandle: function(event) {
-			let vm = this;
-
 			// Parse the data and extract newValue
 			let json = JSON.parse(event.data);
 			let newValues = json["columnvalues"];
-			// Prepare the variable, explicitly define them for clarity
-			let date_obj = new Date(newValues[12]).valueOf() / 1000;
 
 			// Add the new data to the graph
-			vm.addNewData(date_obj, newValues);
+			this.addNewData(newValues);
 		},
 		fastAddNewData: function(elem, index) {
-			let vm = this;
-
 			// Compute the busy time of the CPU from these params
 			let busy = elem.cuser + elem.nice + elem.system + elem.irq + elem.softirq + elem.steal;
 			// Compute the idling time of the CPU from these params
 			let idle = elem.idle + elem.iowait;
 
-			// Add the values to the end of the history array
-			vm.historyBusyDataObj[index] = busy;
-			vm.historyIdleDataObj[index] = idle;
-
+			let dataSize = this.chartLabels.length;
+			let usage = null;
 			// If first item, we have nothing to compare it against, so null it
 			// Or if the previous does not exist, we can't compute the percent
-			if (index == 0 || vm.historyBusyDataObj[index - 1] == null) {
-				vm.chartDataObj[index] = null;
-			} else  {
+			if (!(index == 0 || this.historyBusyDataObj[dataSize - 1] == null)) {
 				// Get the previous entry
-				let prevBusy = vm.historyBusyDataObj[index - 1];
-				let prevIdle = vm.historyIdleDataObj[index - 1];
+				let prevBusy = this.historyBusyDataObj[dataSize - 1];
+				let prevIdle = this.historyIdleDataObj[dataSize - 1];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;
@@ -182,34 +168,25 @@ export default {
 				let totald = total - prevTotal;
 				let idled = idle - prevIdle;
 				// Get the value as percent
-				let percent = (totald - idled)/totald*100;
-				vm.chartDataObj[index] = percent;
+				usage = (totald - idled)/totald*100;
 			}
-
-			// End with adding the time label for the corrsponding value
-			let date_obj = new Date(elem.created_at).valueOf() / 1000;
-			vm.chartLabels[index] = date_obj;
-		},
-		addNewData: function(date_obj, values) {
-			let vm = this;
 
 			// Add the new value to the Array
-			vm.chartLabels.push(date_obj);
-			
+			this.pushValue(moment.utc(elem.created_at).unix(), usage, busy, idle);
+		},
+		addNewData: function(newValues) {
 			// Compute the busy time of the CPU from these params
-			let busy = values[1] + values[2] + values[3] + values[6] + values[7] + values[8];
+			let busy = newValues[1] + newValues[2] + newValues[3] + newValues[6] + newValues[7] + newValues[8];
 			// Compute the idling time of the CPU from these params
-			let idle = values[4] + values[5];
-			// Add the values to the end of the history array
-			vm.historyBusyDataObj.push(busy);
-			vm.historyIdleDataObj.push(idle);
+			let idle = newValues[4] + newValues[5];
+			
+			let dataSize = this.chartLabels.length;
+			let usage = null;
 			// If the previous does not exist, we can't compute the percent
-			if (vm.historyBusyDataObj[vm.scaleTime - 1] == null) {
-				vm.chartDataObj.push(null);
-			} else {
+			if (!(this.historyBusyDataObj[dataSize - 1] == null)) {
 				// Get the previous entry
-				let prevBusy = vm.historyBusyDataObj[vm.scaleTime - 1];
-				let prevIdle = vm.historyIdleDataObj[vm.scaleTime - 1];
+				let prevBusy = this.historyBusyDataObj[dataSize - 1];
+				let prevIdle = this.historyIdleDataObj[dataSize - 1];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;
@@ -217,26 +194,25 @@ export default {
 				let totald = total - prevTotal;
 				let idled = idle - prevIdle;
 				// Get the value as percent
-				let percent = (totald - idled)/totald*100;
-				vm.chartDataObj.push(percent);
+				usage = (totald - idled)/totald*100;
 			}
 
-			// (scaleTime / 60) units of time history
-			if (vm.chartLabels.length > vm.scaleTime) {
-				vm.chartLabels.shift();
-				vm.chartDataObj.shift();
-				vm.historyBusyDataObj.shift();
-				vm.historyIdleDataObj.shift();
-			}
+			// Add the new value to the Array
+			this.pushValue(moment.utc(newValues[12]).unix(), usage, busy, idle);
 
-			// TODO - Might be worth checking if last has been sent less than 5s ago
-			vm.sanitizeData();
+			// Sanitize the Data in case of gap
+			// but also remove too old element
+			this.sanitizeGraphData(
+				this.chartLabels.length,
+				this.scaleTime,
+				this.chartLabels,
+				5,
+				this.spliceData,
+				this.nullData
+			);
 
 			// Update onscreen values
-			vm.datacollection = [
-				vm.chartLabels,
-				vm.chartDataObj,
-			];
+			this.updateGraph();
 		}
 	}
 }
