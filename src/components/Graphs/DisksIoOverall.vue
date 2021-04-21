@@ -88,8 +88,8 @@ export default {
 					axios
 						.get('https://server.speculare.cloud:9640/api/iostats?uuid=' + vm.uuid + '&size=' + (vm.scaleTime * vm.disksNumber))
 						.then(resp => {
-							// Iter over each element in reverse order so that the last object in the
-							// resp.data is in the first position for the graph (as it's the oldest)
+							// Add data in reverse order (push_back) and uPlot use last as most recent
+							// And skip disksNumber by disksNumber
 							for (let i = resp.data.length - 1; i >= 0; i-=vm.disksNumber) {
 								let currentData = [];
 								for (let y = 0; y < vm.disksNumber; y++) {

@@ -1,24 +1,23 @@
 <template>
 	<div class="cpuload">
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 229px">
-			<h3>Loading</h3>
+			<h3>{{ this.loadingMessage }}</h3>
 		</div>
 		<LineChart :chartdata="datacollection" :chartseries="chartSeries" />
 	</div>
 </template>
 
 <script>
-import LineChart from '@/components/Graphs/LineChart'
-import nowUtc from '@/mixins/nowUtc'
+import LineChart from '@/components/Graphs/LineChart';
+import nowUtc from '@/mixins/nowUtc';
+import graphHelper from '@/mixins/graphHelper';
 import axios from 'axios';
-import uPlot from 'uplot';
-
-const _spline = uPlot.paths.spline();
+import moment from 'moment';
 
 export default {
 	name: 'cpuload',
 	props: ['uuid'],
-	mixins: [nowUtc],
+	mixins: [nowUtc, graphHelper],
 	components: {
 		LineChart
 	},
@@ -28,6 +27,7 @@ export default {
 			scaleTime: 300,
 			connection: null,
 			datacollection: null,
+			loadingMessage: "Loading",
 			chartSeries: [
 				{},
 				Object.assign({
@@ -36,7 +36,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 1 / devicePixelRatio,
+					width: 2 / devicePixelRatio,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -52,7 +52,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 1 / devicePixelRatio,
+					width: 2 / devicePixelRatio,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -68,7 +68,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 1 / devicePixelRatio,
+					width: 2 / devicePixelRatio,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -79,10 +79,10 @@ export default {
 					fill:              "#DA70D61A",
 				})
 			],
-			chartLabels: new Array(this.scaleTime),
-			chartDataObjOne: new Array(this.scaleTime),
-			chartDataObjFive: new Array(this.scaleTime),
-			chartDataObjFitheen: new Array(this.scaleTime),
+			chartLabels: [],
+			chartDataObjOne: [],
+			chartDataObjFive: [],
+			chartDataObjFitheen: [],
 		}
 	},
 
@@ -91,22 +91,33 @@ export default {
 
 		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
+			let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
+			let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
 			axios
-				.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime)
+				.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
 				.then(resp => {
-					resp.data.forEach((elem, index) => {
-						vm.fastAddNewData(elem, index);
-					});
+					// Add data in reverse order (push_back) and uPlot use last as most recent
+					for (let i = resp.data.length - 1; i >= 0; i--) {
+						vm.fastAddNewData(resp.data[i]);
+					}
 
-					vm.sanitizeData();
+					if (resp.data.length > 0) {
+						// Be sure to handle correctly gaps in the graph, ...
+						// vm.sanitizeData();
+						vm.sanitizeGraphData(
+							vm.chartLabels.length,
+							vm.scaleTime,
+							vm.chartLabels,
+							5,
+							vm.spliceData,
+							vm.nullData
+						);
 
-					// Update onscreen values
-					vm.datacollection = [
-						vm.chartLabels,
-						vm.chartDataObjOne,
-						vm.chartDataObjFive,
-						vm.chartDataObjFitheen,
-					];
+						// Update onscreen values
+						vm.updateGraph();
+					} else {
+						vm.loadingMessage = "No Data"
+					}
 				})
 				.catch(error => {
 					console.log("[CPULOAD] Failed to fetch previous data", error);
@@ -118,116 +129,78 @@ export default {
 	},
 
 	beforeDestroy: function() {
-		let vm = this;
-
 		// Close the webSocket connection
 		console.log("[CPULOAD] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
-		if (vm.connection != null) {
-			vm.connection.close();
-			vm.connection = null;
+		if (this.connection != null) {
+			this.connection.close();
+			this.connection = null;
 		}
 	},
 
 	methods: {
-		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
-			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
+		nullData: function(i) {
+			this.chartDataObjOne[i] = null;
+			this.chartDataObjFive[i] = null;
+			this.chartDataObjFitheen[i] = null;
 		},
-		nullingDataIndex: function(index) {
-			let vm = this;
-
-			vm.chartDataObjOne[index] = null;
-			vm.chartDataObjFive[index] = null;
-			vm.chartDataObjFitheen[index] = null;
+		spliceData: function(i) {
+			this.chartLabels.splice(i, 1);
+			this.chartDataObjOne.splice(i, 1);
+			this.chartDataObjFive.splice(i, 1);
+			this.chartDataObjFitheen.splice(i, 1);
 		},
-		// TODO - Convert it to a mixins
-		sanitizeData: function() {
-			let vm = this;
-
-			// Be sure the date are following in order (by 1s for now)
-			const now = vm.nowUtc();
-			for (let i = vm.scaleTime - 1; i >= 0; i--) {
-				// Iterate in the reverse order, and find if any missing data from the lastest we have
-				// Also compare start against current time, if over 5s, might be some missing data
-
-				// Plus or minus 5 are for throttleshot
-				if (i == vm.scaleTime - 1) {
-					// Check against now to see if we're missing starting data
-					if (!(now - 5 <= vm.chartLabels[i] && vm.chartLabels[i] <= now + 5)) {
-						vm.chartLabels[i] = now;
-						vm.nullingDataIndex(i);
-					}
-				} else {
-					if (vm.chartLabels[i + 1] > vm.chartLabels[i] + 5) {
-						// Don't need to change the Labels, uPlot already handle this
-						vm.nullingDataIndex(i);
-					}
-				}
-			}
+		updateGraph: function() {
+			this.datacollection = [
+				this.chartLabels, 
+				this.chartDataObjOne, 
+				this.chartDataObjFive, 
+				this.chartDataObjFitheen
+			];
+		},
+		pushValue: function(date, one, five, fith) {
+			this.chartLabels.push(date);
+			this.chartDataObjOne.push(one);
+			this.chartDataObjFive.push(five);
+			this.chartDataObjFitheen.push(fith);
 		},
 		handleWebSocket: function() {
-			let vm = this;
-
 			// Init the websocket for changes in the hosts list
 			console.log("[CPULOAD] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
-			if (vm.connection == null) {
+			if (this.connection == null) {
 				console.log("[CPULOAD] > Setting a new webSocket");
-				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=load_avg&specific_filter=host_uuid.eq." + vm.uuid);
+				this.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=load_avg&specific_filter=host_uuid.eq." + this.uuid);
 			}
-			vm.connection.addEventListener('message', vm.wsMessageHandle);
+			this.connection.addEventListener('message', this.wsMessageHandle);
 		},
 		wsMessageHandle: function(event) {
-			let vm = this;
-
 			// Parse the data and extract newValue
 			let json = JSON.parse(event.data);
 			let newValues = json["columnvalues"];
-			// Prepare the variable, explicitly define them for clarity
-			let date_obj = new Date(newValues[5]).valueOf() / 1000;
-			let valueOne = newValues[1];
-			let valueFive = newValues[2];
-			let valueFitheen = newValues[3];
 
 			// Add the new data to the graph
-			vm.addNewData(date_obj, valueOne, valueFive, valueFitheen);
+			this.addNewData(newValues);
 		},
-		fastAddNewData: function(elem, index) {
-			let vm = this;
-			
-			let date_obj = new Date(elem.created_at).valueOf() / 1000;
+		fastAddNewData: function(elem) {
 			// Add the new value to the Array
-			// starting by the end -> start
-			vm.chartLabels[vm.scaleTime - 1 - index] = date_obj;
-			vm.chartDataObjOne[vm.scaleTime - 1 - index] = elem.one;
-			vm.chartDataObjFive[vm.scaleTime - 1 - index] = elem.five;
-			vm.chartDataObjFitheen[vm.scaleTime - 1 - index] = elem.fifteen;
+			this.pushValue(moment.utc(elem.created_at).unix(), elem.one, elem.five, elem.fifteen);
 		},
-		addNewData: function(date_obj, valueOne, valueFive, valueFitheen) {
-			let vm = this;
-
+		addNewData: function(newValues) {
 			// Add the new value to the Array
-			vm.chartLabels.push(date_obj);
-			vm.chartDataObjOne.push(valueOne);
-			vm.chartDataObjFive.push(valueFive);
-			vm.chartDataObjFitheen.push(valueFitheen);
+			this.pushValue(moment.utc(newValues[5]).unix(), newValues[1], newValues[2], newValues[3]);
 
-			// (scaleTime / 60) units of time history
-			if (vm.chartDataObjOne.length > vm.scaleTime) {
-				vm.chartLabels.shift();
-				vm.chartDataObjOne.shift();
-				vm.chartDataObjFive.shift();
-				vm.chartDataObjFitheen.shift();
-			}
-
-			// TODO - Might be worth checking if last has been sent less than 5s ago
-			vm.sanitizeData();
+			// Sanitize the Data in case of gap
+			// but also remove too old element
+			this.sanitizeGraphData(
+				this.chartLabels.length,
+				this.scaleTime,
+				this.chartLabels,
+				5,
+				this.spliceData,
+				this.nullData
+			);
 
 			// Update onscreen values
-			vm.datacollection = [
-				vm.chartLabels,
-				vm.chartDataObjOne,
-				vm.chartDataObjFive,
-				vm.chartDataObjFitheen,
-			];
+			this.updateGraph();
 		}
 	}
 }

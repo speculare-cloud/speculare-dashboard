@@ -62,8 +62,7 @@ export default {
 			axios
 				.get('https://server.speculare.cloud:9640/api/cpustats?uuid=' + vm.uuid + '&size=' + vm.scaleTime)
 				.then(resp => {
-					// Iter over each element in reverse order so that the last object in the
-					// resp.data is in the first position for the graph (as it's the oldest)
+					// Add data in reverse order (push_back) and uPlot use last as most recent
 					for (let i = resp.data.length - 1; i >= 0; i--) {
 						vm.fastAddNewData(resp.data[i], vm.scaleTime - 1 - i);
 					}

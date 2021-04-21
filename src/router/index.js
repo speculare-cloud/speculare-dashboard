@@ -28,7 +28,7 @@ const routes = [{
             component: () =>
                 import ('@/views/Settings.vue')
         }, {
-            path: '/h/:uuid',
+            path: '/h/:hostname/:uuid',
             name: 'hosts_details',
             component: () =>
                 import ('@/views/Details.vue'),
