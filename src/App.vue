@@ -65,9 +65,9 @@ export default {
 			const s = Math.floor(seconds % 60);
 
 			const dDisplay = d > 0 ? d + "d " : "";
-			const hDisplay = h > 0 ? h + "h " : "";
-			const mDisplay = m > 0 ? m + "m " : "";
-			const sDisplay = s > 0 ? s + "s" : "";
+			const hDisplay = h > 0 ? h.toLocaleString(undefined, {minimumIntegerDigits: 2}) + "h " : "00h ";
+			const mDisplay = m > 0 ? m.toLocaleString(undefined, {minimumIntegerDigits: 2}) + "m " : "00m ";
+			const sDisplay = s > 0 ? s.toLocaleString(undefined, {minimumIntegerDigits: 2}) + "s" : "00s";
 			return dDisplay + hDisplay + mDisplay + sDisplay;
 		},
 		handleWebSocket: function() {
