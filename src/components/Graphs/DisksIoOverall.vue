@@ -37,7 +37,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 2,
+					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -53,7 +53,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 2,
+					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
