@@ -35,7 +35,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 2 / devicePixelRatio,
+					width: 2,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -51,7 +51,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 2 / devicePixelRatio,
+					width: 2,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
@@ -67,7 +67,7 @@ export default {
 					points: {
 						show: false
 					},
-					width: 2 / devicePixelRatio,
+					width: 2,
 					drawStyle: 2,
 					lineInterpolation: null,
 					paths: this.splineGraph,
