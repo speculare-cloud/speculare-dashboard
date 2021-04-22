@@ -157,9 +157,9 @@ export default {
 		},
 		pushValue: function(date, one, five, fith) {
 			this.chartLabels.push(date);
-			this.chartDataObjOne.push(one);
-			this.chartDataObjFive.push(five);
-			this.chartDataObjFitheen.push(fith);
+			this.chartDataObjOne.push(Math.round(one * 100) / 100);
+			this.chartDataObjFive.push(Math.round(five * 100) / 100);
+			this.chartDataObjFitheen.push(Math.round(fith * 100) / 100);
 		},
 		handleWebSocket: function() {
 			// Init the websocket for changes in the hosts list
