@@ -3,7 +3,7 @@
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 229px">
 			<h3>{{ this.loadingMessage }}</h3>
 		</div>
-		<LineChart :chartdata="datacollection" :chartseries="chartSeries" />
+		<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
 	</div>
 </template>
 
@@ -25,6 +25,7 @@ export default {
 		return {
 			scaleTime: 300,
 			disksNumber: 0,
+			unit: "percentage",
 			connection: null,
 			datacollection: null,
 			loadingMessage: "Loading",

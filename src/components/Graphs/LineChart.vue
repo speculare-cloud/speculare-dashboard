@@ -13,6 +13,7 @@ export default {
 			default: null
     	},
 		chartseries: Array,
+		unit: String
   	},
 
 	data () {
@@ -46,6 +47,8 @@ export default {
 
 	methods: {
 		customLegend: function() {
+			let vm = this;
+
 			function init(u, _) {
 				let legendEl = u.root.querySelector(".u-legend");
 				// Get the u-series corresponding to the Timestamp
@@ -59,7 +62,7 @@ export default {
 				});
 				// Create unit item - and insert it before time.firstChild
 				let unit = document.createElement("td");
-				let content = document.createTextNode("unit");
+				let content = document.createTextNode(vm.unit);
 				unit.appendChild(content);
 				time.insertBefore(unit, time.firstChild);
 
