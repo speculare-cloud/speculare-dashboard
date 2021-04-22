@@ -32,7 +32,7 @@ export default {
 				{},
 				Object.assign({
 					label: "read",
-					value: (_, v) => v == null ? "-" : v.toFixed(2) + "mb/s",
+					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
@@ -48,7 +48,7 @@ export default {
 				}),
 				Object.assign({
 					label: "write",
-					value: (_, v) => v == null ? "-" : v.toFixed(2) + "mb/s",
+					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},

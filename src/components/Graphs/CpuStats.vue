@@ -30,8 +30,8 @@ export default {
 			chartSeries: [
 				{},
 				Object.assign({
-					label: "use",
-					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
+					label: "overall",
+					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},

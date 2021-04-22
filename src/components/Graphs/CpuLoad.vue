@@ -31,7 +31,7 @@ export default {
 				{},
 				Object.assign({
 					label: "load1",
-					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
+					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
@@ -47,7 +47,7 @@ export default {
 				}),
 				Object.assign({
 					label: "load5",
-					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
+					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
@@ -63,7 +63,7 @@ export default {
 				}),
 				Object.assign({
 					label: "load15",
-					value: (_, v) => v == null ? "-" : v.toFixed(2) + "%",
+					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
