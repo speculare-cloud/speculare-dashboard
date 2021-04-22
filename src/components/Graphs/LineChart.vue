@@ -45,6 +45,47 @@ export default {
 	},
 
 	methods: {
+		customLegend: function() {
+			function init(u, _) {
+				let legendEl = u.root.querySelector(".u-legend");
+				// Get the u-series corresponding to the Timestamp
+				let time = legendEl.getElementsByClassName("u-series")[0];
+				// Remove first elem of time, which is just the label "Time"
+				time.firstChild.remove();
+				// Assign some style change
+				uPlot.assign(time.firstChild.style, {
+					fontSize: "14px",
+					color: "rgb(189, 189, 193)"
+				});
+				// Create unit item - and insert it before time.firstChild
+				let unit = document.createElement("td");
+				let content = document.createTextNode("unit");
+				unit.appendChild(content);
+				time.insertBefore(unit, time.firstChild);
+
+				// Assign some style change
+				uPlot.assign(time.style, {
+					width: "100%",
+					display: "flex",
+    				webkitBoxPack: "justify",
+    				justifyContent: "space-between",
+				});
+				uPlot.assign(time.firstChild.style, {
+					fontSize: "14px",
+					color: "rgb(189, 189, 193)"
+				});
+				uPlot.assign(legendEl.style, {
+					paddingLeft: "35px",
+					paddingRight: "25px"
+				});
+			}
+
+			return {
+				hooks: {
+					init: init,
+				}
+			};
+		},
 		initMouseEvent: function() {
 			let vm = this;
 
@@ -63,6 +104,9 @@ export default {
 		createChart: function(data) {
 			let opts = {
 				...this.getSize(),
+				plugins: [
+					this.customLegend(),
+				],
 				cursor: {
 					points: {
 						size: (u, seriesIdx) => u.series[seriesIdx].points.size * 0.85,
