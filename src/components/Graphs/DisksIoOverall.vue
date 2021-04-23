@@ -93,11 +93,15 @@ export default {
 							// Add data in reverse order (push_back) and uPlot use last as most recent
 							// And skip disksNumber by disksNumber
 							for (let i = resp.data.length - 1; i >= 0; i-=vm.disksNumber) {
-								let currentData = [];
-								for (let y = 0; y < vm.disksNumber; y++) {
-									currentData.push(resp.data[i - y]);
+								if (vm.disksNumber > 1) {
+									let currentData = [];
+									for (let y = 0; y < vm.disksNumber; y++) {
+										currentData.push(resp.data[i - y]);
+									}
+									vm.fastAddNewData(currentData);
+								} else {
+									vm.fastAddNewData([resp.data[i]]);
 								}
-							 	vm.fastAddNewData(currentData, vm.scaleTime - 1 - Math.floor(i/vm.disksNumber));
 							}
 
 							if (resp.data.length > 0) {
@@ -198,7 +202,7 @@ export default {
 				vm.bufferDataWs = [];
 			}
 		},
-		fastAddNewData: function(elem, index) {			
+		fastAddNewData: function(elem) {			
 			let total_read = 0;
 			let total_write = 0;
 			// Compute total read and write from all disks
@@ -211,10 +215,11 @@ export default {
 			let write = null;
 			// If first item, we have nothing to compare it against, so null it
 			// Or if the previous does not exist, we can't compute the percent
-			if (!(index == 0 || this.historyDataRead[index - 1] == null)) {
+			let prevIndex = this.historyDataRead.length - 1;
+			if (!(prevIndex == -1 || this.historyDataRead[prevIndex - 1] == null)) {
 				// Get the previous values
-				let prevRead = this.historyDataRead[index - 1];
-				let prevWrite = this.historyDataWrite[index - 1];
+				let prevRead = this.historyDataRead[prevIndex - 1];
+				let prevWrite = this.historyDataWrite[prevIndex - 1];
 
 				// Dividing by 1000000 to get mb
 				read = (total_read - prevRead) / 1000000;

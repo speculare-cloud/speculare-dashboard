@@ -66,7 +66,7 @@ export default {
 				.then(resp => {
 					// Add data in reverse order (push_back) and uPlot use last as most recent
 					for (let i = resp.data.length - 1; i >= 0; i--) {
-						vm.fastAddNewData(resp.data[i], vm.scaleTime - 1 - i);
+						vm.fastAddNewData(resp.data[i]);
 					}
 
 					if (resp.data.length > 0) {
@@ -145,7 +145,7 @@ export default {
 			// Add the new data to the graph
 			this.addNewData(newValues);
 		},
-		fastAddNewData: function(elem, index) {
+		fastAddNewData: function(elem) {
 			// Compute the busy time of the CPU from these params
 			let busy = elem.cuser + elem.nice + elem.system + elem.irq + elem.softirq + elem.steal;
 			// Compute the idling time of the CPU from these params
@@ -154,10 +154,11 @@ export default {
 			let usage = null;
 			// If first item, we have nothing to compare it against, so null it
 			// Or if the previous does not exist, we can't compute the percent
-			if (!(index == 0 || this.historyBusyDataObj[index - 1] == null)) {
+			let prevIndex = this.historyBusyDataObj.length - 1;
+			if (!(prevIndex == -1 || this.historyBusyDataObj[prevIndex - 1] == null)) {
 				// Get the previous entry
-				let prevBusy = this.historyBusyDataObj[index - 1];
-				let prevIdle = this.historyIdleDataObj[index - 1];
+				let prevBusy = this.historyBusyDataObj[prevIndex - 1];
+				let prevIdle = this.historyIdleDataObj[prevIndex - 1];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;
