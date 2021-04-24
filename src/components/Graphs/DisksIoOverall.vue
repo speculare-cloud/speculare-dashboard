@@ -238,13 +238,14 @@ export default {
 				total_write += this.bufferDataWs[i][3];
 			}
 
-			let dataSize = this.chartLabels.length;
 			let read = null;
 			let write = null;
-			if (!(this.historyDataRead[dataSize - 1] == null)) {
+			// If the previous does not exist, we can't compute the percent
+			let prevIndex = this.historyDataRead.length - 1;
+			if (!(this.historyDataRead[prevIndex - 1] == null)) {
 				// Get the previous values
-				let prevRead = this.historyDataRead[dataSize - 1];
-				let prevWrite = this.historyDataWrite[dataSize - 1];
+				let prevRead = this.historyDataRead[prevIndex - 1];
+				let prevWrite = this.historyDataWrite[prevIndex - 1];
 
 				// Dividing by 1000000 to get mb
 				read = (total_read - prevRead) / 1000000;

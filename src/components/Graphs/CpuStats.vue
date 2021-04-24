@@ -178,13 +178,13 @@ export default {
 			// Compute the idling time of the CPU from these params
 			let idle = newValues[4] + newValues[5];
 			
-			let dataSize = this.chartLabels.length;
 			let usage = null;
 			// If the previous does not exist, we can't compute the percent
-			if (!(this.historyBusyDataObj[dataSize - 1] == null)) {
+			let prevIndex = this.historyBusyDataObj.length - 1;
+			if (!(this.historyBusyDataObj[prevIndex - 1] == null)) {
 				// Get the previous entry
-				let prevBusy = this.historyBusyDataObj[dataSize - 1];
-				let prevIdle = this.historyIdleDataObj[dataSize - 1];
+				let prevBusy = this.historyBusyDataObj[prevIndex - 1];
+				let prevIdle = this.historyIdleDataObj[prevIndex - 1];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;
