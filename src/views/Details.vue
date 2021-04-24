@@ -44,16 +44,23 @@
 </template>
 
 <script>
-import CpuLoad from '@/components/Graphs/CpuLoad';
-import CpuStats from '@/components/Graphs/CpuStats';
-import DisksIoOverall from '@/components/Graphs/DisksIoOverall';
+import Skeleton from '@/components/Graphs/Skeleton';
 
 export default {
 	name: 'Details',
 	components: {
-		CpuLoad,
-		CpuStats,
-		DisksIoOverall
+		CpuLoad: () => ({
+      		component: import('@/components/Graphs/CpuLoad.vue'),
+      		loading: Skeleton,
+    	}),
+		CpuStats: () => ({
+			component: import('@/components/Graphs/CpuStats'),
+			loading: Skeleton
+		}),
+		DisksIoOverall: () => ({
+			component: import('@/components/Graphs/DisksIoOverall'),
+			loading: Skeleton
+		}),
   	},
 }
 </script>

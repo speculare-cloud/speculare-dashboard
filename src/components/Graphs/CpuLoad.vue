@@ -91,52 +91,70 @@ export default {
 
 		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
-			let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
-			let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
-			axios
-				.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
-				.then(resp => {
-					// Add data in reverse order (push_back) and uPlot use last as most recent
-					for (let i = resp.data.length - 1; i >= 0; i--) {
-						vm.fastAddNewData(resp.data[i]);
-					}
-
-					if (resp.data.length > 0) {
-						// Be sure to handle correctly gaps in the graph, ...
-						vm.sanitizeGraphData(
-							vm.chartLabels.length,
-							vm.scaleTime,
-							vm.chartLabels,
-							5,
-							vm.spliceData,
-							vm.nullData
-						);
-
-						// Update onscreen values
-						vm.updateGraph();
-					} else {
-						vm.loadingMessage = "No Data"
-					}
-				})
-				.catch(error => {
-					console.log("[CPULOAD] Failed to fetch previous data", error);
-				});
-
-			// Init and listen to websocket
-			vm.handleWebSocket();
+			vm.initObserver().observe(vm.$el);
 		});
 	},
 
 	beforeDestroy: function() {
 		// Close the webSocket connection
-		console.log("[CPULOAD] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
-		if (this.connection != null) {
-			this.connection.close();
-			this.connection = null;
-		}
+		this.closeWebSocket();
 	},
 
 	methods: {
+		initObserver: function() {
+			let vm = this;
+
+			// Observe if the $el is visible or not
+			return new IntersectionObserver((entries) => {
+				if (entries[0].intersectionRatio > 0) {
+					// TODO - Loading informations and init the websocket
+					let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
+					let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
+					axios
+						.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
+						.then(resp => {
+							// Add data in reverse order (push_back) and uPlot use last as most recent
+							for (let i = resp.data.length - 1; i >= 0; i--) {
+								vm.fastAddNewData(resp.data[i]);
+							}
+
+							if (resp.data.length > 0) {
+								// Be sure to handle correctly gaps in the graph, ...
+								vm.sanitizeGraphData(
+									vm.chartLabels.length,
+									vm.scaleTime,
+									vm.chartLabels,
+									5,
+									vm.spliceData,
+									vm.nullData
+								);
+
+								// Update onscreen values
+								vm.updateGraph();
+							} else {
+								vm.loadingMessage = "No Data"
+							}
+						})
+						.catch(error => {
+							console.log("[CPULOAD] Failed to fetch previous data", error);
+						});
+
+					vm.handleWebSocket();
+				} else {
+					// TODO - Destroy websocket and free some memory
+					vm.chartLabels = [];
+					vm.chartDataObjOne = [];
+					vm.chartDataObjFive = [];
+					vm.chartDataObjFitheen = [];
+					vm.closeWebSocket();
+				};
+			}, {
+				// Trigger 100px before and after
+				rootMargin: '100px 0px 100px 0px',
+				// Trigger as soon as 0.001 is in the threttleshot
+				threshold: 0.001
+			});
+		},
 		nullData: function(i) {
 			this.chartDataObjOne[i] = null;
 			this.chartDataObjFive[i] = null;
@@ -161,6 +179,14 @@ export default {
 			this.chartDataObjOne.push(Math.round(one * 100) / 100);
 			this.chartDataObjFive.push(Math.round(five * 100) / 100);
 			this.chartDataObjFitheen.push(Math.round(fith * 100) / 100);
+		},
+		closeWebSocket: function() {
+			console.log("[CPULOAD] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
+			if (this.connection != null) {
+				console.log("[CPULOAD] > Closing the webSocket");
+				this.connection.close();
+				this.connection = null;
+			}
 		},
 		handleWebSocket: function() {
 			// Init the websocket for changes in the hosts list
