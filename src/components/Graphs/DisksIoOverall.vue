@@ -78,6 +78,7 @@ export default {
 
 		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
+			// Get how many iostats the hosts has.
 			axios
 				.get('https://server.speculare.cloud:9640/api/iostats_count?uuid=' + vm.uuid + '&size=' + vm.scaleTime)
 				.then(resp => {

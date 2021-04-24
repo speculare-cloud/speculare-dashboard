@@ -167,7 +167,7 @@ export default {
 			console.log("[CPULOAD] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (this.connection == null) {
 				console.log("[CPULOAD] > Setting a new webSocket");
-				this.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=load_avg&specific_filter=host_uuid.eq." + this.uuid);
+				this.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=loadavg&specific_filter=host_uuid.eq." + this.uuid);
 			}
 			this.connection.addEventListener('message', this.wsMessageHandle);
 		},
