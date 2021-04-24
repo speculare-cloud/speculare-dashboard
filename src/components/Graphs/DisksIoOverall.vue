@@ -25,7 +25,7 @@ export default {
 		return {
 			scaleTime: 300,
 			disksNumber: 0,
-			unit: "percentage",
+			unit: "mb/s",
 			connection: null,
 			datacollection: null,
 			loadingMessage: "Loading",
