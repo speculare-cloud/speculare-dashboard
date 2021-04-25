@@ -81,43 +81,38 @@ export default {
 			
 			// Fetching old data with the API
 			axios
-				.get('https://server.speculare.cloud:9640/api/cpustats?uuid=' + vm.uuid + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
+				.get(vm.getBaseUrl('cpustats', vm.uuid) + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
 				.then(resp => {
+					let dataLenght = resp.data.length;
 					// Add data in reverse order (push_back) and uPlot use last as most recent
-					for (let i = resp.data.length - 1; i >= 0; i--) {
+					for (let i = dataLenght - 1; i >= 0; i--) {
 						vm.fastAddNewData(resp.data[i]);
 					}
 
-					if (resp.data.length > 0) {
+					if (dataLenght > 0) {
 						// If there is data is wsBuffer we merge the data
-						if (vm.wsBuffer.length > 0) {
+						let wsBuffSize = vm.wsBuffer.length;
+						if (wsBuffSize > 0) {
 							console.log("[CPUSTATS] >>> Merging wsBuffer with already added data");
-							for (let i = 0; i <= vm.wsBuffer.length - 1; i++) {
-								let date = moment.utc(vm.wsBuffer[i][12]).unix();
+							for (let i = 0; i <= wsBuffSize - 1; i++) {
+								let currItem = vm.wsBuffer[i];
+								let date = moment.utc(currItem[12]).unix();
 								// If the current lastest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
-									let {usage, busy, idle} = this.getDataFromNewValues(vm.wsBuffer[i]);
-
+									// Compute the busy time of the CPU from these params
+									let busy = currItem[1] + currItem[2] + currItem[3] + currItem[6] + currItem[7] + currItem[8];
+									// Compute the idling time of the CPU from these params
+									let idle = currItem[4] + currItem[5];
+									// Get the usage in % computed from busy and idle + prev values
+									let usage = this.getUsageFrom(busy, idle);
 									console.log("[CPUSTATS] >>>> Adding value to the end of the buffer");
+									// Add the new value to the Array
 									vm.pushValue(date, usage, busy, idle);
 								}
 							}
 						}
-
-						// Be sure to handle correctly gaps in the graph, ...
-						vm.sanitizeGraphData(
-							vm.chartLabels.length,
-							vm.scaleTime,
-							vm.chartLabels,
-							5,
-							vm.spliceData,
-							vm.nullData
-						);
-
 						// Update onscreen values
 						vm.updateGraph();
-					} else {
-						vm.loadingMessage = "No Data"
 					}
 
 					// Define the fetching as done
@@ -127,6 +122,8 @@ export default {
 				})
 				.catch(error => {
 					console.log("[CPUSTATS] Failed to fetch previous data", error);
+				}).finally(() => {
+					vm.loadingMessage = "No Data"
 				});
 		},
 		// Empty every arrays and close the websocket
@@ -154,6 +151,17 @@ export default {
 		},
 		// Update the graph by setting datacollection to the new arrays
 		updateGraph: function() {
+			// Sanitize the Data in case of gap
+			// but also remove too old element
+			this.sanitizeGraphData(
+				this.chartLabels.length,
+				this.scaleTime,
+				this.chartLabels,
+				5,
+				this.spliceData,
+				this.nullData
+			);
+			// Update the datacollection so that uPlot update the chart
 			this.datacollection = [
 				this.chartLabels,
 				this.chartDataObj,
@@ -206,39 +214,7 @@ export default {
 				this.wsBuffer.push(newValues);
 			}
 		},
-		fastAddNewData: function(elem) {
-			// Compute the busy time of the CPU from these params
-			let busy = elem.cuser + elem.nice + elem.system + elem.irq + elem.softirq + elem.steal;
-			// Compute the idling time of the CPU from these params
-			let idle = elem.idle + elem.iowait;
-
-			let usage = null;
-			// If first item, we have nothing to compare it against, so null it
-			// Or if the previous does not exist, we can't compute the percent
-			let prevIndex = this.chartLabels.length - 1;
-			if (!(prevIndex == -1 || this.historyBusyDataObj[prevIndex] == null)) {
-				// Get the previous entry
-				let prevBusy = this.historyBusyDataObj[prevIndex];
-				let prevIdle = this.historyIdleDataObj[prevIndex];
-				// Compute the total of the previous and now
-				let prevTotal = prevBusy + prevIdle;
-				let total = busy + idle;
-				// Compute the different between both
-				let totald = total - prevTotal;
-				let idled = idle - prevIdle;
-				// Get the value as percent
-				usage = (totald - idled)/totald*100;
-			}
-
-			// Add the new value to the Array
-			this.pushValue(moment.utc(elem.created_at).unix(), usage, busy, idle);
-		},
-		getDataFromNewValues: function(newValues) {
-			// Compute the busy time of the CPU from these params
-			let busy = newValues[1] + newValues[2] + newValues[3] + newValues[6] + newValues[7] + newValues[8];
-			// Compute the idling time of the CPU from these params
-			let idle = newValues[4] + newValues[5];
-			
+		getUsageFrom: function(busy, idle) {
 			let usage = null;
 			// If the previous does not exist, we can't compute the percent
 			let prevIndex = this.chartLabels.length - 1;
@@ -256,24 +232,29 @@ export default {
 				usage = (totald - idled)/totald*100;
 			}
 
-			return {usage, busy, idle};
+			return usage;
+		},
+		fastAddNewData: function(elem) {
+			// Compute the busy time of the CPU from these params
+			let busy = elem.cuser + elem.nice + elem.system + elem.irq + elem.softirq + elem.steal;
+			// Compute the idling time of the CPU from these params
+			let idle = elem.idle + elem.iowait;
+			// Get the usage in % computed from busy and idle + prev values
+			let usage = this.getUsageFrom(busy, idle);
+
+			// Add the new value to the Array
+			this.pushValue(moment.utc(elem.created_at).unix(), usage, busy, idle);
 		},
 		addNewData: function(newValues) {
-			let {usage, busy, idle} = this.getDataFromNewValues(newValues);
+			// Compute the busy time of the CPU from these params
+			let busy = newValues[1] + newValues[2] + newValues[3] + newValues[6] + newValues[7] + newValues[8];
+			// Compute the idling time of the CPU from these params
+			let idle = newValues[4] + newValues[5];
+			// Get the usage in % computed from busy and idle + prev values
+			let usage = this.getUsageFrom(busy, idle);
 
 			// Add the new value to the Array
 			this.pushValue(moment.utc(newValues[12]).unix(), usage, busy, idle);
-
-			// Sanitize the Data in case of gap
-			// but also remove too old element
-			this.sanitizeGraphData(
-				this.chartLabels.length,
-				this.scaleTime,
-				this.chartLabels,
-				5,
-				this.spliceData,
-				this.nullData
-			);
 
 			// Update onscreen values
 			this.updateGraph();

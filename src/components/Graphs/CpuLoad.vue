@@ -113,42 +113,33 @@ export default {
 
 			// Fetching old data with the API
 			axios
-				.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
+				.get(vm.getBaseUrl('loadavg', vm.uuid) + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
 				.then(resp => {
+					let dataLenght = resp.data.length;
 					// Add data in reverse order (push_back) and uPlot use last as most recent
-					for (let i = resp.data.length - 1; i >= 0; i--) {
+					for (let i = dataLenght - 1; i >= 0; i--) {
 						vm.fastAddNewData(resp.data[i]);
 					}
 
-					if (resp.data.length > 0) {
+					if (dataLenght > 0) {
 						// If there is data is wsBuffer we merge the data
-						if (vm.wsBuffer.length > 0) {
+						let wsBuffSize = vm.wsBuffer.length;
+						if (wsBuffSize > 0) {
 							console.log("[CPULOAD] >>> Merging wsBuffer with already added data");
-							for (let i = 0; i <= vm.wsBuffer.length - 1; i++) {
-								let date = moment.utc(vm.wsBuffer[i][5]).unix();
+							for (let i = 0; i <= wsBuffSize - 1; i++) {
+								let currItem = vm.wsBuffer[i];
+								let date = moment.utc(currItem[5]).unix();
 								// If the current lastest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
 									console.log("[CPULOAD] >>>> Adding value to the end of the buffer");
-									vm.pushValue(date, vm.wsBuffer[i][1], vm.wsBuffer[i][2], vm.wsBuffer[i][3]);
+									// Add the new value to the Array
+									vm.pushValue(date, currItem[1], currItem[2], currItem[3]);
 								}
 							}
 						}
 
-						// Be sure to handle correctly gaps in the graph, ...
-						vm.sanitizeGraphData(
-							vm.chartLabels.length,
-							vm.scaleTime,
-							vm.chartLabels,
-							5,
-							vm.spliceData,
-							vm.nullData
-						);
-
 						// Update onscreen values
 						vm.updateGraph();
-					} else {
-						// If we're here, that mean the API call returned no data
-						vm.loadingMessage = "No Data"
 					}
 
 					// Define the fetching as done
@@ -158,6 +149,8 @@ export default {
 				})
 				.catch(error => {
 					console.log("[CPULOAD] Failed to fetch previous data", error);
+				}).finally(() => {
+					vm.loadingMessage = "No Data"
 				});
 		},
 		// Empty every arrays and close the websocket
@@ -185,6 +178,17 @@ export default {
 		},
 		// Update the graph by setting datacollection to the new arrays
 		updateGraph: function() {
+			// Sanitize the Data in case of gap
+			// but also remove too old element
+			this.sanitizeGraphData(
+				this.chartLabels.length,
+				this.scaleTime,
+				this.chartLabels,
+				5,
+				this.spliceData,
+				this.nullData
+			);
+			// Update the datacollection so that uPlot update the chart
 			this.datacollection = [
 				this.chartLabels, 
 				this.chartDataObjOne, 
@@ -246,17 +250,6 @@ export default {
 		addNewData: function(newValues) {
 			// Add the new value to the Array
 			this.pushValue(moment.utc(newValues[5]).unix(), newValues[1], newValues[2], newValues[3]);
-
-			// Sanitize the Data in case of gap
-			// but also remove too old element
-			this.sanitizeGraphData(
-				this.chartLabels.length,
-				this.scaleTime,
-				this.chartLabels,
-				5,
-				this.spliceData,
-				this.nullData
-			);
 
 			// Update onscreen values
 			this.updateGraph();

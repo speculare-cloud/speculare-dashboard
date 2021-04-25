@@ -5,6 +5,9 @@ const _spline = uPlot.paths.spline();
 
 const sanitizeGraphData = {
     methods: {
+        getBaseUrl: function(table, uuid) {
+            return 'https://server.speculare.cloud:9640/api/' + table + '?uuid=' + uuid;
+        },
         getMinMaxNowString: function(scaleTime) {
             // Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
             let min = moment().utc().subtract(scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
