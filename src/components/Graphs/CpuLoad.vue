@@ -107,9 +107,10 @@ export default {
 			// Observe if the $el is visible or not
 			return new IntersectionObserver((entries) => {
 				if (entries[0].intersectionRatio > 0) {
-					// TODO - Loading informations and init the websocket
+					// Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
 					let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
-					let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
+					// Add 5 seconds to minimize the risks of missing data
+					let max = moment().utc().add(5, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
 					axios
 						.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
 						.then(resp => {

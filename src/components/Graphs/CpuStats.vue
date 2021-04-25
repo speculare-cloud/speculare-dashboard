@@ -65,7 +65,7 @@ export default {
 
 	beforeDestroy: function() {
 		// Close the webSocket connection
-		vm.closeWebSocket();
+		this.closeWebSocket();
 	},
 
 	methods: {
@@ -75,9 +75,10 @@ export default {
 			// Observe if the $el is visible or not
 			return new IntersectionObserver((entries) => {
 				if (entries[0].intersectionRatio > 0) {
-					// TODO - Loading informations and init the websocket
+					// Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
 					let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
-					let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
+					// Add 5 seconds to minimize the risks of missing data
+					let max = moment().utc().add(5, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
 					axios
 						.get('https://server.speculare.cloud:9640/api/cpustats?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
 						.then(resp => {
@@ -181,11 +182,11 @@ export default {
 			let usage = null;
 			// If first item, we have nothing to compare it against, so null it
 			// Or if the previous does not exist, we can't compute the percent
-			let prevIndex = this.historyBusyDataObj.length - 1;
-			if (!(prevIndex == -1 || this.historyBusyDataObj[prevIndex - 1] == null)) {
+			let prevIndex = this.chartLabels.length - 1;
+			if (!(prevIndex == -1 || this.historyBusyDataObj[prevIndex] == null)) {
 				// Get the previous entry
-				let prevBusy = this.historyBusyDataObj[prevIndex - 1];
-				let prevIdle = this.historyIdleDataObj[prevIndex - 1];
+				let prevBusy = this.historyBusyDataObj[prevIndex];
+				let prevIdle = this.historyIdleDataObj[prevIndex];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;
@@ -207,11 +208,11 @@ export default {
 			
 			let usage = null;
 			// If the previous does not exist, we can't compute the percent
-			let prevIndex = this.historyBusyDataObj.length - 1;
-			if (!(this.historyBusyDataObj[prevIndex - 1] == null)) {
+			let prevIndex = this.chartLabels.length - 1;
+			if (!(this.historyBusyDataObj[prevIndex] == null)) {
 				// Get the previous entry
-				let prevBusy = this.historyBusyDataObj[prevIndex - 1];
-				let prevIdle = this.historyIdleDataObj[prevIndex - 1];
+				let prevBusy = this.historyBusyDataObj[prevIndex];
+				let prevIdle = this.historyIdleDataObj[prevIndex];
 				// Compute the total of the previous and now
 				let prevTotal = prevBusy + prevIdle;
 				let total = busy + idle;
@@ -223,6 +224,9 @@ export default {
 			}
 
 			// Add the new value to the Array
+			// I sometime miss a previous value due to the delay for the websocket
+			// this happen just before the loading - the websocket is not yet ready but a new
+			// value would have been added for the history.
 			this.pushValue(moment.utc(newValues[12]).unix(), usage, busy, idle);
 
 			// Sanitize the Data in case of gap

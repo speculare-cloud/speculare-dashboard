@@ -84,7 +84,7 @@ export default {
 
 	beforeDestroy: function() {
 		// Close the webSocket connection
-		vm.closeWebSocket();
+		this.closeWebSocket();
 	},
 
 	methods: {
@@ -101,9 +101,10 @@ export default {
 							vm.disksNumber = resp.data;
 							vm.bufferDataWs = [];
 
-							// Fetch previous data
+							// Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
 							let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
-							let max = moment().utc().format("YYYY-MM-DDTHH:mm:ss.SSS");
+							// Add 5 seconds to minimize the risks of missing data
+							let max = moment().utc().add(5, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
 							axios
 								.get('https://server.speculare.cloud:9640/api/iostats?uuid=' + vm.uuid + '&size=' + (vm.scaleTime * vm.disksNumber) + '&min_date=' + min + '&max_date=' + max)
 								.then(resp => {
@@ -243,11 +244,11 @@ export default {
 			let write = null;
 			// If first item, we have nothing to compare it against, so null it
 			// Or if the previous does not exist, we can't compute the percent
-			let prevIndex = this.historyDataRead.length - 1;
-			if (!(prevIndex == -1 || this.historyDataRead[prevIndex - 1] == null)) {
+			let prevIndex = this.chartLabels.length - 1;
+			if (!(prevIndex == -1 || this.historyDataRead[prevIndex] == null)) {
 				// Get the previous values
-				let prevRead = this.historyDataRead[prevIndex - 1];
-				let prevWrite = this.historyDataWrite[prevIndex - 1];
+				let prevRead = this.historyDataRead[prevIndex];
+				let prevWrite = this.historyDataWrite[prevIndex];
 
 				// Dividing by 1000000 to get mb
 				read = (total_read - prevRead) / 1000000;
@@ -269,11 +270,11 @@ export default {
 			let read = null;
 			let write = null;
 			// If the previous does not exist, we can't compute the percent
-			let prevIndex = this.historyDataRead.length - 1;
-			if (!(this.historyDataRead[prevIndex - 1] == null)) {
+			let prevIndex = this.chartLabels.length - 1;
+			if (!(this.historyDataRead[prevIndex] == null)) {
 				// Get the previous values
-				let prevRead = this.historyDataRead[prevIndex - 1];
-				let prevWrite = this.historyDataWrite[prevIndex - 1];
+				let prevRead = this.historyDataRead[prevIndex];
+				let prevWrite = this.historyDataWrite[prevIndex];
 
 				// Dividing by 1000000 to get mb
 				read = (total_read - prevRead) / 1000000;
@@ -281,6 +282,9 @@ export default {
 			}
 
 			// Add the new value to the Array
+			// I sometime miss a previous value due to the delay for the websocket
+			// this happen just before the loading - the websocket is not yet ready but a new
+			// value would have been added for the history.
 			this.pushValue(date_obj, read, write, total_read, total_write);
 
 			// Be sure to handle correctly gaps in the graph, ...
