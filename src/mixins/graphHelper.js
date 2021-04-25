@@ -5,6 +5,13 @@ const _spline = uPlot.paths.spline();
 
 const sanitizeGraphData = {
     methods: {
+        getMinMaxNowString: function(scaleTime) {
+            // Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
+            let min = moment().utc().subtract(scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
+            // Add 5 seconds to minimize the risks of missing data
+            let max = moment().utc().add(5, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
+            return '&min_date=' + min + '&max_date=' + max;
+        },
         splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
             return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip);
         },

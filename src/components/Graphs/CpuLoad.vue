@@ -10,13 +10,14 @@
 <script>
 import LineChart from '@/components/Graphs/LineChart';
 import graphHelper from '@/mixins/graphHelper';
+import constructObs from '@/mixins/constructObs';
 import axios from 'axios';
 import moment from 'moment';
 
 export default {
 	name: 'cpuload',
 	props: ['uuid'],
-	mixins: [graphHelper],
+	mixins: [graphHelper, constructObs],
 	components: {
 		LineChart
 	},
@@ -26,6 +27,7 @@ export default {
 			scaleTime: 300,
 			unit: "load",
 			connection: null,
+			fetchingDone: false,
 			datacollection: null,
 			loadingMessage: "Loading",
 			chartSeries: [
@@ -79,6 +81,7 @@ export default {
 					fill:              "#DA70D61A",
 				})
 			],
+			wsBuffer: [],
 			chartLabels: [],
 			chartDataObjOne: [],
 			chartDataObjFive: [],
@@ -91,7 +94,10 @@ export default {
 
 		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
-			vm.initObserver().observe(vm.$el);
+			// Setup the IntersectionObserver
+			// call to the vm.handleWebSocket if we're in realtime,
+			// otherwise just call vm.fetching
+			vm.constructObs(vm.handleWebSocket, vm.cleaning).observe(vm.$el);
 		});
 	},
 
@@ -101,72 +107,83 @@ export default {
 	},
 
 	methods: {
-		initObserver: function() {
+		// Function responsible to init the fetching data and the websocket connection
+		fetching: function() {
 			let vm = this;
 
-			// Observe if the $el is visible or not
-			return new IntersectionObserver((entries) => {
-				if (entries[0].intersectionRatio > 0) {
-					// Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
-					let min = moment().utc().subtract(vm.scaleTime, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
-					// Add 5 seconds to minimize the risks of missing data
-					let max = moment().utc().add(5, 'seconds').format("YYYY-MM-DDTHH:mm:ss.SSS");
-					axios
-						.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + '&min_date=' + min + '&max_date=' + max)
-						.then(resp => {
-							// Add data in reverse order (push_back) and uPlot use last as most recent
-							for (let i = resp.data.length - 1; i >= 0; i--) {
-								vm.fastAddNewData(resp.data[i]);
+			// Fetching old data with the API
+			axios
+				.get('https://server.speculare.cloud:9640/api/loadavg?uuid=' + vm.uuid + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
+				.then(resp => {
+					// Add data in reverse order (push_back) and uPlot use last as most recent
+					for (let i = resp.data.length - 1; i >= 0; i--) {
+						vm.fastAddNewData(resp.data[i]);
+					}
+
+					if (resp.data.length > 0) {
+						// If there is data is wsBuffer we merge the data
+						if (vm.wsBuffer.length > 0) {
+							console.log("[CPULOAD] >>> Merging wsBuffer with already added data");
+							for (let i = 0; i <= vm.wsBuffer.length - 1; i++) {
+								let date = moment.utc(vm.wsBuffer[i][5]).unix();
+								// If the current lastest date is lower than the date in the buffer
+								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
+									console.log("[CPULOAD] >>>> Adding value to the end of the buffer");
+									vm.pushValue(date, vm.wsBuffer[i][1], vm.wsBuffer[i][2], vm.wsBuffer[i][3]);
+								}
 							}
+						}
 
-							if (resp.data.length > 0) {
-								// Be sure to handle correctly gaps in the graph, ...
-								vm.sanitizeGraphData(
-									vm.chartLabels.length,
-									vm.scaleTime,
-									vm.chartLabels,
-									5,
-									vm.spliceData,
-									vm.nullData
-								);
+						// Be sure to handle correctly gaps in the graph, ...
+						vm.sanitizeGraphData(
+							vm.chartLabels.length,
+							vm.scaleTime,
+							vm.chartLabels,
+							5,
+							vm.spliceData,
+							vm.nullData
+						);
 
-								// Update onscreen values
-								vm.updateGraph();
-							} else {
-								vm.loadingMessage = "No Data"
-							}
-						})
-						.catch(error => {
-							console.log("[CPULOAD] Failed to fetch previous data", error);
-						});
+						// Update onscreen values
+						vm.updateGraph();
+					} else {
+						// If we're here, that mean the API call returned no data
+						vm.loadingMessage = "No Data"
+					}
 
-					vm.handleWebSocket();
-				} else {
-					// TODO - Destroy websocket and free some memory
-					vm.chartLabels = [];
-					vm.chartDataObjOne = [];
-					vm.chartDataObjFive = [];
-					vm.chartDataObjFitheen = [];
-					vm.closeWebSocket();
-				};
-			}, {
-				// Trigger 100px before and after
-				rootMargin: '100px 0px 100px 0px',
-				// Trigger as soon as 0.001 is in the threttleshot
-				threshold: 0.001
-			});
+					// Define the fetching as done
+					vm.fetchingDone = true;
+					// Clear the wsBuffer
+					vm.wsBuffer = [];
+				})
+				.catch(error => {
+					console.log("[CPULOAD] Failed to fetch previous data", error);
+				});
 		},
+		// Empty every arrays and close the websocket
+		cleaning: function() {
+			this.fetchingDone = false;
+			this.chartLabels = [];
+			this.chartDataObjOne = [];
+			this.chartDataObjFive = [];
+			this.chartDataObjFitheen = [];
+			this.wsBuffer = [];
+			this.closeWebSocket();
+		},
+		// Null the data of an index (without nulling the Labels)
 		nullData: function(i) {
 			this.chartDataObjOne[i] = null;
 			this.chartDataObjFive[i] = null;
 			this.chartDataObjFitheen[i] = null;
 		},
+		// Remove one index from each data arrays
 		spliceData: function(i) {
 			this.chartLabels.splice(i, 1);
 			this.chartDataObjOne.splice(i, 1);
 			this.chartDataObjFive.splice(i, 1);
 			this.chartDataObjFitheen.splice(i, 1);
 		},
+		// Update the graph by setting datacollection to the new arrays
 		updateGraph: function() {
 			this.datacollection = [
 				this.chartLabels, 
@@ -175,12 +192,14 @@ export default {
 				this.chartDataObjFitheen
 			];
 		},
+		// Add values (Labels and data) to the arrays
 		pushValue: function(date, one, five, fith) {
 			this.chartLabels.push(date);
 			this.chartDataObjOne.push(Math.round(one * 100) / 100);
 			this.chartDataObjFive.push(Math.round(five * 100) / 100);
 			this.chartDataObjFitheen.push(Math.round(fith * 100) / 100);
 		},
+		// Pretty explicit, but close the websocket and set null for the connection
 		closeWebSocket: function() {
 			console.log("[CPULOAD] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
 			if (this.connection != null) {
@@ -189,22 +208,36 @@ export default {
 				this.connection = null;
 			}
 		},
+		// Init the websocket for changes in the hosts list
 		handleWebSocket: function() {
-			// Init the websocket for changes in the hosts list
+			let vm = this;
+
 			console.log("[CPULOAD] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
-			if (this.connection == null) {
+			if (vm.connection == null) {
 				console.log("[CPULOAD] > Setting a new webSocket");
-				this.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=loadavg&specific_filter=host_uuid.eq." + this.uuid);
+				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=loadavg&specific_filter=host_uuid.eq." + vm.uuid);
 			}
-			this.connection.addEventListener('message', this.wsMessageHandle);
+			// only add the open (at least for the vm.fetching) if we're in realtime
+			vm.connection.addEventListener('open', function() {
+				console.log("[CPULOAD] >> webSocket opened");
+				vm.fetching();
+			});
+			// Setup onmessage listener
+			vm.connection.addEventListener('message', vm.wsMessageHandle);
 		},
 		wsMessageHandle: function(event) {
 			// Parse the data and extract newValue
 			let json = JSON.parse(event.data);
 			let newValues = json["columnvalues"];
 
-			// Add the new data to the graph
-			this.addNewData(newValues);
+			if (this.fetchingDone) {
+				// Add the new data to the graph
+				this.addNewData(newValues);
+			} else {
+				// Add the value to the wsBuffer
+				console.log("[CPULOAD] >> Adding value to the wsBuffer (WS opened but fetching not done yet)")
+				this.wsBuffer.push(newValues);
+			}
 		},
 		fastAddNewData: function(elem) {
 			// Add the new value to the Array
