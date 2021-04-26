@@ -31,7 +31,7 @@
 				<a :href="href" @click="navigate">
 					<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
 						<div class="flex justify-center items-center bg-green-400 rounded-full w-12 h-12">
-							<img :src="require('@/assets/imgs/os/'+ lower(item.system) +'.svg')" class="w-8 h-8" width="2rem" height="2rem"/>
+							<img :src="require('@/assets/imgs/os/'+ lower(item.system) +'.svg')" :alt="item.system" class="w-8 h-8" width="2rem" height="2rem"/>
 						</div>
 						<div class="py-1 ml-4">
 							<h3 class="font-medium">{{ item.hostname }}</h3>
