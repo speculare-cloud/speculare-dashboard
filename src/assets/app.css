@@ -1,4 +1,3 @@
-@import '~material-design-icons/iconfont/material-icons.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,4 +30,8 @@ body,
         opacity: 0;
         transition-property: left, top, opacity;
     }
+}
+
+svg {
+    fill: currentColor;
 }

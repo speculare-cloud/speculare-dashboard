@@ -5,9 +5,9 @@
 				<li class="inline-flex items-center">
 					<router-link to="/" v-slot="{ href, navigate }" custom>
 						<a :href="href" @click="navigate">
-							<span class="w-6 h-6 material-icons block">
-								home
-							</span>
+							<svg class="h-6 w-6">
+    							<use xlink:href="@/assets/imgs/home.svg#home" />
+  							</svg>
 						</a>
 					</router-link>
 					<svg class="h-5 w-auto" fill="currentColor" viewBox="0 0 20 20">

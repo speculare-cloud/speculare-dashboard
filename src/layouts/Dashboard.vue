@@ -18,25 +18,25 @@
 				<nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block pl-4 pr-4 md:pr-0 pb-4 md:pb-0 md:overflow-y-auto">
 					<router-link to="/hosts" v-slot="{ href, navigate, isExactActive }" custom>
 						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
-								format_list_bulleted
-							</span>
+							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
+    							<use xlink:href="@/assets/imgs/list.svg#list" />
+  							</svg>
 							<div>Hosts list</div>
 						</a>
 					</router-link>
 					<router-link to="/alarms" v-slot="{ href, navigate, isExactActive }" custom>
 						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
-								notifications
-							</span>
+							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
+    							<use xlink:href="@/assets/imgs/notifications.svg#notifications" />
+  							</svg>
 							<div>Alarms</div>
 						</a>
 					</router-link>
 					<router-link to="/settings" v-slot="{ href, navigate, isExactActive }" custom>
 						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
-							<span class="h-6 w-6 mr-3 material-icons" :class="[isExactActive ? 'text-green-300' : '']">
-								settings
-							</span>
+							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
+    							<use xlink:href="@/assets/imgs/settings.svg#settings" />
+  							</svg>
 							<div>Settings</div>
 						</a>
 					</router-link>
