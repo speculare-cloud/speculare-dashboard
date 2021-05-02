@@ -1,5 +1,5 @@
 <template>
-	<div class="cpustats">
+	<div class="cputimes">
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
 			<h3>{{ this.loadingMessage }}</h3>
 		</div>
@@ -15,7 +15,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 export default {
-	name: 'cpustats',
+	name: 'cputimes',
 	props: ['uuid'],
 	mixins: [graphHelper, constructObs],
 	components: {
@@ -81,7 +81,7 @@ export default {
 			
 			// Fetching old data with the API
 			axios
-				.get(vm.getBaseUrl('cpustats', vm.uuid) + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
+				.get(vm.getBaseUrl('cputimes', vm.uuid) + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
 				.then(resp => {
 					let dataLenght = resp.data.length;
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -93,7 +93,7 @@ export default {
 						// If there is data is wsBuffer we merge the data
 						let wsBuffSize = vm.wsBuffer.length;
 						if (wsBuffSize > 0) {
-							console.log("[CPUSTATS] >>> Merging wsBuffer with already added data");
+							console.log("[CPUTIMES] >>> Merging wsBuffer with already added data");
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								let currItem = vm.wsBuffer[i];
 								let date = moment.utc(currItem[12]).unix();
@@ -105,7 +105,7 @@ export default {
 									let idle = currItem[4] + currItem[5];
 									// Get the usage in % computed from busy and idle + prev values
 									let usage = this.getUsageFrom(busy, idle);
-									console.log("[CPUSTATS] >>>> Adding value to the end of the buffer");
+									console.log("[CPUTIMES] >>>> Adding value to the end of the buffer");
 									// Add the new value to the Array
 									vm.pushValue(date, usage, busy, idle);
 								}
@@ -121,7 +121,7 @@ export default {
 					vm.wsBuffer = [];
 				})
 				.catch(error => {
-					console.log("[CPUSTATS] Failed to fetch previous data", error);
+					console.log("[CPUTIMES] Failed to fetch previous data", error);
 				}).finally(() => {
 					vm.loadingMessage = "No Data"
 				});
@@ -176,9 +176,9 @@ export default {
 		},
 		// Pretty explicit, but close the websocket and set null for the connection
 		closeWebSocket: function() {
-			console.log("[CPUSTATS] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
+			console.log("[CPUTIMES] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
 			if (this.connection != null) {
-				console.log("[CPUSTATS] > Closing the webSocket");
+				console.log("[CPUTIMES] > Closing the webSocket");
 				this.connection.close();
 				this.connection = null;
 			}
@@ -187,14 +187,14 @@ export default {
 		handleWebSocket: function() {
 			let vm = this;
 
-			console.log("[CPUSTATS] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
+			console.log("[CPUTIMES] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (vm.connection == null) {
-				console.log("[CPUSTATS] > Setting a new webSocket");
-				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=cpustats&specific_filter=host_uuid.eq." + vm.uuid);
+				console.log("[CPUTIMES] > Setting a new webSocket");
+				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=cputimes&specific_filter=host_uuid.eq." + vm.uuid);
 			}
 			// only add the open (at least for the vm.fetching) if we're in realtime
 			vm.connection.addEventListener('open', function() {
-				console.log("[CPUSTATS] >> webSocket opened");
+				console.log("[CPUTIMES] >> webSocket opened");
 				vm.fetching();
 			});
 			// Setup onmessage listener
@@ -210,7 +210,7 @@ export default {
 				this.addNewData(newValues);
 			} else {
 				// Add the value to the wsBuffer
-				console.log("[CPUSTATS] >> Adding value to the wsBuffer (WS opened but fetching not done yet)")
+				console.log("[CPUTIMES] >> Adding value to the wsBuffer (WS opened but fetching not done yet)")
 				this.wsBuffer.push(newValues);
 			}
 		},

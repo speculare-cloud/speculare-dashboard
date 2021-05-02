@@ -31,7 +31,7 @@
 		<div role="section" class="mt-8">
 			<h3 class="text-2xl text-gray-100 mb-4">CPU</h3>
 			<h4 class="text-lg text-gray-200">Utilization</h4>
-			<CpuStats :uuid="this.$route.params.uuid"/>
+			<CpuTimes :uuid="this.$route.params.uuid"/>
 			<h4 class="text-lg text-gray-200 mt-4">Load</h4>
 			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
@@ -49,14 +49,14 @@ import Skeleton from '@/components/Graphs/Skeleton';
 export default {
 	name: 'Details',
 	components: {
+		CpuTimes: () => ({
+			component: import('@/components/Graphs/CpuTimes'),
+			loading: Skeleton
+		}),
 		CpuLoad: () => ({
       		component: import('@/components/Graphs/CpuLoad.vue'),
       		loading: Skeleton,
     	}),
-		CpuStats: () => ({
-			component: import('@/components/Graphs/CpuStats'),
-			loading: Skeleton
-		}),
 		DisksIoOverall: () => ({
 			component: import('@/components/Graphs/DisksIoOverall'),
 			loading: Skeleton

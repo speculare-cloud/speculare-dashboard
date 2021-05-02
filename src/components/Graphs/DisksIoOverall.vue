@@ -286,8 +286,8 @@ export default {
 			let total_write = 0;
 			// Compute total read and write from all disks
 			for (let i = 0; i < this.disksNumber; i++) {
-				total_read += elem[i].bytes_read;
-				total_write += elem[i].bytes_wrtn;
+				total_read += elem[i].read_bytes;
+				total_write += elem[i].write_bytes;
 			}
 
 			let {read, write} = this.getReadWriteFrom(total_read, total_write);
@@ -300,14 +300,14 @@ export default {
 			let total_write = 0;
 			// Compute total read and write from all disks
 			for (let i = 0; i < this.bufferDataWs.length; i++) {
-				total_read += this.bufferDataWs[i][2];
-				total_write += this.bufferDataWs[i][3];
+				total_read += this.bufferDataWs[i][3];
+				total_write += this.bufferDataWs[i][5];
 			}
 
 			let {read, write} = this.getReadWriteFrom(total_read, total_write);
 
 			// Add the new value to the Array
-			this.pushValue(moment.utc(this.bufferDataWs[0][5]).unix(), read, write, total_read, total_write);
+			this.pushValue(moment.utc(this.bufferDataWs[0][8]).unix(), read, write, total_read, total_write);
 
 			// Update onscreen values
 			this.updateGraph();
