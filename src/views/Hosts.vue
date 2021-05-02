@@ -30,7 +30,7 @@
 			<router-link v-for="item in this.$store.state.hosts_values" v-bind:key="item.uuid" :to="{ name: 'hosts_details', params: { hostname: item.hostname, uuid: item.uuid} }" v-slot="{ href, navigate }" custom>
 				<a :href="href" @click="navigate">
 					<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-						<div class="flex justify-center items-center bg-green-400 rounded-full w-12 h-12">
+						<div class="flex justify-center items-center border-solid border-2 border-green-300 rounded-full w-12 h-12">
 							<img :src="require('@/assets/imgs/os/'+ lower(item.system) +'.svg')" :alt="item.system" class="w-8 h-8" width="2rem" height="2rem"/>
 						</div>
 						<div class="py-1 ml-4">
