@@ -219,7 +219,7 @@ export default {
 			console.log("[CPULOAD] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (vm.connection == null) {
 				console.log("[CPULOAD] > Setting a new webSocket");
-				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=loadavg&specific_filter=host_uuid.eq." + vm.uuid);
+				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?change_table=loadavg&change_type=insert&specific_filter=host_uuid.eq." + vm.uuid);
 			}
 			// only add the open (at least for the vm.fetching) if we're in realtime
 			vm.connection.addEventListener('open', function() {
