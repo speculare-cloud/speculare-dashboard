@@ -22,7 +22,7 @@
         "@vue/cli-plugin-vuex": "~4.5.12",
         "@vue/cli-service": "^4.5.12",
         "autoprefixer": "^9.8.6",
-        "postcss": "^7.0.35",
+        "postcss": "^8.2.14",
         "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0",
         "vue-template-compiler": "^2.6.12"
     }
