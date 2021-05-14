@@ -3,10 +3,8 @@
 		<h2 v-if="this.$store.state.category.length" class="text-lg font-medium leading-normal mb-4 text-gray-200">Groups</h2>
 		<div v-if="this.$store.state.category.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:xl:grid-cols-5 gap-4 mb-8">
 			<div v-for="item in this.$store.state.category" v-bind:key="item.id" class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-				<div class="flex justify-center items-center rounded-full w-12 h-12" v-bind:style="{ backgroundColor: item.color }">
-					<span class="h-6 w-6 material-icons cursor-default">
-						{{ item.icon }}
-					</span>
+				<div class="flex justify-center items-center rounded-full w-12 h-12" style="background-color: #004878">
+					<img :src="require('@/assets/imgs/server.svg')" :alt="item.system" class="w-6 h-8" width="2rem" height="2rem"/>
 				</div>
 				<div class="py-1 ml-4">
 					<h3 class="font-medium">{{ item.name }}</h3>
@@ -30,8 +28,8 @@
 			<router-link v-for="item in this.$store.state.hosts_values" v-bind:key="item.uuid" :to="{ name: 'hosts_details', params: { hostname: item.hostname, uuid: item.uuid} }" v-slot="{ href, navigate }" custom>
 				<a :href="href" @click="navigate">
 					<div class="flex items-center text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200">
-						<div class="flex justify-center items-center border-solid border-2 border-green-300 rounded-full w-12 h-12">
-							<img :src="require('@/assets/imgs/os/'+ lower(item.system) +'.svg')" :alt="item.system" class="w-8 h-8" width="2rem" height="2rem"/>
+						<div class="flex justify-center items-center rounded-full w-12 h-12" style="background-color: #004878">
+							<img :src="require('@/assets/imgs/server.svg')" :alt="item.system" class="w-6 h-8" width="2rem" height="2rem"/>
 						</div>
 						<div class="py-1 ml-4">
 							<h3 class="font-medium">{{ item.hostname }}</h3>
