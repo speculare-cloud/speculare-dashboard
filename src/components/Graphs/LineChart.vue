@@ -13,7 +13,8 @@ export default {
 			default: null
     	},
 		chartseries: Array,
-		unit: String
+		unit: String,
+		yscale: Array
   	},
 
 	data () {
@@ -146,16 +147,17 @@ export default {
 						ticks: {
 							width: 1 / devicePixelRatio,
 							stroke: "#2c3235",
-						}
+						},
 					},
 				],
 				scales: {
 					x: {
 						time: true,
 					},
-					y: {
-						auto: true,
-					},
+					y: this.yscale && this.yscale.length ? {
+						auto: false,
+						range: this.yscale,
+					} : { auto: true },
 				}
 			};
 			this.chart = new uPlot(opts, data, this.$refs.uniqueName);

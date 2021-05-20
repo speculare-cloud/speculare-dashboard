@@ -18,9 +18,6 @@
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
-#notfound {
-	background-color: rgb(17, 24, 39);
-}
 * {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box
@@ -32,6 +29,7 @@ body {
 }
 
 #notfound {
+	background-color: rgb(17, 24, 39);
 	position: relative;
 	height: 100vh
 }

@@ -3,7 +3,7 @@
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
 			<h3>{{ this.loadingMessage }}</h3>
 		</div>
-		<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
+		<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" :yscale="[0, 100]" />
 	</div>
 </template>
 
@@ -33,7 +33,7 @@ export default {
 			chartSeries: [
 				{},
 				Object.assign({
-					label: "overall",
+					label: "user & system",
 					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false

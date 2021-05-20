@@ -273,7 +273,8 @@ export default {
 				// Get the previous values
 				let prevRead = this.historyDataRead[prevIndex];
 				let prevWrite = this.historyDataWrite[prevIndex];
-
+				
+				// TODO - Auto scale to kb/mb/gb depending on the values
 				// Dividing by 1000000 to get mb
 				read = (total_read - prevRead) / 1000000;
 				write = -((total_write - prevWrite) / 1000000);
