@@ -24,7 +24,7 @@ export default {
 			// Get initial list of hosts (don't wait for websocket to add them at first)
 			// If we wait for the websocket this would take a long time...
 			axios
-				.get('https://server.speculare.cloud:9640/api/hosts')
+				.get('https://server.speculare.cloud/api/hosts')
 				.then(resp => {
 					resp.data.forEach(elem => {
 						// Construct newObj to add to the list
