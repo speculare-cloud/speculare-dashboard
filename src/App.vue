@@ -77,7 +77,7 @@ export default {
 			console.log("[HOSTS] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (vm.connection == null) {
 				console.log("[HOSTS] > Setting a new webSocket");
-				vm.connection = new WebSocket("wss://cdc.speculare.cloud:9641/ws?query=update:hosts");
+				vm.connection = new WebSocket("wss://cdc.speculare.cloud/ws?query=update:hosts");
 			}
 			vm.connection.addEventListener('message', vm.wsMessageHandle);
 		},
