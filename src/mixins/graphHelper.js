@@ -6,7 +6,7 @@ const _spline = uPlot.paths.spline();
 const sanitizeGraphData = {
     methods: {
         getBaseUrl: function(table, uuid) {
-            return 'https://server.speculare.cloud/api/' + table + '?uuid=' + uuid;
+            return this.$apiBaseUrl + '/api/' + table + '?uuid=' + uuid;
         },
         getMinMaxNowString: function(scaleTime) {
             // Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph

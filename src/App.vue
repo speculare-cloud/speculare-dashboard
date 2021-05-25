@@ -24,7 +24,7 @@ export default {
 			// Get initial list of hosts (don't wait for websocket to add them at first)
 			// If we wait for the websocket this would take a long time...
 			axios
-				.get('https://server.speculare.cloud/api/hosts')
+				.get(vm.$apiBaseUrl + '/api/hosts')
 				.then(resp => {
 					resp.data.forEach(elem => {
 						// Construct newObj to add to the list
@@ -77,7 +77,7 @@ export default {
 			console.log("[HOSTS] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
 			if (vm.connection == null) {
 				console.log("[HOSTS] > Setting a new webSocket");
-				vm.connection = new WebSocket("wss://cdc.speculare.cloud/ws?query=update:hosts");
+				vm.connection = new WebSocket(vm.$wsBaseUrl + "/ws?query=update:hosts");
 			}
 			vm.connection.addEventListener('message', vm.wsMessageHandle);
 		},
