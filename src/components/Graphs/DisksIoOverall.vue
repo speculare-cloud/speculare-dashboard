@@ -33,38 +33,26 @@ export default {
 			loadingMessage: "Loading",
 			chartSeries: [
 				{},
-				Object.assign({
+				{
 					label: "read",
 					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
 					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
-					drawStyle: 2,
-					lineInterpolation: null,
-					paths: this.splineGraph,
-				}, {
-					drawStyle:         0,
-					lineInterpolation: 1,
-					stroke:            "#7EB26D",
-					fill:              "#7EB26D1A",
-				}),
-				Object.assign({
+					stroke: "#7EB26D",
+					fill: "#7EB26D1A",
+				},
+				{
 					label: "write",
 					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
 					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
-					drawStyle: 2,
-					lineInterpolation: null,
-					paths: this.splineGraph,
-				}, {
-					drawStyle:         0,
-					lineInterpolation: 1,
-					stroke:            "#DA70D6",
-					fill:              "#DA70D61A",
-				})
+					stroke: "#DA70D6",
+					fill: "#DA70D61A",
+				}
 			],
 			wsBuffer: [],
 			chartLabels: [],

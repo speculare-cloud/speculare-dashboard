@@ -32,22 +32,16 @@ export default {
 			loadingMessage: "Loading",
 			chartSeries: [
 				{},
-				Object.assign({
+				{
 					label: "user & system",
 					value: (_, v) => v == null ? "-" : v.toFixed(2),
 					points: {
 						show: false
 					},
 					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
-					drawStyle: 2,
-					lineInterpolation: null,
-					paths: this.splineGraph,
-				}, {
-					drawStyle:         0,
-					lineInterpolation: 1,
-					stroke:            "#EAB839",
-					fill:              "#EAB8391A",
-				})
+					stroke: "#EAB839",
+					fill: "#EAB8391A",
+				}
 			],
 			wsBuffer: [],
 			chartLabels: [],
