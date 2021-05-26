@@ -184,7 +184,7 @@ export default {
 				this.chartLabels.length,
 				this.scaleTime,
 				this.chartLabels,
-				5,
+				10,
 				this.spliceData,
 				this.nullData
 			);
