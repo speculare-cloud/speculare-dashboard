@@ -63,8 +63,8 @@ export default {
 				}, {
 					drawStyle:         0,
 					lineInterpolation: 1,
-					stroke:            "#008080",
-					fill:              "#008080",
+					stroke:            "#ff5722",
+					fill:              "#ff5722",
 				}),
 				Object.assign({
 					label: "cached",
@@ -213,8 +213,8 @@ export default {
 			// Update the datacollection so that uPlot update the chart
 			this.datacollection = [
 				this.chartLabels, 
-				this.chartDataObjFree, 
-				this.chartDataObjUsed, 
+				this.chartDataObjFree,
+				this.chartDataObjUsed,
 				this.chartDataObjCached,
 				this.chartDataObjBuffers
 			];

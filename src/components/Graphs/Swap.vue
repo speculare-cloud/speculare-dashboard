@@ -63,8 +63,8 @@ export default {
 				}, {
 					drawStyle:         0,
 					lineInterpolation: 1,
-					stroke:            "#008080",
-					fill:              "#008080",
+					stroke:            "#ff5722",
+					fill:              "#ff5722",
 				})
 			],
 			wsBuffer: [],
