@@ -50,6 +50,11 @@
 			<h4 class="text-lg text-gray-200">System swap memory usage</h4>
 			<Swap :uuid="this.$route.params.uuid"/>
 		</div>
+		<div role="section" class="mt-4 mb-12">
+			<h3 class="text-2xl text-gray-100 mb-4">network</h3>
+			<h4 class="text-lg text-gray-200">Total bandwidth of all physical network interfaces</h4>
+			<IoCounters :uuid="this.$route.params.uuid"/>
+		</div>
 	</div>
 </template>
 
@@ -77,6 +82,10 @@ export default {
 		}),
 		Swap: () => ({
 			component: import('@/components/Graphs/Swap'),
+			loading: Skeleton
+		}),
+		IoCounters: () => ({
+			component: import('@/components/Graphs/IoCounters'),
 			loading: Skeleton
 		}),
   	},
