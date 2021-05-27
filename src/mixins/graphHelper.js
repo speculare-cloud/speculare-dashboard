@@ -24,7 +24,7 @@ const sanitizeGraphData = {
             const min = moment.utc().subtract(scaleTime, 'seconds').unix();
             for (let i = dataSize - 1; i >= 0; i--) {
                 // Iterate in the reverse order, and find if any missing data from the lastest we have
-                // Also compare start against current time, if over 5s, might be some missing data
+                // Also compare start against current time, if over throttleshot, might be some missing data
 
                 // If the current data is too old, get rid of it
                 if (chartLabels[i] < min) {

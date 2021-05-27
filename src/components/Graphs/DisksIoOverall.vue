@@ -14,6 +14,8 @@ import constructObs from '@/mixins/constructObs';
 import axios from 'axios';
 import moment from 'moment';
 
+const BYTES_TO_MB = 1000000;
+
 export default {
 	name: 'disksiooverall',
 	props: ['uuid'],
@@ -263,9 +265,8 @@ export default {
 				let prevWrite = this.historyDataWrite[prevIndex];
 				
 				// TODO - Auto scale to kb/mb/gb depending on the values
-				// Dividing by 1000000 to get mb
-				read = (total_read - prevRead) / 1000000;
-				write = -((total_write - prevWrite) / 1000000);
+				read = (total_read - prevRead) / BYTES_TO_MB;
+				write = -((total_write - prevWrite) / BYTES_TO_MB);
 			}
 
 			return {read, write, total_read, total_write};
