@@ -28,7 +28,7 @@ export default {
 		return {
 			scaleTime: 300,
 			disksNumber: 0,
-			unit: "mb/s",
+			unit: "MiB/s",
 			connection: null,
 			fetchingDone: false,
 			datacollection: null,

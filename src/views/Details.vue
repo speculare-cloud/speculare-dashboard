@@ -29,16 +29,21 @@
 		</nav>
 
 		<div role="section" class="mt-8">
-			<h3 class="text-2xl text-gray-100 mb-4">CPU</h3>
+			<h3 class="text-2xl text-gray-100 mb-4">cpu</h3>
 			<h4 class="text-lg text-gray-200">Utilization</h4>
 			<CpuTimes :uuid="this.$route.params.uuid"/>
 			<h4 class="text-lg text-gray-200 mt-4">Load</h4>
 			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
-		<div role="section" class="mt-4 mb-12">
-			<h3 class="text-2xl text-gray-100 mb-4">Disks</h3>
+		<div role="section" class="mt-4">
+			<h3 class="text-2xl text-gray-100 mb-4">disks</h3>
 			<h4 class="text-lg text-gray-200">Io</h4>
 			<DisksIoOverall :uuid="this.$route.params.uuid"/>
+		</div>
+		<div role="section" class="mt-4 mb-12">
+			<h3 class="text-2xl text-gray-100 mb-4">ram</h3>
+			<h4 class="text-lg text-gray-200">Physical memory usage</h4>
+			<Ram :uuid="this.$route.params.uuid"/>
 		</div>
 	</div>
 </template>
@@ -59,6 +64,10 @@ export default {
     	}),
 		DisksIoOverall: () => ({
 			component: import('@/components/Graphs/DisksIoOverall'),
+			loading: Skeleton
+		}),
+		Ram: () => ({
+			component: import('@/components/Graphs/Ram'),
 			loading: Skeleton
 		}),
   	},
