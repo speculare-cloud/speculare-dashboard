@@ -40,10 +40,15 @@
 			<h4 class="text-lg text-gray-200">Io</h4>
 			<DisksIoOverall :uuid="this.$route.params.uuid"/>
 		</div>
-		<div role="section" class="mt-4 mb-12">
+		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">ram</h3>
 			<h4 class="text-lg text-gray-200">Physical memory usage</h4>
 			<Ram :uuid="this.$route.params.uuid"/>
+		</div>
+		<div role="section" class="mt-4 mb-12">
+			<h3 class="text-2xl text-gray-100 mb-4">swap</h3>
+			<h4 class="text-lg text-gray-200">System swap memory usage</h4>
+			<Swap :uuid="this.$route.params.uuid"/>
 		</div>
 	</div>
 </template>
@@ -68,6 +73,10 @@ export default {
 		}),
 		Ram: () => ({
 			component: import('@/components/Graphs/Ram'),
+			loading: Skeleton
+		}),
+		Swap: () => ({
+			component: import('@/components/Graphs/Swap'),
 			loading: Skeleton
 		}),
   	},
