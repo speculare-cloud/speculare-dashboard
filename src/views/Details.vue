@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import Skeleton from '@/components/Graphs/Skeleton';
+import Skeleton from '@/components/Graphs/Utils/Skeleton';
 
 export default {
 	name: 'Details',

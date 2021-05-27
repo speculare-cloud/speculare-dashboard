@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import LineChart from '@/components/Graphs/LineChart';
+import LineChart from '@/components/Graphs/Utils/LineChart';
 import graphHelper from '@/mixins/graphHelper';
 import constructObs from '@/mixins/constructObs';
 import axios from 'axios';
