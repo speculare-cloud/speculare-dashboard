@@ -10,7 +10,7 @@ const constructObs = {
                 };
             }, {
                 // Trigger 100px before and after
-                rootMargin: '100px 0px 100px 0px',
+                rootMargin: '258px 0px 258px 0px',
                 // Trigger as soon as 0.001 is in the threttleshot
                 threshold: 0.001
             });

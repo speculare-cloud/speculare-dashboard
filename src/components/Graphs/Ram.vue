@@ -3,12 +3,12 @@
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
 			<h3>{{ this.loadingMessage }}</h3>
 		</div>
-		<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
+		<Stacked :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
 	</div>
 </template>
 
 <script>
-import LineChart from '@/components/Graphs/Utils/LineChart';
+import Stacked from '@/components/Graphs/Utils/Stacked';
 import graphHelper from '@/mixins/graphHelper';
 import constructObs from '@/mixins/constructObs';
 import axios from 'axios';
@@ -21,7 +21,7 @@ export default {
 	props: ['uuid'],
 	mixins: [graphHelper, constructObs],
 	components: {
-		LineChart
+		Stacked
 	},
 
 	data () {
@@ -36,7 +36,7 @@ export default {
 				{},
 				Object.assign({
 					label: "free",
-					value: (u, v, si, i) => v == null ? "-" : (this.chartDataObjFree[i] - this.chartDataObjUsed[i]).toFixed(1),
+					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjFree[i].toFixed(1),
 					points: {
 						show: false
 					},
@@ -48,11 +48,11 @@ export default {
 					drawStyle:         0,
 					lineInterpolation: 1,
 					stroke:            "#7EB26D",
-					fill:              "#7EB26D1A",
+					fill:              "#7EB26D",
 				}),
 				Object.assign({
 					label: "used",
-					value: (u, v, si, i) => v == null ? "-" : (this.chartDataObjUsed[i] - this.chartDataObjCached[i]).toFixed(1),
+					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjUsed[i].toFixed(1),
 					points: {
 						show: false
 					},
@@ -64,11 +64,11 @@ export default {
 					drawStyle:         0,
 					lineInterpolation: 1,
 					stroke:            "#008080",
-					fill:              "#0080801A",
+					fill:              "#008080",
 				}),
 				Object.assign({
 					label: "cached",
-					value: (u, v, si, i) => v == null ? "-" : (this.chartDataObjCached[i] - this.chartDataObjBuffers[i]).toFixed(1),
+					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjCached[i].toFixed(1),
 					points: {
 						show: false
 					},
@@ -80,11 +80,11 @@ export default {
 					drawStyle:         0,
 					lineInterpolation: 1,
 					stroke:            "#DA70D6",
-					fill:              "#DA70D61A",
+					fill:              "#DA70D6",
 				}),
 				Object.assign({
 					label: "buffers",
-					value: (u, v, si, i) => v == null ? "-" : this.chartDataObjBuffers[i].toFixed(1),
+					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjBuffers[i].toFixed(1),
 					points: {
 						show: false
 					},
@@ -96,7 +96,7 @@ export default {
 					drawStyle:         0,
 					lineInterpolation: 1,
 					stroke:            "#EAB839",
-					fill:              "#EAB8391A",
+					fill:              "#EAB839",
 				})
 			],
 			wsBuffer: [],
@@ -147,12 +147,12 @@ export default {
 							console.log("[MEMORY] >>> Merging wsBuffer with already added data");
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								let currItem = vm.wsBuffer[i];
-								let date = moment.utc(currItem[5]).unix();
+								let date = moment.utc(currItem[8]).unix();
 								// If the current lastest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
 									console.log("[MEMORY] >>>> Adding value to the end of the buffer");
 									// Add the new value to the Array
-									// vm.pushValue(date, currItem[1], currItem[2], currItem[3]);
+									vm.pushValue(date, currItem[2], currItem[3], currItem[6], currItem[5]);
 								}
 							}
 						}
@@ -222,9 +222,9 @@ export default {
 		// Add values (Labels and data) to the arrays
 		pushValue: function(date, free, used, cached, buffers) {
 			this.chartLabels.push(date);
-			this.chartDataObjFree.push((free + used + cached + buffers) / KB_TO_MB);
-			this.chartDataObjUsed.push((used + cached + buffers) / KB_TO_MB);
-			this.chartDataObjCached.push((cached + buffers) / KB_TO_MB);
+			this.chartDataObjFree.push(free / KB_TO_MB);
+			this.chartDataObjUsed.push(used / KB_TO_MB);
+			this.chartDataObjCached.push(cached / KB_TO_MB);
 			this.chartDataObjBuffers.push(buffers / KB_TO_MB);
 		},
 		// Pretty explicit, but close the websocket and set null for the connection
@@ -273,10 +273,10 @@ export default {
 		},
 		addNewData: function(newValues) {
 			// Add the new value to the Array
-			// this.pushValue(moment.utc(newValues[5]).unix(), newValues[1], newValues[2], newValues[3]);
+			this.pushValue(moment.utc(newValues[8]).unix(), newValues[2], newValues[3], newValues[6], newValues[5]);
 
 			// Update onscreen values
-			// this.updateGraph();
+			this.updateGraph();
 		}
 	}
 }
