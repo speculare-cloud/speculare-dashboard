@@ -6,6 +6,7 @@
   <p>
 
 [![Apache 2 License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
+[![CodeFactor](https://www.codefactor.io/repository/github/speculare-cloud/speculare-dashboard/badge)](https://www.codefactor.io/repository/github/speculare-cloud/speculare-dashboard)
 
   </p>
 </div>
