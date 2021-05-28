@@ -30,29 +30,30 @@
 
 		<div role="section" class="mt-8">
 			<h3 class="text-2xl text-gray-100 mb-4">cpu</h3>
-			<h4 class="text-lg text-gray-200">Utilization</h4>
+			<p class="text-sm text-gray-200">Total CPU utilization. 100% here means there is no CPU idle time at all.</p>
 			<CpuTimes :uuid="this.$route.params.uuid"/>
-			<h4 class="text-lg text-gray-200 mt-4">Load</h4>
+			<h3 class="text-2xl text-gray-100 mb-4 mt-4">load</h3>
+			<p class="text-sm text-gray-200">System load. The 3 metrics refer to 1, 5 and 15 minutes averages. Computed once every 5 seconds.</p>
 			<CpuLoad :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">disks</h3>
-			<h4 class="text-lg text-gray-200">Io</h4>
+			<p class="text-sm text-gray-200">Total Disk I/O for all physical disks. Physical are disks present in <code>/sys/block</code> but don't have a <code>{}/device</code> in it.</p>
 			<DisksIoOverall :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">ram</h3>
-			<h4 class="text-lg text-gray-200">Physical memory usage</h4>
+			<p class="text-sm text-gray-200">System Randam Access Memory (i.e. physical memory) usage.</p>
 			<Ram :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">swap</h3>
-			<h4 class="text-lg text-gray-200">System swap memory usage</h4>
+			<p class="text-sm text-gray-200">System swap memory usage. Swap space is used when the RAM if full.</p>
 			<Swap :uuid="this.$route.params.uuid"/>
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">network</h3>
-			<h4 class="text-lg text-gray-200">Total bandwidth of all physical network interfaces</h4>
+			<p class="text-sm text-gray-200">Total bandwidth of all physical network interfaces. Physical are all the network interfaces that are listed in <code>/proc/net/dev</code>, but do not exist in <code>/sys/devices/virtual/net</code>.</p>
 			<IoCounters :uuid="this.$route.params.uuid"/>
 		</div>
 	</div>
