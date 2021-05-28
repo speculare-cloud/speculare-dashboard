@@ -86,6 +86,7 @@ export default {
 			chartDataObjOne: [],
 			chartDataObjFive: [],
 			chartDataObjFitheen: [],
+			obs: null,
 		}
 	},
 
@@ -97,13 +98,17 @@ export default {
 			// Setup the IntersectionObserver
 			// call to the vm.handleWebSocket if we're in realtime,
 			// otherwise just call vm.fetching
-			vm.constructObs(vm.handleWebSocket, vm.cleaning).observe(vm.$el);
+			this.obs = vm.constructObs(vm.handleWebSocket, vm.cleaning);
+			// Observe the element
+			this.obs.observe(vm.$el);
 		});
 	},
 
 	beforeDestroy: function() {
+		// Stop the Observation of the element
+		this.obs.unobserve(this.$el);
 		// Close the webSocket connection
-		this.closeWebSocket();
+		this.cleaning();
 	},
 
 	methods: {
