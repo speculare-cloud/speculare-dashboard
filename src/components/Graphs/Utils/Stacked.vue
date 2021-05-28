@@ -150,7 +150,7 @@ export default {
 				hooks: {
 					setSeries: [
 						(u, i) => {
-							let stacked = stack(data, i => !u.series[i].show);
+							let stacked = this.stack(data, i => !u.series[i].show);
 							u.delBand(null);
 							stacked.bands.forEach(b => u.addBand(b));
 							u.setData(stacked.data);
