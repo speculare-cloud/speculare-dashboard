@@ -28,7 +28,7 @@
 			</ul>
 		</nav>
 
-		<div role="section" class="mt-8">
+		<div role="section" class="mt-4 md:mt-8">
 			<h3 class="text-2xl text-gray-100 mb-4">cpu</h3>
 			<p class="text-sm text-gray-200">Total CPU utilization. 100% here means there is no CPU idle time at all.</p>
 			<CpuTimes :uuid="this.$route.params.uuid"/>
