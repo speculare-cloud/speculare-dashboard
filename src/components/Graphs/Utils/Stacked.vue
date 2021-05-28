@@ -106,28 +106,30 @@ export default {
 				vm.hovered = true;
 			});
 		},
-		// TODO - Rewrite, optimize and understand
 		stack: function(data, omit, dobands=true) {
-			let data2 = [];
-			let accum = Array(data[0].length).fill(0);
+			let d0lenght = data[0].length;
+			let accum = Array(d0lenght);
+			for (let i = 0; i < d0lenght; ++i) accum[i] = 0;
+			let stacked_data = [data[0]];
+			let length = data.length;
 			let bands = [];
 
-			for (let i = 1; i < data.length; i++)
-				data2.push(omit(i) ? data[i] : data[i].map((v, i) => (accum[i] += +v)));
+			// Compute the stacked value (add each value (kind of))
+			for (let i = 1; i < length; i++) {
+				stacked_data.push(omit(i) ? data[i] : data[i].map((v, i) => (accum[i] += +v)));
+			}
 
-			for (let i = 1; i < data.length; i++)
+			for (let i = 1; i < length; i++) {
 				!omit(i) && bands.push({
 					series: [
-						data.findIndex((s, j) => j > i && !omit(j)),
+						data.findIndex((_s, j) => j > i && !omit(j)),
 						i,
-					],
-					fill: () => null,
+					]
 				});
-
-			bands = dobands ? bands.filter(b => b.series[1] > -1) : null;
+			}
 
 			return {
-				data: [data[0]].concat(data2),
+				data: stacked_data,
 				bands,
 			};
 		},
