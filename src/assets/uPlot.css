@@ -41,7 +41,7 @@
 .u-legend {
     font-size: 14px;
     margin: auto;
-    text-align: center;
+    text-align: left;
 }
 
 .u-inline {
@@ -50,10 +50,6 @@
 
 .u-inline * {
     display: inline-block;
-}
-
-.u-inline tr {
-    margin-right: 16px;
 }
 
 .u-legend th {
@@ -66,14 +62,16 @@
 }
 
 .u-legend .u-marker {
-    width: 1em;
-    height: 1em;
     margin-right: 4px;
     background-clip: content-box !important;
+    width: 14px;
+    height: 7px;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 .u-inline.u-live th::after {
-    content: ":";
+    content: none;
     vertical-align: middle;
 }
 
@@ -140,10 +138,6 @@
     display: none;
 }
 
-.u-legend {
-    text-align: left;
-}
-
 .u-inline tr {
     margin-right: 8px;
 }
@@ -156,13 +150,6 @@
     font-size: 11px;
 }
 
-.u-legend .u-marker {
-    width: 14px;
-    height: 7px;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
 .u-legend .u-label {
     color: rgb(229, 231, 235);
 }
@@ -170,8 +157,4 @@
 .u-legend .u-value {
     font-size: 11px;
     color: rgb(229, 231, 235);
-}
-
-.u-inline.u-live th::after {
-    content: none;
 }
