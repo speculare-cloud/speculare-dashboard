@@ -8,6 +8,26 @@ body,
     min-height: 100vh;
 }
 
+::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+ ::-webkit-scrollbar-thumb {
+    background: rgb(156, 163, 175);
+    border-radius: 16px;
+    border: 4px solid rgb(17, 24, 39);
+}
+
+ ::-webkit-scrollbar-thumb:hover {
+    background: #f9d4ff;
+}
+
+ ::-webkit-scrollbar-track {
+    background: rgb(17, 24, 39);
+    border-radius: 0px;
+}
+
 .shimming:after {
     animation: shine 4s ease-in-out infinite;
     content: "";
