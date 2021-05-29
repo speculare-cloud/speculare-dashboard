@@ -1,6 +1,6 @@
 <template>
 	<div class="settings">
-		<h1 class="text-6xl font-normal leading-normal mt-0 mb-2 text-gray-100">Settings</h1>
+		<h2 class="text-lg font-medium leading-normal mb-4 text-gray-200">Settings</h2>
 	</div>
 </template>
 
