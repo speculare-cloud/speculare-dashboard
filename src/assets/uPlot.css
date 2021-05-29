@@ -146,6 +146,12 @@
     vertical-align: bottom;
 }
 
+.u-series th {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .u-label {
     font-size: 11px;
 }
