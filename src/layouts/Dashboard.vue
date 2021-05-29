@@ -1,10 +1,10 @@
 <template>
-	<div id="dashvue" class="antialiased bg-gray-100 dark-mode:bg-gray-900">
+	<div id="dashvue" class="antialiased bg-gray-900">
 		<div class="md:flex flex-col md:flex-row md:min-h-screen w-full">
-			<div class="flex flex-col w-full md:w-48 text-gray-700 bg-white dark-mode:text-gray-200 dark-mode:bg-gray-800 flex-shrink-0">
+			<div class="flex flex-col w-full md:w-48 text-gray-200 bg-gray-800 flex-shrink-0">
 				<div class="flex-shrink-0 px-8 md:px-0 py-4 flex flex-row items-center justify-between md:justify-center">
 					<router-link to="/" v-slot="{ href, navigate }" custom>
-						<a :href="href" @click="navigate" class="text-lg font-semibold tracking-widest text-gray-900 uppercase rounded-lg dark-mode:text-white focus:outline-none focus:shadow-outline">
+						<a :href="href" @click="navigate" class="text-lg font-semibold tracking-widest uppercase rounded-lg text-white focus:outline-none focus:shadow-outline">
 							Speculare
 						</a>
 					</router-link>
@@ -17,7 +17,7 @@
 				</div>
 				<nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block pl-4 pr-4 md:pr-0 pb-4 md:pb-0 md:overflow-y-auto">
 					<router-link to="/hosts" v-slot="{ href, navigate, isExactActive }" custom>
-						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100" :class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']">
 							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
     							<use xlink:href="@/assets/imgs/list.svg#list" />
   							</svg>
@@ -25,7 +25,7 @@
 						</a>
 					</router-link>
 					<router-link to="/alarms" v-slot="{ href, navigate, isExactActive }" custom>
-						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100" :class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']">
 							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
     							<use xlink:href="@/assets/imgs/notifications.svg#notifications" />
   							</svg>
@@ -33,7 +33,7 @@
 						</a>
 					</router-link>
 					<router-link to="/settings" v-slot="{ href, navigate, isExactActive }" custom>
-						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold text-gray-900 rounded-l-lg rounded-r-lg md:rounded-r-none dark-mode:hover:bg-gray-600 dark-mode:hover:text-gray-100 hover:text-gray-900 hover:bg-gray-200" :class="[isExactActive ? 'dark-mode:bg-gray-600 dark-mode:text-gray-100' : 'dark-mode:text-gray-400']">
+						<a :href="href" @click="navigate" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100" :class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']">
 							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
     							<use xlink:href="@/assets/imgs/settings.svg#settings" />
   							</svg>

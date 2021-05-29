@@ -23,7 +23,7 @@
 					</svg>
 				</li>
 				<li class="inline-flex items-center">
-					<p href="#" class="text-gray-500" aria-current="page">{{ this.$route.params.hostname }}</p>
+					<p href="#" class="text-gray-400" aria-current="page">{{ this.$route.params.hostname }}</p>
 				</li>
 			</ul>
 		</nav>
