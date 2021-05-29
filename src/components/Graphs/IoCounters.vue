@@ -47,7 +47,7 @@ export default {
 				},
 				{
 					label: "sent",
-					value: (_, v) => v == null ? "-" : v.toFixed(2),
+					value: (_, v) => v == null ? "-" : Math.abs(v).toFixed(2),
 					points: {
 						show: false
 					},
