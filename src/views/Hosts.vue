@@ -45,13 +45,5 @@
 <script>
 export default {
 	name: 'Hosts',
-
-	methods: {
-		lower: function(value) {
-			if (!value) return ''
-    		value = value.toString()
-    		return value.toLowerCase()
-		}
-	}
 }
 </script>
