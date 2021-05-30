@@ -29,7 +29,7 @@ export default {
 			if (oldData == null || !this.chart) {
 				this.createChart(newData);
 			} else if (!this.hovered && this.chart) {
-				let stacked = this.stack(newData, i => false, false);
+				let stacked = this.stack(newData, i => false);
 				this.chart.setData(stacked.data);
 			}
 			
@@ -106,17 +106,29 @@ export default {
 				vm.hovered = true;
 			});
 		},
-		stack: function(data, omit, dobands=true) {
-			let d0lenght = data[0].length;
+		stack: function(data, omit) {
+			const d0lenght = data[0].length;
 			let accum = Array(d0lenght);
 			for (let i = 0; i < d0lenght; ++i) accum[i] = 0;
 			let stacked_data = [data[0]];
-			let length = data.length;
+			const length = data.length;
 			let bands = [];
 
 			// Compute the stacked value (add each value (kind of))
 			for (let i = 1; i < length; i++) {
-				stacked_data.push(omit(i) ? data[i] : data[i].map((v, i) => (accum[i] += +v)));
+				if (omit(i)) {
+					stacked_data.push(data[i]);
+				} else {
+					const dilength = data[i].length;
+					for (let j = 0; j < dilength; j++) {
+						accum[j] += data[i][j];
+					}
+					let arrCopy = Array(dilength);
+					for (let j = 0; j < dilength; j++) {
+						arrCopy[j] = accum[j];
+					}
+					stacked_data.push(arrCopy);
+				}
 			}
 
 			for (let i = 1; i < length; i++) {
