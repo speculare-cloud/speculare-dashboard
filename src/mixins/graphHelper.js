@@ -5,6 +5,9 @@ const _spline = uPlot.paths.spline();
 
 const sanitizeGraphData = {
     methods: {
+        intValueOrTilde: function(val, dec) {
+            return val == null ? "-" : val.toFixed(dec)
+        },
         getBaseUrl: function(table, uuid) {
             return this.$apiBaseUrl + '/api/' + table + '?uuid=' + uuid;
         },

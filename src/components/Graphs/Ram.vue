@@ -36,7 +36,7 @@ export default {
 				{},
 				Object.assign({
 					label: "free",
-					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjFree[i].toFixed(1),
+					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjFree[i], 1),
 					points: {
 						show: false
 					},
@@ -52,7 +52,7 @@ export default {
 				}),
 				Object.assign({
 					label: "used",
-					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjUsed[i].toFixed(1),
+					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjUsed[i], 1),
 					points: {
 						show: false
 					},
@@ -68,7 +68,7 @@ export default {
 				}),
 				Object.assign({
 					label: "cached",
-					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjCached[i].toFixed(1),
+					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjCached[i], 1),
 					points: {
 						show: false
 					},
@@ -84,7 +84,7 @@ export default {
 				}),
 				Object.assign({
 					label: "buffers",
-					value: (_u, v, _si, i) => v == null ? "-" : this.chartDataObjBuffers[i].toFixed(1),
+					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjBuffers[i], 1),
 					points: {
 						show: false
 					},
