@@ -23,9 +23,9 @@
         "@vue/cli-service": "^4.5.12",
         "autoprefixer": "^9.8.6",
         "babel-plugin-transform-remove-console": "^6.9.4",
+        "moment-locales-webpack-plugin": "^1.2.0",
         "postcss": "^7.0.35",
-        "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0",
-        "vue-template-compiler": "^2.6.12",
-        "moment-locales-webpack-plugin": "^1.2.0"
+        "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2",
+        "vue-template-compiler": "^2.6.12"
     }
 }

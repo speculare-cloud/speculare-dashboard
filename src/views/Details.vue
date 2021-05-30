@@ -56,6 +56,10 @@
 			<p class="text-sm text-gray-200">Total bandwidth of all physical network interfaces. Physical are all the network interfaces that are listed in <code>/proc/net/dev</code>, but do not exist in <code>/sys/devices/virtual/net</code>.</p>
 			<IoCounters :uuid="this.$route.params.uuid"/>
 		</div>
+
+		<button class="p-3 bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none fixed bottom-8 right-8">
+			<img src="@/assets/imgs/graph_custom.svg" class="w-6 h-6 inline-block" />
+        </button>
 	</div>
 </template>
 
