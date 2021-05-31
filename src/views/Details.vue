@@ -64,90 +64,58 @@
 		<div class="modal fixed w-full h-full top-0 left-0 items-center justify-center p-4" :class="{'flex': open, 'hidden': !open}">
 			<div class="modal-container bg-gray-700 mx-auto rounded shadow-lg z-50 overflow-y-auto">
 				<div class="modal-content py-4 text-left px-6">
-					<!-- Header -->
-					<div class="flex justify-end items-center pb-3">
+					<!-- Body -->
+					<div>
+						<p class="text-lg text-gray-100 mb-4">Range selector</p>
+						<!-- Add -->
+						<DatePicker v-model="range" :max-date="new Date()" color="teal" is-range is-dark :columns="$screens({ default: 1, lg: 2 })" is-expanded />
+						<div class="flex flex-col sm:flex-row justify-start items-center mt-4">
+							<div class="relative flex-grow w-full">
+								<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
+									fill="none"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									viewBox="0 0 24 24"
+									stroke="currentColor" >
+									<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								</svg>
+								<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full text-gray-900" :value="range.start" />
+							</div>
+							<span class="flex-shrink-0 m-2">
+								<svg class="w-4 h-4 stroke-current text-gray-600" viewBox="0 0 24 24">
+									<path stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+								</svg>
+							</span>
+							<div class="relative flex-grow w-full">
+								<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
+									fill="none"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									viewBox="0 0 24 24"
+									stroke="currentColor">
+									<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+								</svg>
+								<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full text-gray-900" :value="range.end" />
+							</div>
+						</div>
+					</div>
+
+					<!-- Footer -->
+					<div class="flex justify-between mt-4">
 						<button @click="open = false">
 							<svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
 								<path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
 							</svg>
 						</button>
-					</div>
-
-					<!-- Body -->
-					<div class="flex-none md:flex gap-8">
-						<div class="flex-auto">
-							<p class="text-lg text-gray-100 mb-4">Quick selector</p>
-							<div>
-								<div class="mb-2 border border-gray-400 rounded-md px-3 py-1 text-gray-200 hover:border-green-400 hover:cursor-pointer">
-									<span class="w-full block">Last 5 minutes</span>
-								</div>
-								<div class="mb-2 border border-gray-400 rounded-md px-3 py-1 text-gray-200 hover:border-green-400 hover:cursor-pointer">
-									<span class="w-full block">Last 15 minutes</span>
-								</div>
-								<div class="mb-2 border border-gray-400 rounded-md px-3 py-1 text-gray-200 hover:border-green-400 hover:cursor-pointer">
-									<span class="w-full block">Last 30 minutes</span>
-								</div>
-								<div class="mb-2 border border-gray-400 rounded-md px-3 py-1 text-gray-200 hover:border-green-400 hover:cursor-pointer">
-									<span class="w-full block">Last 1 hour</span>
-								</div>
-								<div class="mb-2 border border-gray-400 rounded-md px-3 py-1 text-gray-200 hover:border-green-400 hover:cursor-pointer">
-									<span class="w-full block">Last 3 hours</span>
-								</div>
-								<div class="mb-2 border border-gray-400 rounded-md px-3 py-1 text-gray-200 hover:border-green-400 hover:cursor-pointer">
-									<span class="w-full block">Last 6 hours</span>
-								</div>
-							</div>
+						<div>
+							<button class="px-4 bg-transparent p-2 rounded-md text-green-500 hover:bg-gray-800 hover:text-green-400 mr-2" @click="clearSelection">Clear</button>
+							<button class="px-4 bg-green-500 p-2 rounded-md text-white hover:bg-green-600" @click="applySelection">Apply</button>
 						</div>
-						<div class="flex-auto mt-4 md:mt-0">
-							<p class="text-lg text-gray-100 mb-4">Range selector</p>
-							<!-- Add -->
-							<DatePicker v-model="range" :max-date="new Date()" color="teal" is-range is-dark :columns="$screens({ default: 1, lg: 2 })" is-expanded />
-							<div class="flex flex-col sm:flex-row justify-start items-center mt-4">
-								<div class="relative flex-grow w-full">
-									<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
-										fill="none"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										viewBox="0 0 24 24"
-										stroke="currentColor" >
-										<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-									</svg>
-									<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full text-gray-900" :value="range.start" />
-								</div>
-								<span class="flex-shrink-0 m-2">
-									<svg class="w-4 h-4 stroke-current text-gray-600" viewBox="0 0 24 24">
-										<path stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-									</svg>
-								</span>
-								<div class="relative flex-grow w-full">
-									<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
-										fill="none"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										viewBox="0 0 24 24"
-										stroke="currentColor">
-										<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-									</svg>
-									<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full text-gray-900" :value="range.end" />
-								</div>
-							</div>
-						</div>
-						<!-- NOTE - Assume the data is collected every seconds at first as this influence the scale -->
-						<!-- TODO - Fetch dynamically the scale (the every seconds part of the above), it depends on the config -->
-						<!-- TODO - Add selection for "Last 5/15/30 minutes/hours + custom scale" -->
-						<!-- TODO - Add selection for begin at -->
-						<!-- TODO - Add selection for end at -->
-					</div>
-
-					<!-- Footer -->
-					<div class="flex justify-end mt-4">
-						<button class="px-4 bg-transparent p-2 rounded-md text-green-500 hover:bg-gray-800 hover:text-green-400 mr-2" @click="clearSelection">Clear</button>
-						<button class="px-4 bg-green-500 p-2 rounded-md text-white hover:bg-green-600" @click="applySelection">Apply</button>
 					</div>
 				</div>
 			</div>
