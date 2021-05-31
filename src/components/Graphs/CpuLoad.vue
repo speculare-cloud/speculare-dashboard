@@ -16,7 +16,7 @@ import moment from 'moment';
 
 export default {
 	name: 'cpuload',
-	props: ['uuid'],
+	props: ['uuid', 'scaleTime'],
 	mixins: [graphHelper, constructObs],
 	components: {
 		LineChart
@@ -24,7 +24,6 @@ export default {
 
 	data () {
 		return {
-			scaleTime: 300,
 			unit: "load",
 			connection: null,
 			fetchingDone: false,
@@ -90,6 +89,30 @@ export default {
 		}
 	},
 
+	watch: {
+		scaleTime: function(newVal, oldVal) {
+			console.log("[CPULOAD] New value = ", newVal, " && Old value = ", oldVal);
+			if (newVal == null) {
+				// TODO - Handle newVal == null
+				// null can occur if we're not using the scale, we may use a start+end date to see in the past.
+				// In that case we can just close the websocket + clean + fetching.
+			} else if (oldVal == null || newVal > oldVal) {
+				// TODO - Optimize:
+				// We could only fetch the new data, since the oldest data to the targeted time of the scale.
+				// That way we can avoid cleaning and refetching everything (which is time consuming).
+				// Also we can introduce something like "take 1 value every 10" on the server side if the scale is big enough.
+				
+				this.cleaning(false);
+				this.fetching();
+			} else {
+				// TODO - Optimize:
+				// It's already working as the sanitize function will take care of deleting old data.
+				// But the sanitize function doesn't trigger until a new data is receive on the websocket.
+				// So we can force a "range cleaning" + graph update.
+			}
+		}
+	},
+
 	mounted: function() {
 		let vm = this;
 
@@ -116,6 +139,7 @@ export default {
 		fetching: function() {
 			let vm = this;
 
+			vm.fetchingDone = false;
 			// Fetching old data with the API
 			axios
 				.get(vm.getBaseUrl('loadavg', vm.uuid) + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
@@ -159,14 +183,16 @@ export default {
 				});
 		},
 		// Empty every arrays and close the websocket
-		cleaning: function() {
+		cleaning: function(ws=true) {
 			this.fetchingDone = false;
 			this.chartLabels = [];
 			this.chartDataObjOne = [];
 			this.chartDataObjFive = [];
 			this.chartDataObjFitheen = [];
 			this.wsBuffer = [];
-			this.closeWebSocket();
+			if (ws) {
+				this.closeWebSocket();
+			}
 		},
 		// Null the data of an index (without nulling the Labels)
 		nullData: function(i) {

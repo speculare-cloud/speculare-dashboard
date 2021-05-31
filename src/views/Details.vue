@@ -31,30 +31,30 @@
 		<div role="section" class="mt-4 md:mt-8">
 			<h3 class="text-2xl text-gray-100 mb-4">cpu</h3>
 			<p class="text-sm text-gray-200">Total CPU utilization. 100% here means there is no CPU idle time at all.</p>
-			<CpuTimes :uuid="this.$route.params.uuid"/>
+			<CpuTimes :uuid="this.$route.params.uuid" :scaleTime="trueScale"/>
 			<h3 class="text-2xl text-gray-100 mb-4 mt-4">load</h3>
 			<p class="text-sm text-gray-200">System load. The 3 metrics refer to 1, 5 and 15 minutes averages. Computed once every 5 seconds.</p>
-			<CpuLoad :uuid="this.$route.params.uuid"/>
+			<CpuLoad :uuid="this.$route.params.uuid" :scaleTime="trueScale"/>
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">disks</h3>
 			<p class="text-sm text-gray-200">Total Disk I/O for all physical disks. Physical are disks present in <code>/sys/block</code> but don't have a <code>{}/device</code> in it.</p>
-			<DisksIoOverall :uuid="this.$route.params.uuid"/>
+			<DisksIoOverall :uuid="this.$route.params.uuid" :scaleTime="trueScale"/>
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">ram</h3>
 			<p class="text-sm text-gray-200">System Randam Access Memory (i.e. physical memory) usage.</p>
-			<Ram :uuid="this.$route.params.uuid"/>
+			<Ram :uuid="this.$route.params.uuid" :scaleTime="trueScale"/>
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">swap</h3>
 			<p class="text-sm text-gray-200">System swap memory usage. Swap space is used when the RAM if full.</p>
-			<Swap :uuid="this.$route.params.uuid"/>
+			<Swap :uuid="this.$route.params.uuid" :scaleTime="trueScale"/>
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">network</h3>
 			<p class="text-sm text-gray-200">Total bandwidth of all physical network interfaces. Physical are all the network interfaces that are listed in <code>/proc/net/dev</code>, but do not exist in <code>/sys/devices/virtual/net</code>.</p>
-			<IoCounters :uuid="this.$route.params.uuid"/>
+			<IoCounters :uuid="this.$route.params.uuid" :scaleTime="trueScale"/>
 		</div>
 
 		<button class="p-3 bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none fixed bottom-8 right-8" @click="open = !open">
@@ -68,7 +68,7 @@
 					<div class="">
 						<div class="">
 							<p class="text-lg text-gray-100 mb-4">Quick selector</p>
-							<select class="form-select block w-full py-1">
+							<select class="form-select block w-full py-1" ref="scaleSelect">
 								<option></option>
 								<option selected="selected">Last 5 minutes</option>
 								<option>Last 15 minutes</option>
@@ -141,6 +141,7 @@
 import Skeleton from '@/components/Graphs/Utils/Skeleton';
 import DatePicker from 'v-calendar/lib/components/date-picker.umd'
 
+const scaleIdxArr = [5, 15, 30, 60, 180, 360];
 export default {
 	name: 'Details',
 	components: {
@@ -175,7 +176,7 @@ export default {
 		return {
 			open: false,
 			trueRange: null,
-			trueScale: 5,
+			trueScale: (5 * 60),
 			range: {
       			start: null,
       			end: null
@@ -186,7 +187,7 @@ export default {
 	methods: {
 		clearSelection: function() {
 			// Apply default value for the scale
-			this.trueScale = 5;
+			this.trueScale = (5 * 60);
 			// Clear out the range selection
 			this.range = {
 				start: null,
@@ -194,6 +195,10 @@ export default {
 			};
 		},
 		applySelection: function() {
+			let scaleIdx = this.$refs["scaleSelect"].selectedIndex;
+			if (scaleIdx != 0) {
+				this.trueScale = scaleIdxArr[scaleIdx-1] * 60;
+			}
 			// Finally, close the modal
 			this.open = !open;
 		}
