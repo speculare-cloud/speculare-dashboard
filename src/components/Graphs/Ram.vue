@@ -18,7 +18,7 @@ const KB_TO_MB = 1000;
 
 export default {
 	name: 'ram',
-	props: ['uuid', 'scaleTime'],
+	props: ['uuid', 'graphRange'],
 	mixins: [graphHelper, constructObs],
 	components: {
 		Stacked
@@ -26,6 +26,7 @@ export default {
 
 	data () {
 		return {
+			defaultScale: 300,
 			unit: "MiB",
 			connection: null,
 			fetchingDone: false,
@@ -109,26 +110,9 @@ export default {
 	},
 
 	watch: {
-		scaleTime: function(newVal, oldVal) {
-			console.log("[RAM] New value = ", newVal, " && Old value = ", oldVal);
-			if (newVal == null) {
-				// TODO - Handle newVal == null
-				// null can occur if we're not using the scale, we may use a start+end date to see in the past.
-				// In that case we can just close the websocket + clean + fetching.
-			} else if (oldVal == null || newVal > oldVal) {
-				// TODO - Optimize:
-				// We could only fetch the new data, since the oldest data to the targeted time of the scale.
-				// That way we can avoid cleaning and refetching everything (which is time consuming).
-				// Also we can introduce something like "take 1 value every 10" on the server side if the scale is big enough.
-				
-				this.cleaning(false);
-				this.fetching();
-			} else {
-				// TODO - Optimize:
-				// It's already working as the sanitize function will take care of deleting old data.
-				// But the sanitize function doesn't trigger until a new data is receive on the websocket.
-				// So we can force a "range cleaning" + graph update.
-			}
+		graphRange: function(newVal, oldVal) {
+			console.log("[RAM] graphRange changed");
+			this.handleGraphRangeChange(newVal, oldVal, this.cleaning, this.fetching, this.handleWebSocket, this.connection);
 		}
 	},
 
@@ -154,14 +138,24 @@ export default {
 	},
 
 	methods: {
+		getScale: function() {
+			return this.graphRange.scale != null ? this.graphRange.scale : this.defaultScale
+		},
 		// Function responsible to init the fetching data and the websocket connection
 		fetching: function() {
 			let vm = this;
 
-			vm.fetchingDone = false;
+			// Compute the rangeParams in case of start & end or just scale
+			let rangeParams;
+			if (vm.graphRange.start != null) {
+				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end);
+			} else {
+				rangeParams = vm.getMinMaxNowString(vm.getScale());
+			}
+
 			// Fetching old data with the API
 			axios
-				.get(vm.getBaseUrl('memory', vm.uuid) + '&size=' + vm.scaleTime + vm.getMinMaxNowString(vm.scaleTime))
+				.get(vm.getBaseUrl('memory', vm.uuid) + '&size=' + vm.getScale() + rangeParams)
 				.then(resp => {
 					let dataLenght = resp.data.length;
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -222,12 +216,12 @@ export default {
 			this.chartDataObjBuffers[i] = null;
 		},
 		// Remove one index from each data arrays
-		spliceData: function(i) {
-			this.chartLabels.splice(i, 1);
-			this.chartDataObjFree.splice(i, 1);
-			this.chartDataObjUsed.splice(i, 1);
-			this.chartDataObjCached.splice(i, 1);
-			this.chartDataObjBuffers.splice(i, 1);
+		spliceData: function(start, nb) {
+			this.chartLabels.splice(start, nb);
+			this.chartDataObjFree.splice(start, nb);
+			this.chartDataObjUsed.splice(start, nb);
+			this.chartDataObjCached.splice(start, nb);
+			this.chartDataObjBuffers.splice(start, nb);
 		},
 		// Update the graph by setting datacollection to the new arrays
 		updateGraph: function() {
@@ -235,9 +229,9 @@ export default {
 			// but also remove too old element
 			this.sanitizeGraphData(
 				this.chartLabels.length,
-				this.scaleTime,
+				this.getScale(),
 				this.chartLabels,
-				10,
+				this.getScale()/60 + 5,
 				this.spliceData,
 				this.nullData
 			);
@@ -271,18 +265,20 @@ export default {
 		handleWebSocket: function() {
 			let vm = this;
 
-			console.log("[MEMORY] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
-			if (vm.connection == null) {
-				console.log("[MEMORY] > Setting a new webSocket");
-				vm.connection = new WebSocket(vm.$wsBaseUrl + "/ws?query=insert:memory:host_uuid.eq." + vm.uuid);
+			if (vm.getScale() == 300) {
+				console.log("[MEMORY] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
+				if (vm.connection == null) {
+					console.log("[MEMORY] > Setting a new webSocket");
+					vm.connection = new WebSocket(vm.$wsBaseUrl + "/ws?query=insert:memory:host_uuid.eq." + vm.uuid);
+				}
+				// only add the open (at least for the vm.fetching) if we're in realtime
+				vm.connection.addEventListener('open', function() {
+					console.log("[MEMORY] >> webSocket opened");
+					vm.fetching();
+				});
+				// Setup onmessage listener
+				vm.connection.addEventListener('message', vm.wsMessageHandle);
 			}
-			// only add the open (at least for the vm.fetching) if we're in realtime
-			vm.connection.addEventListener('open', function() {
-				console.log("[MEMORY] >> webSocket opened");
-				vm.fetching();
-			});
-			// Setup onmessage listener
-			vm.connection.addEventListener('message', vm.wsMessageHandle);
 		},
 		wsMessageHandle: function(event) {
 			// Parse the data and extract newValue

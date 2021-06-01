@@ -5,11 +5,47 @@ const _spline = uPlot.paths.spline();
 
 const sanitizeGraphData = {
     methods: {
+        handleGraphRangeChange: function(newVal, oldVal, cleaning, fetching, handleWebSocket, connection) {
+            if (newVal.start != null) {
+                // Clear the data and close the websocket
+                cleaning();
+                // Refetch the data
+                fetching();
+            } else {
+                // TODO - Optimize: (can be tricky to optimize as we'll have a diff granularity).
+                // We could only fetch the new data, since the oldest data to the targeted time of the scale.
+                // That way we can avoid cleaning and refetching everything (which is time consuming).
+                // Also we can introduce something like "take 1 value every 10" on the server side if the scale is big enough.
+
+                if (newVal.scale != null) {
+                    // Clear the data and close the websocket if needed
+                    cleaning(newVal.scale != 300);
+                    // Check if we have to open the WS (if we're trying to get the last 5 minutes)
+                    if (newVal.scale == 300 && connection == null) {
+                        // Open the websocket and refetch the data
+                        handleWebSocket();
+                    } else {
+                        // Refetch the data
+                        fetching();
+                    }
+                } else {
+                    // If we're here, this means that we cleared the selection and so we fallback to the default value for scale.
+                    // We have to check if previous scale was 300, if it is we don't do anything, else we clean + handle/fetch.
+                    if (oldVal.scale != null && oldVal.scale != 300) {
+                        cleaning();
+                        handleWebSocket();
+                    }
+                }
+            }
+        },
         intValueOrTilde: function(val, dec) {
             return val == null ? "-" : val.toFixed(dec)
         },
         getBaseUrl: function(table, uuid) {
             return this.$apiBaseUrl + '/api/' + table + '?uuid=' + uuid;
+        },
+        getMinMaxString: function(start, end) {
+            return '&min_date=' + start + '&max_date=' + end;
         },
         getMinMaxNowString: function(scaleTime) {
             // Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
@@ -31,8 +67,7 @@ const sanitizeGraphData = {
 
                 // If the current data is too old, get rid of it
                 if (chartLabels[i] < min) {
-                    // console.log("Data too old for => ", i);
-                    spliceData(i);
+                    spliceData(i, 1);
                     continue;
                 }
 
