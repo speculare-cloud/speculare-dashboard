@@ -81,7 +81,7 @@
 						<div class="mt-4">
 							<p class="text-lg text-gray-100 mb-4">Range selector</p>
 							<DatePicker v-model="range" :max-date="new Date()" :model-config="modelConfig" color="teal" is-range is-dark>
-								<template v-slot="{ inputValue, inputEvents, isDragging }">
+								<template v-slot="{ inputValue, isDragging, togglePopover }">
 									<div class="flex flex-col sm:flex-row justify-start items-center">
 										<div class="relative flex-grow">
 											<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
@@ -91,7 +91,7 @@
 											</svg>
 											<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full"
 												:class="isDragging ? 'text-gray-600' : 'text-gray-900'"
-												:value="inputValue.start" v-on="inputEvents.start" />
+												:value="inputValue.start" @click="togglePopover()" placeholder="Click to select"/>
 										</div>
 										<span class="flex-shrink-0 m-2">
 											<svg class="w-4 h-4 stroke-current text-gray-600" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@
 											</svg>
 											<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full"
 												:class="isDragging ? 'text-gray-600' : 'text-gray-900'"
-												:value="inputValue.end" v-on="inputEvents.end"/>
+												:value="inputValue.end" @click="togglePopover()" placeholder="Click to select"/>
 										</div>
 									</div>
 								</template>
