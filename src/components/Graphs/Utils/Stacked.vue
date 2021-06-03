@@ -136,7 +136,8 @@ export default {
 					series: [
 						data.findIndex((_s, j) => j > i && !omit(j)),
 						i,
-					]
+					],
+					fill: () => null,
 				});
 			}
 
