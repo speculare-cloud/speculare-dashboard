@@ -29,7 +29,7 @@ export default {
 			if (oldData == null || !this.chart) {
 				this.createChart(newData);
 			} else if (!this.hovered && this.chart) {
-				let stacked = this.stack(newData, i => false);
+				let stacked = this.stack(newData, i => !this.chart.series[i].show);
 				this.chart.setData(stacked.data);
 			}
 			
