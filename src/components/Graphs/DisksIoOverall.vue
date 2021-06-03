@@ -227,6 +227,12 @@ export default {
 		// Add values (Labels and data) to the arrays
 		pushValue: function(date, read, write, histRead, histWrite) {
 			this.chartLabels.push(date);
+			// If scale != default, should divide the values by granularity (at least for the graph)
+			if (this.getScale() != this.defaultScale) {
+				console.log("[DISKSIOOVERALL] Dividing value for the granularity [", this.graphRange.granularity, "]");
+				read = read / this.graphRange.granularity;
+				write = write / this.graphRange.granularity;
+			}
 			this.chartDataObjRead.push(read);
 			this.chartDataObjWrite.push(write);
 			this.historyDataRead.push(histRead);

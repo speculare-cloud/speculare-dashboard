@@ -177,6 +177,7 @@ export default {
 		return {
 			open: false,
 			graphRange: {
+				granularity: 1,
 				scale: null,
 				start: null,
 				end: null
@@ -193,10 +194,16 @@ export default {
 	},
 
 	methods: {
+		computeGranularity: function(scale) {
+			// Using ~ we convert the float to int once in it inversed form
+			// Reusing ~ again we reverse it again and TADAAA not decimal
+			return ~~((0.003 * 900) * 0.93 + 0.298206);
+		},
 		clearSelection: function() {
 			this.$refs["scaleSelect"].selectedIndex = 0;
 			// Clear out the range selection
 			this.graphRange = {
+				granularity: null,
 				scale: null,
 				start: null,
 				end: null
@@ -217,6 +224,7 @@ export default {
 				let scaleIdx = this.$refs["scaleSelect"].selectedIndex;
 				if (scaleIdx != 0) {
 					this.graphRange = {
+						granularity: this.computeGranularity(scaleIdxArr[scaleIdx-1] * 60),
 						scale: scaleIdxArr[scaleIdx-1] * 60,
 						start: null,
 						end: null

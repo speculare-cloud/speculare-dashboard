@@ -227,6 +227,12 @@ export default {
 		// Add values (Labels and data) to the arrays
 		pushValue: function(date, recv, sent, histrecv, histSent) {
 			this.chartLabels.push(date);
+			// If scale != default, should divide the values by granularity (at least for the graph)
+			if (this.getScale() != this.defaultScale) {
+				console.log("[IOCOUNTERS] Dividing value for the granularity [", this.graphRange.granularity, "]");
+				recv = recv / this.graphRange.granularity;
+				sent = sent / this.graphRange.granularity;
+			}
 			this.chartDataObjRecv.push(recv);
 			this.chartDataObjSent.push(sent);
 			this.historyDataRecv.push(histrecv);
