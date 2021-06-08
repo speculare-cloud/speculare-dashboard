@@ -1,59 +1,66 @@
 <template>
-	<div class="disksiooverall">
-		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
-			<h3>{{ this.loadingMessage }}</h3>
-		</div>
-		<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
+	<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
+		<h3>{{ loadingMessage }}</h3>
 	</div>
+	<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
 </template>
 
 <script>
 import LineChart from '@/components/Graphs/Utils/LineChart'
-import graphHelper from '@/mixins/graphHelper';
-import constructObs from '@/mixins/constructObs';
-import axios from 'axios';
-import moment from 'moment';
+import graphHelper from '@/mixins/graphHelper'
+import constructObs from '@/mixins/constructObs'
+import axios from 'axios'
+import moment from 'moment'
 
-const BYTES_TO_MB = 1000000;
+const BYTES_TO_MB = 1000000
 
 export default {
-	name: 'disksiooverall',
-	props: ['uuid', 'graphRange'],
-	mixins: [graphHelper, constructObs],
+	name: 'Disksiooverall',
 	components: {
 		LineChart
+	},
+	mixins: [graphHelper, constructObs],
+	props: {
+		uuid: {
+			type: String,
+			required: true
+		},
+		graphRange: {
+			type: Object,
+			default: null
+		}
 	},
 
 	data () {
 		return {
 			defaultScale: 300,
 			disksNumber: 0,
-			unit: "MiB/s",
+			unit: 'MiB/s',
 			connection: null,
 			fetchingDone: false,
 			datacollection: null,
-			loadingMessage: "Loading",
+			loadingMessage: 'Loading',
 			chartSeries: [
 				{},
 				{
-					label: "read",
-					value: (_, v) => v == null ? "-" : v.toFixed(2),
+					label: 'read',
+					value: (_, v) => v == null ? '-' : v.toFixed(2),
 					points: {
 						show: false
 					},
 					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
-					stroke: "#7EB26D",
-					fill: "#7EB26D1A",
+					stroke: '#7EB26D',
+					fill: '#7EB26D1A'
 				},
 				{
-					label: "write",
-					value: (_, v) => v == null ? "-" : Math.abs(v).toFixed(2),
+					label: 'write',
+					value: (_, v) => v == null ? '-' : Math.abs(v).toFixed(2),
 					points: {
 						show: false
 					},
 					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
-					stroke: "#DA70D6",
-					fill: "#DA70D61A",
+					stroke: '#DA70D6',
+					fill: '#DA70D61A'
 				}
 			],
 			wsBuffer: [],
@@ -63,278 +70,277 @@ export default {
 			historyDataRead: [],
 			historyDataWrite: [],
 			bufferDataWs: [],
-			obs: null,
+			obs: null
 		}
 	},
 
 	watch: {
-		graphRange: function(newVal, oldVal) {
-			console.log("[DISKIOOVERALL] graphRange changed");
-			this.handleGraphRangeChange(newVal, oldVal, this.cleaning, this.fetching, this.handleWebSocket, this.connection);
+		graphRange: function (newVal, oldVal) {
+			console.log('[DISKIOOVERALL] graphRange changed')
+			this.handleGraphRangeChange(newVal, oldVal, this.cleaning, this.fetching, this.handleWebSocket, this.connection)
 		}
 	},
 
-	mounted: function() {
-		let vm = this;
+	mounted: function () {
+		const vm = this
 
 		// Don't setup anything before everything is rendered
 		vm.$nextTick(function () {
 			// Setup the IntersectionObserver
 			// call to the vm.handleWebSocket if we're in realtime,
 			// otherwise just call vm.fetching
-			this.obs = vm.constructObs(vm.handleWebSocket, vm.cleaning);
+			this.obs = vm.constructObs(vm.handleWebSocket, vm.cleaning)
 			// Observe the element
-			this.obs.observe(vm.$el);
-		});
+			this.obs.observe(vm.$el)
+		})
 	},
 
-	beforeUnmount: function() {
+	beforeUnmount: function () {
 		// Stop the Observation of the element
-		this.obs.unobserve(this.$el);
+		this.obs.unobserve(this.$el)
 		// Close the webSocket connection
-		this.cleaning();
+		this.cleaning()
 	},
 
 	methods: {
-		getScale: function() {
+		getScale: function () {
 			return this.graphRange.scale != null ? this.graphRange.scale : this.defaultScale
 		},
 		// Function responsible to init the fetching data and the websocket connection
-		fetching: async function() {
-			let vm = this;
+		fetching: async function () {
+			const vm = this
 
 			// Await the first call to iostats_count cause it's needed for the next
 			await axios.get(vm.getBaseUrl('iostats_count', vm.uuid))
 				.then(resp => (vm.disksNumber = resp.data))
 				.catch(err => {
-					console.log("[DISKSIOOVERALL] Failed to fetch number of disks", err);
-					return;
-				});
+					console.log('[DISKSIOOVERALL] Failed to fetch number of disks', err)
+				})
 
 			// Compute the rangeParams in case of start & end or just scale
-			let rangeParams;
+			let rangeParams
 			if (vm.graphRange.start != null) {
-				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end);
+				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end)
 			} else {
-				rangeParams = vm.getMinMaxNowString(vm.getScale());
+				rangeParams = vm.getMinMaxNowString(vm.getScale())
 			}
 
 			axios
 				.get(vm.getBaseUrl('iostats', vm.uuid) + '&size=' + (vm.getScale() * vm.disksNumber) + rangeParams)
 				.then(resp => {
-					let dataLenght = resp.data.length;
+					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
 					// And skip disksNumber by disksNumber
-					for (let i = dataLenght - 1; i >= 0; i-=vm.disksNumber) {
+					for (let i = dataLenght - 1; i >= 0; i -= vm.disksNumber) {
 						if (vm.disksNumber > 1) {
-							let currentData = [];
+							const currentData = []
 							for (let y = 0; y < vm.disksNumber; y++) {
-								currentData.push(resp.data[i - y]);
+								currentData.push(resp.data[i - y])
 							}
-							vm.fastAddNewData(currentData);
+							vm.fastAddNewData(currentData)
 						} else {
-							vm.fastAddNewData([resp.data[i]]);
+							vm.fastAddNewData([resp.data[i]])
 						}
 					}
 
 					if (dataLenght > 0) {
 						// If there is data is wsBuffer we merge the data
-						let wsBuffSize = vm.wsBuffer.length;
+						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
-							console.log("[DISKSIOOVERALL] >>> Merging wsBuffer with already added data");
+							console.log('[DISKSIOOVERALL] >>> Merging wsBuffer with already added data')
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
-								let currItem = vm.wsBuffer[i];
-								let date = moment.utc(currItem[0][5]).unix();
+								const currItem = vm.wsBuffer[i]
+								const date = moment.utc(currItem[0][5]).unix()
 								// If the current lastest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
-									let total_read = 0;
-									let total_write = 0;
+									let total_read = 0
+									let total_write = 0
 									// Compute total read and write from all disks
 									for (let y = 0; y < currItem.length; y++) {
-										total_read += currItem[y][2];
-										total_write += currItem[y][3];
+										total_read += currItem[y][2]
+										total_write += currItem[y][3]
 									}
-									let {read, write} = vm.getReadWriteFrom(total_read, total_write);
-									console.log("[DISKSIOOVERALL] >>>> Adding value to the end of the buffer");
+									const { read, write } = vm.getReadWriteFrom(total_read, total_write)
+									console.log('[DISKSIOOVERALL] >>>> Adding value to the end of the buffer')
 									// Add the new value to the Array
-									vm.pushValue(date, read, write, total_read, total_write);
+									vm.pushValue(date, read, write, total_read, total_write)
 								}
 							}
 						}
 
 						// Update onscreen values
-						vm.updateGraph();
+						vm.updateGraph()
 					}
 
 					// Define the fetching as done
-					vm.fetchingDone = true;
+					vm.fetchingDone = true
 					// Clear the wsBuffer
-					vm.wsBuffer = [];
+					vm.wsBuffer = []
 				})
 				.catch(error => {
-					console.log("[DISKSIOOVERALL] Failed to fetch previous data", error);
+					console.log('[DISKSIOOVERALL] Failed to fetch previous data', error)
 				}).finally(() => {
-					vm.loadingMessage = "No Data"
-				});
+					vm.loadingMessage = 'No Data'
+				})
 		},
 		// Empty every arrays and close the websocket
-		cleaning: function(ws=true) {
-			this.fetchingDone = false;
-			this.chartLabels = [];
-			this.chartDataObjRead = [];
-			this.chartDataObjWrite = [];
-			this.historyDataRead = [];
-			this.historyDataWrite = [];
-			this.wsBuffer = [];
+		cleaning: function (ws = true) {
+			this.fetchingDone = false
+			this.chartLabels = []
+			this.chartDataObjRead = []
+			this.chartDataObjWrite = []
+			this.historyDataRead = []
+			this.historyDataWrite = []
+			this.wsBuffer = []
 			if (ws) {
-				this.closeWebSocket();
+				this.closeWebSocket()
 			}
 		},
 		// Null the data of an index (without nulling the Labels)
-		nullData: function(i) {
-			this.chartDataObjRead[i] = null;
-			this.chartDataObjWrite[i] = null;
-			this.historyDataRead[i] = null;
-			this.historyDataWrite[i] = null;
+		nullData: function (i) {
+			this.chartDataObjRead[i] = null
+			this.chartDataObjWrite[i] = null
+			this.historyDataRead[i] = null
+			this.historyDataWrite[i] = null
 		},
 		// Remove one index from each data arrays
-		spliceData: function(start, nb) {
-			this.chartLabels.splice(start, nb);
-			this.chartDataObjRead.splice(start, nb);
-			this.chartDataObjWrite.splice(start, nb);
-			this.historyDataRead.splice(start, nb);
-			this.historyDataWrite.splice(start, nb);
+		spliceData: function (start, nb) {
+			this.chartLabels.splice(start, nb)
+			this.chartDataObjRead.splice(start, nb)
+			this.chartDataObjWrite.splice(start, nb)
+			this.historyDataRead.splice(start, nb)
+			this.historyDataWrite.splice(start, nb)
 		},
 		// Update the graph by setting datacollection to the new arrays
-		updateGraph: function() {
+		updateGraph: function () {
 			// Sanitize the Data in case of gap
 			// but also remove too old element
 			this.sanitizeGraphData(
 				this.chartLabels.length,
 				this.getScale(),
 				this.chartLabels,
-				this.getScale()/60 + 5,
+				this.getScale() / 60 + 5,
 				this.spliceData,
 				this.nullData
-			);
+			)
 			// Update the datacollection so that uPlot update the chart
 			this.datacollection = [
 				this.chartLabels,
 				this.chartDataObjRead,
-				this.chartDataObjWrite,
-			];
+				this.chartDataObjWrite
+			]
 		},
 		// Add values (Labels and data) to the arrays
-		pushValue: function(date, read, write, histRead, histWrite) {
-			this.chartLabels.push(date);
+		pushValue: function (date, read, write, histRead, histWrite) {
+			this.chartLabels.push(date)
 			// If scale != default, should divide the values by granularity (at least for the graph)
-			if (this.getScale() != this.defaultScale) {
-				console.log("[DISKSIOOVERALL] Dividing value for the granularity [", this.graphRange.granularity, "]");
-				read = read / this.graphRange.granularity;
-				write = write / this.graphRange.granularity;
+			if (this.getScale() !== this.defaultScale) {
+				console.log('[DISKSIOOVERALL] Dividing value for the granularity [', this.graphRange.granularity, ']')
+				read = read / this.graphRange.granularity
+				write = write / this.graphRange.granularity
 			}
-			this.chartDataObjRead.push(read);
-			this.chartDataObjWrite.push(write);
-			this.historyDataRead.push(histRead);
-			this.historyDataWrite.push(histWrite);
+			this.chartDataObjRead.push(read)
+			this.chartDataObjWrite.push(write)
+			this.historyDataRead.push(histRead)
+			this.historyDataWrite.push(histWrite)
 		},
 		// Pretty explicit, but close the websocket and set null for the connection
-		closeWebSocket: function() {
-			console.log("[DISKSIOOVERALL] %cClosing %cthe WebSocket connection", "color:red;", "color:white;");
+		closeWebSocket: function () {
+			console.log('[DISKSIOOVERALL] %cClosing %cthe WebSocket connection', 'color:red;', 'color:white;')
 			if (this.connection != null) {
-				console.log("[DISKSIOOVERALL] > Closing the webSocket");
-				this.connection.close();
-				this.connection = null;
+				console.log('[DISKSIOOVERALL] > Closing the webSocket')
+				this.connection.close()
+				this.connection = null
 			}
 		},
 		// Init the websocket for changes in the hosts list
-		handleWebSocket: function() {
-			let vm = this;
+		handleWebSocket: function () {
+			const vm = this
 
-			if (vm.getScale() == 300) {
-				console.log("[DISKSIOOVERALL] %cStarting %cconnection to WebSocket Server", "color:green;", "color:white;");
+			if (vm.getScale() === 300) {
+				console.log('[DISKSIOOVERALL] %cStarting %cconnection to WebSocket Server', 'color:green;', 'color:white;')
 				if (vm.connection == null) {
-					console.log("[DISKSIOOVERALL] > Setting a new webSocket");
-					vm.connection = new WebSocket(vm.$wsBaseUrl + "/ws?query=insert:iostats:host_uuid.eq." + vm.uuid);
+					console.log('[DISKSIOOVERALL] > Setting a new webSocket')
+					vm.connection = new WebSocket(vm.$wsBaseUrl + '/ws?query=insert:iostats:host_uuid.eq.' + vm.uuid)
 				}
 				// only add the open (at least for the vm.fetching) if we're in realtime
-				vm.connection.addEventListener('open', function() {
-					console.log("[DISKSIOOVERALL] >> webSocket opened");
-					vm.fetching();
-				});
+				vm.connection.addEventListener('open', function () {
+					console.log('[DISKSIOOVERALL] >> webSocket opened')
+					vm.fetching()
+				})
 				// Setup onmessage listener
-				vm.connection.addEventListener('message', vm.wsMessageHandle);
+				vm.connection.addEventListener('message', vm.wsMessageHandle)
 			}
 		},
 		// TODO - Error in the case where we get a WS message before the intNumber is set.
-		wsMessageHandle: function(event) {
+		wsMessageHandle: function (event) {
 			// Parse the data and extract newValue
-			let json = JSON.parse(event.data);
-			let newValues = json["columnvalues"];
+			const json = JSON.parse(event.data)
+			const newValues = json.columnvalues
 			// Create a buffer of values due to WS sending one event by one event
 			// - and as multiple disks as the same time...
-			this.bufferDataWs.push(newValues);
-			if (this.fetchingDone && this.bufferDataWs.length == this.disksNumber) {
+			this.bufferDataWs.push(newValues)
+			if (this.fetchingDone && this.bufferDataWs.length === this.disksNumber) {
 				// Add the new data to the graph
-				this.addNewData();
+				this.addNewData()
 				// Clear the array
-				this.bufferDataWs = [];
-			// If we're not yet done with the fetching, but done with filling the disks buffer
-			} else if (!this.fetchingDone && this.bufferDataWs.length == this.disksNumber) {
+				this.bufferDataWs = []
+				// If we're not yet done with the fetching, but done with filling the disks buffer
+			} else if (!this.fetchingDone && this.bufferDataWs.length === this.disksNumber) {
 				// Add the value to the wsBuffer
-				console.log("[DISKSIOOVERALL] >> Adding values to the wsBuffer (WS opened but fetching not done yet)")
-				this.wsBuffer.push(this.bufferDataWs);
+				console.log('[DISKSIOOVERALL] >> Adding values to the wsBuffer (WS opened but fetching not done yet)')
+				this.wsBuffer.push(this.bufferDataWs)
 				// Clear the array
-				this.bufferDataWs = [];
+				this.bufferDataWs = []
 			}
 		},
-		getReadWriteFrom: function(total_read, total_write) {
-			let read = null;
-			let write = null;
+		getReadWriteFrom: function (total_read, total_write) {
+			let read = null
+			let write = null
 			// If the previous does not exist, we can't compute the percent
-			let prevIndex = this.chartLabels.length - 1;
+			const prevIndex = this.chartLabels.length - 1
 			if (!(this.historyDataRead[prevIndex] == null)) {
 				// Get the previous values
-				let prevRead = this.historyDataRead[prevIndex];
-				let prevWrite = this.historyDataWrite[prevIndex];
-				
+				const prevRead = this.historyDataRead[prevIndex]
+				const prevWrite = this.historyDataWrite[prevIndex]
+
 				// TODO - Auto scale to kb/mb/gb depending on the values
-				read = (total_read - prevRead) / BYTES_TO_MB;
-				write = -((total_write - prevWrite) / BYTES_TO_MB);
+				read = (total_read - prevRead) / BYTES_TO_MB
+				write = -((total_write - prevWrite) / BYTES_TO_MB)
 			}
 
-			return {read, write};
+			return { read, write }
 		},
-		fastAddNewData: function(elem) {			
-			let total_read = 0;
-			let total_write = 0;
+		fastAddNewData: function (elem) {
+			let total_read = 0
+			let total_write = 0
 			// Compute total read and write from all disks
 			for (let i = 0; i < this.disksNumber; i++) {
-				total_read += elem[i].read_bytes;
-				total_write += elem[i].write_bytes;
+				total_read += elem[i].read_bytes
+				total_write += elem[i].write_bytes
 			}
 
-			let {read, write} = this.getReadWriteFrom(total_read, total_write);
+			const { read, write } = this.getReadWriteFrom(total_read, total_write)
 
 			// Add the new value to the Array
-			this.pushValue(moment.utc(elem[0].created_at).unix(), read, write, total_read, total_write);
+			this.pushValue(moment.utc(elem[0].created_at).unix(), read, write, total_read, total_write)
 		},
-		addNewData: function() {
-			let total_read = 0;
-			let total_write = 0;
+		addNewData: function () {
+			let total_read = 0
+			let total_write = 0
 			// Compute total read and write from all disks
 			for (let i = 0; i < this.bufferDataWs.length; i++) {
-				total_read += this.bufferDataWs[i][3];
-				total_write += this.bufferDataWs[i][5];
+				total_read += this.bufferDataWs[i][3]
+				total_write += this.bufferDataWs[i][5]
 			}
 
-			let {read, write} = this.getReadWriteFrom(total_read, total_write);
+			const { read, write } = this.getReadWriteFrom(total_read, total_write)
 
 			// Add the new value to the Array
-			this.pushValue(moment.utc(this.bufferDataWs[0][8]).unix(), read, write, total_read, total_write);
+			this.pushValue(moment.utc(this.bufferDataWs[0][8]).unix(), read, write, total_read, total_write)
 
 			// Update onscreen values
-			this.updateGraph();
+			this.updateGraph()
 		}
 	}
 }

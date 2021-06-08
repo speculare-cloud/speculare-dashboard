@@ -1,14 +1,14 @@
 <template>
-	<div class="alarms">
-		<h2 class="text-lg font-medium leading-normal mb-4 text-gray-200">Alarms</h2>
-		<!-- Currently ongoing alarms -->
-		<!-- Currently enable alarms -->
-		<!-- Alarms list and create alarm -->
-	</div>
+	<h2 class="text-lg font-medium leading-normal mb-4 text-gray-200">
+		Alarms
+	</h2>
+	<!-- Currently ongoing alarms -->
+	<!-- Currently enable alarms -->
+	<!-- Alarms list and create alarm -->
 </template>
 
 <script>
 export default {
-	name: 'Alarms',
+	name: 'Alarms'
 }
 </script>
