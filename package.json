@@ -11,7 +11,7 @@
         "core-js": "^3.13.1",
         "moment": "^2.29.1",
         "pluralize": "^8.0.0",
-        "uplot": "^1.6.11",
+        "uplot": "^1.6.12",
         "v-calendar": "^2.3.0",
         "vue": "^2.6.13",
         "vue-router": "^3.5.1",
