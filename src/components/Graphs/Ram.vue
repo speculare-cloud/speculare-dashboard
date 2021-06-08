@@ -1,11 +1,14 @@
 <template>
-	<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
-		<h3>{{ loadingMessage }}</h3>
+	<div>
+		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
+			<h3>{{ loadingMessage }}</h3>
+		</div>
+		<Stacked :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
 	</div>
-	<Stacked :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
 </template>
 
 <script>
+import { nextTick } from 'vue'
 import Stacked from '@/components/Graphs/Utils/Stacked'
 import graphHelper from '@/mixins/graphHelper'
 import constructObs from '@/mixins/constructObs'
@@ -127,13 +130,11 @@ export default {
 		const vm = this
 
 		// Don't setup anything before everything is rendered
-		vm.$nextTick(function () {
+		nextTick(() => {
 			// Setup the IntersectionObserver
-			// call to the vm.handleWebSocket if we're in realtime,
-			// otherwise just call vm.fetching
 			this.obs = vm.constructObs(vm.handleWebSocket, vm.cleaning)
 			// Observe the element
-			this.obs.observe(vm.$el)
+			vm.obs.observe(vm.$el)
 		})
 	},
 

@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { nextTick } from 'vue'
 import axios from 'axios'
 
 export default {
@@ -20,7 +21,7 @@ export default {
 		const vm = this
 
 		// Don't setup anything before everything is rendered
-		vm.$nextTick(function () {
+		nextTick(() => {
 			// Get initial list of hosts (don't wait for websocket to add them at first)
 			// If we wait for the websocket this would take a long time...
 			axios
