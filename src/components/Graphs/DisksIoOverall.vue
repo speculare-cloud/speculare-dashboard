@@ -88,7 +88,7 @@ export default {
 		});
 	},
 
-	beforeDestroy: function() {
+	beforeUnmount: function() {
 		// Stop the Observation of the element
 		this.obs.unobserve(this.$el);
 		// Close the webSocket connection

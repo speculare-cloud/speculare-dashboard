@@ -8,7 +8,7 @@
 				</div>
 				<div class="py-1 ml-4">
 					<h3 class="font-medium">{{ item.name }}</h3>
-					<p class="text-sm text-gray-400">{{ item.nhosts }} {{ 'Host' | pluralize(item.nhosts) }}</p>
+					<p class="text-sm text-gray-400">{{ item.nhosts }} {{ $filters.pluralize('Host', item.nhosts) }}</p>
 				</div>
 			</div>
 		</div>
@@ -25,18 +25,16 @@
 				</div>
 			</div>
 			<!-- Real data, will take the lead once loaded -->
-			<router-link v-for="item in this.$store.state.hosts_values" v-bind:key="item.uuid" :to="{ name: 'hosts_details', params: { hostname: item.hostname, uuid: item.uuid} }" v-slot="{ href, navigate }" custom>
-				<a :href="href" @click="navigate">
-					<div class="flex items-center text-gray-200 bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg hover:bg-gray-600 hover:text-gray-100">
-						<div class="flex justify-center items-center rounded-full w-12 h-12" style="background-color: #004878">
-							<img :src="require('@/assets/imgs/server.svg')" :alt="item.system" class="w-6 h-8" width="2rem" height="2rem"/>
-						</div>
-						<div class="py-1 ml-4">
-							<h3 class="font-medium">{{ item.hostname }}</h3>
-							<p class="text-sm text-gray-400">{{ item.uptime }}</p>
-						</div>
+			<router-link v-for="item in this.$store.state.hosts_values" v-bind:key="item.uuid" :to="{ name: 'hosts_details', params: { hostname: item.hostname, uuid: item.uuid} }">
+				<div class="flex items-center text-gray-200 bg-gray-800 relative shadow px-4 py-3 rounded-lg hover:shadow-lg hover:bg-gray-600 hover:text-gray-100">
+					<div class="flex justify-center items-center rounded-full w-12 h-12" style="background-color: #004878">
+						<img :src="require('@/assets/imgs/server.svg')" :alt="item.system" class="w-6 h-8" width="2rem" height="2rem"/>
 					</div>
-				</a>
+					<div class="py-1 ml-4">
+						<h3 class="font-medium">{{ item.hostname }}</h3>
+						<p class="text-sm text-gray-400">{{ item.uptime }}</p>
+					</div>
+				</div>
 			</router-link>
 		</div>
 	</div>

@@ -10,7 +10,7 @@ import axios from 'axios';
 export default {
 	name: 'App',
 
-	data: function() {
+	data() {
 		return {
 			connection: null
 		}
@@ -48,7 +48,7 @@ export default {
 		});
 	},
 
-	beforeDestroy: function() {
+	beforeUnmount: function() {
 		let vm = this;
 		
 		// Close the webSocket connection

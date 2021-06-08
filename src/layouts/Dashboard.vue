@@ -3,10 +3,8 @@
 		<div class="md:flex flex-col md:flex-row md:min-h-screen w-full">
 			<div class="flex flex-col w-full md:w-48 text-gray-200 bg-gray-800 flex-shrink-0">
 				<div class="flex-shrink-0 px-8 md:px-0 py-4 flex flex-row items-center justify-between md:justify-center">
-					<router-link to="/" v-slot="{ href, navigate }" custom>
-						<a :href="href" @click="navigate" class="text-lg font-semibold tracking-widest uppercase rounded-lg text-white focus:outline-none focus:shadow-outline">
-							Speculare
-						</a>
+					<router-link to="/" class="text-lg font-semibold tracking-widest uppercase rounded-lg text-white focus:outline-none focus:shadow-outline">
+						Speculare
 					</router-link>
 					<button class="rounded-lg md:hidden focus:outline-none focus:shadow-outline" @click="open = !open" aria-label="menu">
 						<svg fill="currentColor" viewBox="0 0 20 20" class="w-6 h-6">

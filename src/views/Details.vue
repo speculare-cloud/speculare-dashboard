@@ -3,20 +3,18 @@
 		<nav class="text-sm font-medium leading-normal mb-4 text-gray-200" aria-label="Breadcrumb">
 			<ul class="flex text-sm lg:text-base">
 				<li class="inline-flex items-center">
-					<router-link to="/" v-slot="{ href, navigate }" custom>
-						<a :href="href" @click="navigate">
-							<svg class="h-6 w-6">
-    							<use xlink:href="@/assets/imgs/home.svg#home" />
-  							</svg>
-						</a>
+					<router-link to="/">
+						<svg class="h-6 w-6">
+							<use xlink:href="@/assets/imgs/home.svg#home" />
+						</svg>
 					</router-link>
 					<svg class="h-5 w-auto" fill="currentColor" viewBox="0 0 20 20">
 						<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
 					</svg>
 				</li>
 				<li class="inline-flex items-center" v-for="(breadcrumb, idx) in this.$route.meta.breadcrumb" :key="idx">
-					<router-link :to="'/' + breadcrumb.link" v-slot="{ href, navigate }" custom>
-						<a :href="href" @click="navigate">{{ breadcrumb.name }}</a>
+					<router-link :to="'/' + breadcrumb.link">
+						{{ breadcrumb.name }}
 					</router-link>
 					<svg class="h-5 w-auto" fill="currentColor" viewBox="0 0 20 20">
 						<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
@@ -139,37 +137,38 @@
 
 <script>
 import Skeleton from '@/components/Graphs/Utils/Skeleton';
-import DatePicker from 'v-calendar/lib/components/date-picker.umd'
-import moment from 'moment';
+import { DatePicker } from 'v-calendar';
+import { defineAsyncComponent } from 'vue'
+// import moment from 'moment';
 
 const scaleIdxArr = [5, 15, 30, 60, 180, 360];
 export default {
 	name: 'Details',
 	components: {
 		DatePicker,
-		CpuTimes: () => ({
-			component: import('@/components/Graphs/CpuTimes'),
-			loading: Skeleton
+		CpuTimes: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/CpuTimes'),
+			loadingComponent: Skeleton
 		}),
-		CpuLoad: () => ({
-      		component: import('@/components/Graphs/CpuLoad.vue'),
-      		loading: Skeleton,
-    	}),
-		DisksIoOverall: () => ({
-			component: import('@/components/Graphs/DisksIoOverall'),
-			loading: Skeleton
+		CpuLoad: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/CpuLoad.vue'),
+			loadingComponent: Skeleton
 		}),
-		Ram: () => ({
-			component: import('@/components/Graphs/Ram'),
-			loading: Skeleton
+		DisksIoOverall: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/DisksIoOverall'),
+			loadingComponent: Skeleton
 		}),
-		Swap: () => ({
-			component: import('@/components/Graphs/Swap'),
-			loading: Skeleton
+		Ram: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/Ram'),
+			loadingComponent: Skeleton
 		}),
-		IoCounters: () => ({
-			component: import('@/components/Graphs/IoCounters'),
-			loading: Skeleton
+		Swap: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/Swap'),
+			loadingComponent: Skeleton
+		}),
+		IoCounters: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/IoCounters'),
+			loadingComponent: Skeleton
 		}),
   	},
 
