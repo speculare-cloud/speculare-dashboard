@@ -121,7 +121,7 @@ export default {
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const date = moment.utc(currItem[12]).unix()
-								// If the current lastest date is lower than the date in the buffer
+								// If the current latest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
 									// Compute the busy time of the CPU from these params
 									const busy = currItem[1] + currItem[2] + currItem[3] + currItem[6] + currItem[7] + currItem[8]

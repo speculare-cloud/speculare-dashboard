@@ -159,7 +159,7 @@ export default {
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const date = moment.utc(currItem[5]).unix()
-								// If the current lastest date is lower than the date in the buffer
+								// If the current latest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
 									console.log('[loadavg] >>>> Adding value to the end of the buffer')
 									// Add the new value to the Array

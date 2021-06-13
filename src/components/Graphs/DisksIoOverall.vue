@@ -151,7 +151,7 @@ export default {
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const date = moment.utc(currItem[0][5]).unix()
-								// If the current lastest date is lower than the date in the buffer
+								// If the current latest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
 									let total_read = 0
 									let total_write = 0

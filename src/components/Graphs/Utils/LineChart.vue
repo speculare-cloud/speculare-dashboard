@@ -42,7 +42,7 @@ export default {
 			}
 
 			if (!this.hovered) {
-				// Update the legend to the lastest value
+				// Update the legend to the latest value
 				this.chart.setLegend({ idx: newData[1].length - 1 }, false)
 			}
 		}
