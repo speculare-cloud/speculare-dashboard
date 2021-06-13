@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 const ws = {
 	methods: {
 		initWS (table, vm) {
@@ -5,7 +7,8 @@ const ws = {
 				console.log('[' + table + '] %cStarting %cconnection to WebSocket Server', 'color:green;', 'color:white;')
 				if (vm.connection == null) {
 					console.log('[' + table + '] > Setting a new webSocket')
-					vm.connection = new WebSocket(vm.$wsBaseUrl + '/ws?query=insert:' + table + ':host_uuid.eq.' + vm.uuid)
+					const now_table = table + moment.utc().format('_pYYYY_MM_DD')
+					vm.connection = new WebSocket(vm.$wsBaseUrl + '/ws?query=insert:' + now_table + ':host_uuid.eq.' + vm.uuid)
 				}
 				// only add the open (at least for the vm.fetching) if we're in realtime
 				vm.connection.addEventListener('open', function () {
