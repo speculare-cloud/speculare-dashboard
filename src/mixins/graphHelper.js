@@ -3,9 +3,27 @@ import uPlot from 'uplot'
 
 const _spline = uPlot.paths.spline()
 
-const sanitizeGraphData = {
+const graphHelper = {
 	methods: {
-		handleGraphRangeChange: function (newVal, oldVal, cleaning, fetching, handleWebSocket, connection) {
+		updateGraph: function (vm, updateValues) {
+			const scale = vm.getScale(vm)
+			// Sanitize the Data in case of gap
+			// but also remove too old element
+			vm.sanitizeGraphData(
+				vm.chartLabels.length,
+				scale,
+				vm.chartLabels,
+				scale / 60 + 5,
+				vm.spliceData,
+				vm.nullData
+			)
+			// Update the datacollection so that uPlot update the chart
+			updateValues()
+		},
+		getScale: function (vm) {
+			return vm.graphRange.scale != null ? vm.graphRange.scale : vm.defaultScale
+		},
+		handleGraphRangeChange: function (newVal, oldVal, cleaning, fetching, handleWebSocket, isConnectionNull) {
 			if (newVal.start != null) {
 				// Clear the data and close the websocket
 				cleaning()
@@ -21,7 +39,7 @@ const sanitizeGraphData = {
 					// Clear the data and close the websocket if needed
 					cleaning(newVal.scale !== 300)
 					// Check if we have to open the WS (if we're trying to get the last 5 minutes)
-					if (newVal.scale === 300 && connection === null) {
+					if (newVal.scale === 300 && isConnectionNull) {
 						// Open the websocket and refetch the data
 						handleWebSocket()
 					} else {
@@ -89,4 +107,4 @@ const sanitizeGraphData = {
 	}
 }
 
-export default sanitizeGraphData
+export default graphHelper

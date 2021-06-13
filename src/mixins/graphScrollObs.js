@@ -1,6 +1,6 @@
-const constructObs = {
+const graphScrollObs = {
 	methods: {
-		constructObs (fetching, cleaning) {
+		graphScrollObs (fetching, cleaning) {
 			// Observe if the $el is visible or not
 			return new IntersectionObserver((entries) => {
 				if (entries[0].intersectionRatio > 0) {
@@ -18,4 +18,4 @@ const constructObs = {
 	}
 }
 
-export default constructObs
+export default graphScrollObs

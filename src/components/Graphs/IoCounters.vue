@@ -11,7 +11,8 @@
 import { nextTick } from 'vue'
 import LineChart from '@/components/Graphs/Utils/LineChart'
 import graphHelper from '@/mixins/graphHelper'
-import constructObs from '@/mixins/constructObs'
+import graphScrollObs from '@/mixins/graphScrollObs'
+import graphWebSocket from '@/mixins/graphWebSocket'
 import axios from 'axios'
 import moment from 'moment'
 
@@ -22,7 +23,7 @@ export default {
 	components: {
 		LineChart
 	},
-	mixins: [graphHelper, constructObs],
+	mixins: [graphHelper, graphScrollObs, graphWebSocket],
 	props: {
 		uuid: {
 			type: String,
@@ -79,8 +80,9 @@ export default {
 
 	watch: {
 		graphRange: function (newVal, oldVal) {
-			console.log('[CPUTIMES] graphRange changed')
-			this.handleGraphRangeChange(newVal, oldVal, this.cleaning, this.fetching, this.handleWebSocket, this.connection)
+			const vm = this
+			console.log('[iocounters] graphRange changed')
+			vm.handleGraphRangeChange(newVal, oldVal, vm.cleaning, vm.fetching, function () { vm.initWS('iocounters', vm) }, vm.connection === null)
 		}
 	},
 
@@ -90,7 +92,7 @@ export default {
 		// Don't setup anything before everything is rendered
 		nextTick(() => {
 			// Setup the IntersectionObserver
-			this.obs = vm.constructObs(vm.handleWebSocket, vm.cleaning)
+			this.obs = vm.graphScrollObs(function () { vm.initWS('iocounters', vm) }, vm.cleaning)
 			// Observe the element
 			vm.obs.observe(vm.$el)
 		})
@@ -104,9 +106,6 @@ export default {
 	},
 
 	methods: {
-		getScale: function () {
-			return this.graphRange.scale != null ? this.graphRange.scale : this.defaultScale
-		},
 		// Function responsible to init the fetching data and the websocket connection
 		fetching: async function () {
 			const vm = this
@@ -115,7 +114,7 @@ export default {
 			await axios.get(vm.getBaseUrl('iocounters_count', vm.uuid))
 				.then(resp => (vm.intNumber = resp.data))
 				.catch(err => {
-					console.log('[IOCOUNTERS] Failed to fetch number of disks', err)
+					console.log('[iocounters] Failed to fetch number of disks', err)
 				})
 
 			// Compute the rangeParams in case of start & end or just scale
@@ -123,11 +122,11 @@ export default {
 			if (vm.graphRange.start != null) {
 				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end)
 			} else {
-				rangeParams = vm.getMinMaxNowString(vm.getScale())
+				rangeParams = vm.getMinMaxNowString(vm.getScale(vm))
 			}
 
 			axios
-				.get(vm.getBaseUrl('iocounters', vm.uuid) + '&size=' + (vm.getScale() * vm.intNumber) + rangeParams)
+				.get(vm.getBaseUrl('iocounters', vm.uuid) + '&size=' + (vm.getScale(vm) * vm.intNumber) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -148,7 +147,7 @@ export default {
 						// If there is data is wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
-							console.log('[IOCOUNTERS] >>> Merging wsBuffer with already added data')
+							console.log('[iocounters] >>> Merging wsBuffer with already added data')
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const date = moment.utc(currItem[0][11]).unix()
@@ -162,7 +161,7 @@ export default {
 										total_sent += currItem[y][6]
 									}
 									const { recv, sent } = vm.getReadWriteFrom(total_recv, total_sent)
-									console.log('[IOCOUNTERS] >>>> Adding value to the end of the buffer')
+									console.log('[iocounters] >>>> Adding value to the end of the buffer')
 									// Add the new value to the Array
 									vm.pushValue(date, recv, sent, total_recv, total_sent)
 								}
@@ -170,7 +169,7 @@ export default {
 						}
 
 						// Update onscreen values
-						vm.updateGraph()
+						vm.updateGraph(vm, function () { vm.datacollection = [vm.chartLabels, vm.chartDataObjRecv, vm.chartDataObjSent] })
 					}
 
 					// Define the fetching as done
@@ -179,7 +178,7 @@ export default {
 					vm.wsBuffer = []
 				})
 				.catch(error => {
-					console.log('[IOCOUNTERS] Failed to fetch previous data', error)
+					console.log('[iocounters] Failed to fetch previous data', error)
 				}).finally(() => {
 					vm.loadingMessage = 'No Data'
 				})
@@ -194,7 +193,7 @@ export default {
 			this.historyDataSent = []
 			this.wsBuffer = []
 			if (ws) {
-				this.closeWebSocket()
+				this.closeWS('iocounters', this)
 			}
 		},
 		// Null the data of an index (without nulling the Labels)
@@ -212,31 +211,12 @@ export default {
 			this.historyDataRecv.splice(start, nb)
 			this.historyDataSent.splice(start, nb)
 		},
-		// Update the graph by setting datacollection to the new arrays
-		updateGraph: function () {
-			// Sanitize the Data in case of gap
-			// but also remove too old element
-			this.sanitizeGraphData(
-				this.chartLabels.length,
-				this.getScale(),
-				this.chartLabels,
-				this.getScale() / 60 + 5,
-				this.spliceData,
-				this.nullData
-			)
-			// Update the datacollection so that uPlot update the chart
-			this.datacollection = [
-				this.chartLabels,
-				this.chartDataObjRecv,
-				this.chartDataObjSent
-			]
-		},
 		// Add values (Labels and data) to the arrays
 		pushValue: function (date, recv, sent, histrecv, histSent) {
 			this.chartLabels.push(date)
 			// If scale != default, should divide the values by granularity (at least for the graph)
-			if (this.getScale() !== this.defaultScale) {
-				console.log('[IOCOUNTERS] Dividing value for the granularity [', this.graphRange.granularity, ']')
+			if (this.getScale(this) !== this.defaultScale) {
+				console.log('[iocounters] Dividing value for the granularity [', this.graphRange.granularity, ']')
 				recv = recv / this.graphRange.granularity
 				sent = sent / this.graphRange.granularity
 			}
@@ -245,35 +225,6 @@ export default {
 			this.historyDataRecv.push(histrecv)
 			this.historyDataSent.push(histSent)
 		},
-		// Pretty explicit, but close the websocket and set null for the connection
-		closeWebSocket: function () {
-			console.log('[IOCOUNTERS] %cClosing %cthe WebSocket connection', 'color:red;', 'color:white;')
-			if (this.connection != null) {
-				console.log('[IOCOUNTERS] > Closing the webSocket')
-				this.connection.close()
-				this.connection = null
-			}
-		},
-		// Init the websocket for changes in the hosts list
-		handleWebSocket: function () {
-			const vm = this
-
-			if (vm.getScale() === 300) {
-				console.log('[IOCOUNTERS] %cStarting %cconnection to WebSocket Server', 'color:green;', 'color:white;')
-				if (vm.connection == null) {
-					console.log('[IOCOUNTERS] > Setting a new webSocket')
-					vm.connection = new WebSocket(vm.$wsBaseUrl + '/ws?query=insert:iocounters:host_uuid.eq.' + vm.uuid)
-				}
-				// only add the open (at least for the vm.fetching) if we're in realtime
-				vm.connection.addEventListener('open', function () {
-					console.log('[IOCOUNTERS] >> webSocket opened')
-					vm.fetching()
-				})
-				// Setup onmessage listener
-				vm.connection.addEventListener('message', vm.wsMessageHandle)
-			}
-		},
-		// TODO - Error in the case where we get a WS message before the intNumber is set.
 		wsMessageHandle: function (event) {
 			// Parse the data and extract newValue
 			const json = JSON.parse(event.data)
@@ -289,7 +240,7 @@ export default {
 				// If we're not yet done with the fetching, but done with filling the disks buffer
 			} else if (!this.fetchingDone && this.bufferDataWs.length === this.intNumber) {
 				// Add the value to the wsBuffer
-				console.log('[IOCOUNTERS] >> Adding values to the wsBuffer (WS opened but fetching not done yet)')
+				console.log('[iocounters] >> Adding values to the wsBuffer (WS opened but fetching not done yet)')
 				this.wsBuffer.push(this.bufferDataWs)
 				// Clear the array
 				this.bufferDataWs = []
@@ -327,21 +278,22 @@ export default {
 			this.pushValue(moment.utc(elem[0].created_at).unix(), recv, sent, total_recv, total_sent)
 		},
 		addNewData: function () {
+			const vm = this
 			let total_recv = 0
 			let total_sent = 0
 			// Compute total read and write from all disks
-			for (let i = 0; i < this.bufferDataWs.length; i++) {
-				total_recv += this.bufferDataWs[i][2]
-				total_sent += this.bufferDataWs[i][6]
+			for (let i = 0; i < vm.bufferDataWs.length; i++) {
+				total_recv += vm.bufferDataWs[i][2]
+				total_sent += vm.bufferDataWs[i][6]
 			}
 
-			const { recv, sent } = this.getReadWriteFrom(total_recv, total_sent)
+			const { recv, sent } = vm.getReadWriteFrom(total_recv, total_sent)
 
 			// Add the new value to the Array
-			this.pushValue(moment.utc(this.bufferDataWs[0][11]).unix(), recv, sent, total_recv, total_sent)
+			vm.pushValue(moment.utc(vm.bufferDataWs[0][11]).unix(), recv, sent, total_recv, total_sent)
 
 			// Update onscreen values
-			this.updateGraph()
+			vm.updateGraph(vm, function () { vm.datacollection = [vm.chartLabels, vm.chartDataObjRecv, vm.chartDataObjSent] })
 		}
 	}
 }

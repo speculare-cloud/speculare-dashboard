@@ -42,7 +42,7 @@
 			<p class="text-sm text-gray-200">
 				System load. The 3 metrics refer to 1, 5 and 15 minutes averages. Computed once every 5 seconds.
 			</p>
-			<CpuLoad :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<LoadAvg :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">
@@ -188,8 +188,8 @@ export default {
 			loader: () => import('@/components/Graphs/CpuTimes'),
 			loadingComponent: Skeleton
 		}),
-		CpuLoad: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/CpuLoad.vue'),
+		LoadAvg: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/LoadAvg.vue'),
 			loadingComponent: Skeleton
 		}),
 		DisksIoOverall: defineAsyncComponent({
