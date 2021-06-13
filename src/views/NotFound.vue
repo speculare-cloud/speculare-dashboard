@@ -1,16 +1,20 @@
 <template>
 	<div id="notfound">
 		<div class="notfound">
-			<h1 class="text-gray-200">404</h1>
-			<h2 class="text-gray-200">Oops! Page Not Found</h2>
-			<p class="text-gray-400">Sorry but the page you are looking for does not exist, have been removed, name changed or is temporarily unavailable</p>
-			<router-link to="/" v-slot="{ href, navigate }" custom>
-				<a :href="href" @click="navigate" class="flex items-center py-2">
-					<svg class="h-6 w-6 mr-2">
-						<use xlink:href="@/assets/imgs/arrow_back.svg#arrow_back" />
-					</svg>
-					<div>Back to homepage</div>
-				</a>
+			<h1 class="text-gray-200">
+				404
+			</h1>
+			<h2 class="text-gray-200">
+				Oops! Page Not Found
+			</h2>
+			<p class="text-gray-400">
+				Sorry but the page you are looking for does not exist, have been removed, name changed or is temporarily unavailable
+			</p>
+			<router-link to="/" class="flex items-center py-2">
+				<svg class="h-6 w-6 mr-2">
+					<use xlink:href="@/assets/imgs/arrow_back.svg#arrow_back" />
+				</svg>
+				<div>Back to homepage</div>
 			</router-link>
 		</div>
 	</div>

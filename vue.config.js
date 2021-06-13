@@ -1,12 +1,17 @@
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 
 module.exports = {
-    devServer: {
-        host: "localhost"
-    },
-    configureWebpack: {
-        plugins: [
-            new MomentLocalesPlugin(),
-        ]
-    }
+	lintOnSave: false,
+	devServer: {
+		host: 'localhost',
+		overlay: {
+			warnings: true,
+			errors: true
+		}
+	},
+	configureWebpack: {
+		plugins: [
+			new MomentLocalesPlugin()
+		]
+	}
 }

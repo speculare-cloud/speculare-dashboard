@@ -3,25 +3,23 @@
 		<div v-if="datacollection == null" class="w-100 flex items-center justify-center text-xl text-gray-400" style="height: 258px">
 			<h3>{{ loadingMessage }}</h3>
 		</div>
-		<Stacked :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
+		<LineChart :chartdata="datacollection" :chartseries="chartSeries" :unit="unit" />
 	</div>
 </template>
 
 <script>
 import { nextTick } from 'vue'
-import Stacked from '@/components/Graphs/Utils/Stacked'
+import LineChart from '@/components/Graphs/Utils/LineChart'
 import graphHelper from '@/mixins/graphHelper'
 import graphScrollObs from '@/mixins/graphScrollObs'
 import graphWebSocket from '@/mixins/graphWebSocket'
 import axios from 'axios'
 import moment from 'moment'
 
-const KB_TO_MB = 1000
-
 export default {
-	name: 'Ram',
+	name: 'Loadavg',
 	components: {
-		Stacked
+		LineChart
 	},
 	mixins: [graphHelper, graphScrollObs, graphWebSocket],
 	props: {
@@ -38,7 +36,7 @@ export default {
 	data () {
 		return {
 			defaultScale: 300,
-			unit: 'MiB',
+			unit: 'load',
 			connection: null,
 			fetchingDone: false,
 			datacollection: null,
@@ -46,8 +44,8 @@ export default {
 			chartSeries: [
 				{},
 				Object.assign({
-					label: 'free',
-					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjFree[i], 1),
+					label: 'load1',
+					value: (_, v) => v == null ? '-' : v.toFixed(2),
 					points: {
 						show: false
 					},
@@ -59,11 +57,11 @@ export default {
 					drawStyle: 0,
 					lineInterpolation: 1,
 					stroke: '#7EB26D',
-					fill: '#7EB26D'
+					fill: '#7EB26D1A'
 				}),
 				Object.assign({
-					label: 'used',
-					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjUsed[i], 1),
+					label: 'load5',
+					value: (_, v) => v == null ? '-' : v.toFixed(2),
 					points: {
 						show: false
 					},
@@ -74,12 +72,12 @@ export default {
 				}, {
 					drawStyle: 0,
 					lineInterpolation: 1,
-					stroke: '#ff5722',
-					fill: '#ff5722'
+					stroke: '#008080',
+					fill: '#0080801A'
 				}),
 				Object.assign({
-					label: 'cached',
-					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjCached[i], 1),
+					label: 'load15',
+					value: (_, v) => v == null ? '-' : v.toFixed(2),
 					points: {
 						show: false
 					},
@@ -91,31 +89,14 @@ export default {
 					drawStyle: 0,
 					lineInterpolation: 1,
 					stroke: '#DA70D6',
-					fill: '#DA70D6'
-				}),
-				Object.assign({
-					label: 'buffers',
-					value: (_u, v, _si, i) => this.intValueOrTilde(this.chartDataObjBuffers[i], 1),
-					points: {
-						show: false
-					},
-					width: Math.min(Math.max(2 / devicePixelRatio, 1.25), 2),
-					drawStyle: 2,
-					lineInterpolation: null,
-					paths: this.splineGraph
-				}, {
-					drawStyle: 0,
-					lineInterpolation: 1,
-					stroke: '#EAB839',
-					fill: '#EAB839'
+					fill: '#DA70D61A'
 				})
 			],
 			wsBuffer: [],
 			chartLabels: [],
-			chartDataObjFree: [],
-			chartDataObjUsed: [],
-			chartDataObjCached: [],
-			chartDataObjBuffers: [],
+			chartDataObjOne: [],
+			chartDataObjFive: [],
+			chartDataObjFitheen: [],
 			obs: null
 		}
 	},
@@ -123,8 +104,8 @@ export default {
 	watch: {
 		graphRange: function (newVal, oldVal) {
 			const vm = this
-			console.log('[memory] graphRange changed')
-			this.handleGraphRangeChange(newVal, oldVal, vm.cleaning, vm.fetching, function () { vm.initWS('cputimes', vm) }, vm.connection === null)
+			console.log('[loadavg] graphRange changed')
+			vm.handleGraphRangeChange(newVal, oldVal, vm.cleaning, vm.fetching, function () { vm.initWS('loadavg', vm) }, vm.connection === null)
 		}
 	},
 
@@ -134,7 +115,7 @@ export default {
 		// Don't setup anything before everything is rendered
 		nextTick(() => {
 			// Setup the IntersectionObserver
-			this.obs = vm.graphScrollObs(function () { vm.initWS('memory', vm) }, vm.cleaning)
+			vm.obs = vm.graphScrollObs(function () { vm.initWS('loadavg', vm) }, vm.cleaning)
 			// Observe the element
 			vm.obs.observe(vm.$el)
 		})
@@ -162,7 +143,7 @@ export default {
 
 			// Fetching old data with the API
 			axios
-				.get(vm.getBaseUrl('memory', vm.uuid) + '&size=' + vm.getScale(vm) + rangeParams)
+				.get(vm.getBaseUrl('loadavg', vm.uuid) + '&size=' + vm.getScale(vm) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -174,26 +155,27 @@ export default {
 						// If there is data is wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
-							console.log('[memory] >>> Merging wsBuffer with already added data')
+							console.log('[loadavg] >>> Merging wsBuffer with already added data')
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
-								const date = moment.utc(currItem[8]).unix()
+								const date = moment.utc(currItem[5]).unix()
 								// If the current lastest date is lower than the date in the buffer
 								if (vm.chartLabels[vm.chartLabels.length - 1] < date) {
-									console.log('[memory] >>>> Adding value to the end of the buffer')
+									console.log('[loadavg] >>>> Adding value to the end of the buffer')
 									// Add the new value to the Array
-									vm.pushValue(date, currItem[2], currItem[3], currItem[6], currItem[5])
+									vm.pushValue(date, currItem[1], currItem[2], currItem[3])
 								}
 							}
 						}
 
 						// Update onscreen values
 						vm.updateGraph(vm, function () {
-							vm.datacollection = [vm.chartLabels,
-								vm.chartDataObjFree,
-								vm.chartDataObjUsed,
-								vm.chartDataObjCached,
-								vm.chartDataObjBuffers]
+							vm.datacollection = [
+								vm.chartLabels,
+								vm.chartDataObjOne,
+								vm.chartDataObjFive,
+								vm.chartDataObjFitheen
+							]
 						})
 					}
 
@@ -203,7 +185,7 @@ export default {
 					vm.wsBuffer = []
 				})
 				.catch(error => {
-					console.log('[memory] Failed to fetch previous data', error)
+					console.log('[loadavg] Failed to fetch previous data', error)
 				}).finally(() => {
 					vm.loadingMessage = 'No Data'
 				})
@@ -212,37 +194,33 @@ export default {
 		cleaning: function (ws = true) {
 			this.fetchingDone = false
 			this.chartLabels = []
-			this.chartDataObjFree = []
-			this.chartDataObjUsed = []
-			this.chartDataObjCached = []
-			this.chartDataObjBuffers = []
+			this.chartDataObjOne = []
+			this.chartDataObjFive = []
+			this.chartDataObjFitheen = []
 			this.wsBuffer = []
 			if (ws) {
-				this.closeWS('memory', this)
+				this.closeWS('loadavg', this)
 			}
 		},
 		// Null the data of an index (without nulling the Labels)
 		nullData: function (i) {
-			this.chartDataObjFree[i] = null
-			this.chartDataObjUsed[i] = null
-			this.chartDataObjCached[i] = null
-			this.chartDataObjBuffers[i] = null
+			this.chartDataObjOne[i] = null
+			this.chartDataObjFive[i] = null
+			this.chartDataObjFitheen[i] = null
 		},
-		// Remove one index from each data arrays
+		// Remove nb index from each data arrays starting from start
 		spliceData: function (start, nb) {
 			this.chartLabels.splice(start, nb)
-			this.chartDataObjFree.splice(start, nb)
-			this.chartDataObjUsed.splice(start, nb)
-			this.chartDataObjCached.splice(start, nb)
-			this.chartDataObjBuffers.splice(start, nb)
+			this.chartDataObjOne.splice(start, nb)
+			this.chartDataObjFive.splice(start, nb)
+			this.chartDataObjFitheen.splice(start, nb)
 		},
 		// Add values (Labels and data) to the arrays
-		pushValue: function (date, free, used, cached, buffers) {
+		pushValue: function (date, one, five, fith) {
 			this.chartLabels.push(date)
-			this.chartDataObjFree.push(free / KB_TO_MB)
-			this.chartDataObjUsed.push(used / KB_TO_MB)
-			this.chartDataObjCached.push(cached / KB_TO_MB)
-			this.chartDataObjBuffers.push(buffers / KB_TO_MB)
+			this.chartDataObjOne.push(Math.round(one * 100) / 100)
+			this.chartDataObjFive.push(Math.round(five * 100) / 100)
+			this.chartDataObjFitheen.push(Math.round(fith * 100) / 100)
 		},
 		wsMessageHandle: function (event) {
 			// Parse the data and extract newValue
@@ -254,26 +232,27 @@ export default {
 				this.addNewData(newValues)
 			} else {
 				// Add the value to the wsBuffer
-				console.log('[memory] >> Adding value to the wsBuffer (WS opened but fetching not done yet)')
+				console.log('[loadavg] >> Adding value to the wsBuffer (WS opened but fetching not done yet)')
 				this.wsBuffer.push(newValues)
 			}
 		},
 		fastAddNewData: function (elem) {
 			// Add the new value to the Array
-			this.pushValue(moment.utc(elem.created_at).unix(), elem.free, elem.used, elem.cached, elem.buffers)
+			this.pushValue(moment.utc(elem.created_at).unix(), elem.one, elem.five, elem.fifteen)
 		},
 		addNewData: function (newValues) {
 			const vm = this
 			// Add the new value to the Array
-			vm.pushValue(moment.utc(newValues[8]).unix(), newValues[2], newValues[3], newValues[6], newValues[5])
+			vm.pushValue(moment.utc(newValues[5]).unix(), newValues[1], newValues[2], newValues[3])
 
 			// Update onscreen values
 			vm.updateGraph(vm, function () {
-				vm.datacollection = [vm.chartLabels,
-					vm.chartDataObjFree,
-					vm.chartDataObjUsed,
-					vm.chartDataObjCached,
-					vm.chartDataObjBuffers]
+				vm.datacollection = [
+					vm.chartLabels,
+					vm.chartDataObjOne,
+					vm.chartDataObjFive,
+					vm.chartDataObjFitheen
+				]
 			})
 		}
 	}
