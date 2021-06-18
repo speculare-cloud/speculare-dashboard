@@ -19,7 +19,7 @@ import moment from 'moment'
 const BYTES_TO_MB = 1000000
 
 export default {
-	name: 'Iocounters',
+	name: 'Ionets',
 	components: {
 		LineChart
 	},
@@ -81,8 +81,8 @@ export default {
 	watch: {
 		graphRange: function (newVal, oldVal) {
 			const vm = this
-			console.log('[iocounters] graphRange changed')
-			vm.handleGraphRangeChange(newVal, oldVal, vm.cleaning, vm.fetching, function () { vm.initWS('iocounters', vm) }, vm.connection === null)
+			console.log('[ionets] graphRange changed')
+			vm.handleGraphRangeChange(newVal, oldVal, vm.cleaning, vm.fetching, function () { vm.initWS('ionets', vm) }, vm.connection === null)
 		}
 	},
 
@@ -92,7 +92,7 @@ export default {
 		// Don't setup anything before everything is rendered
 		nextTick(() => {
 			// Setup the IntersectionObserver
-			this.obs = vm.graphScrollObs(function () { vm.initWS('iocounters', vm) }, vm.cleaning)
+			this.obs = vm.graphScrollObs(function () { vm.initWS('ionets', vm) }, vm.cleaning)
 			// Observe the element
 			vm.obs.observe(vm.$el)
 		})
@@ -111,10 +111,10 @@ export default {
 			const vm = this
 
 			// Await the first call to iostats_count cause it's needed for the next
-			await axios.get(vm.getBaseUrl('iocounters_count', vm.uuid))
+			await axios.get(vm.getBaseUrl('ionets_count', vm.uuid))
 				.then(resp => (vm.intNumber = resp.data))
 				.catch(err => {
-					console.log('[iocounters] Failed to fetch number of disks', err)
+					console.log('[ionets] Failed to fetch number of disks', err)
 				})
 
 			// Compute the rangeParams in case of start & end or just scale
@@ -126,7 +126,7 @@ export default {
 			}
 
 			axios
-				.get(vm.getBaseUrl('iocounters', vm.uuid) + '&size=' + (vm.getScale(vm) * vm.intNumber) + rangeParams)
+				.get(vm.getBaseUrl('ionets', vm.uuid) + '&size=' + (vm.getScale(vm) * vm.intNumber) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -147,7 +147,7 @@ export default {
 						// If there is data is wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
-							console.log('[iocounters] >>> Merging wsBuffer with already added data')
+							console.log('[ionets] >>> Merging wsBuffer with already added data')
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const date = moment.utc(currItem[0][11]).unix()
@@ -161,7 +161,7 @@ export default {
 										total_sent += currItem[y][6]
 									}
 									const { recv, sent } = vm.getReadWriteFrom(total_recv, total_sent)
-									console.log('[iocounters] >>>> Adding value to the end of the buffer')
+									console.log('[ionets] >>>> Adding value to the end of the buffer')
 									// Add the new value to the Array
 									vm.pushValue(date, recv, sent, total_recv, total_sent)
 								}
@@ -178,7 +178,7 @@ export default {
 					vm.wsBuffer = []
 				})
 				.catch(error => {
-					console.log('[iocounters] Failed to fetch previous data', error)
+					console.log('[ionets] Failed to fetch previous data', error)
 				}).finally(() => {
 					vm.loadingMessage = 'No Data'
 				})
@@ -193,7 +193,7 @@ export default {
 			this.historyDataSent = []
 			this.wsBuffer = []
 			if (ws) {
-				this.closeWS('iocounters', this)
+				this.closeWS('ionets', this)
 			}
 		},
 		// Null the data of an index (without nulling the Labels)
@@ -216,7 +216,7 @@ export default {
 			this.chartLabels.push(date)
 			// If scale != default, should divide the values by granularity (at least for the graph)
 			if (this.getScale(this) !== this.defaultScale) {
-				console.log('[iocounters] Dividing value for the granularity [', this.graphRange.granularity, ']')
+				console.log('[ionets] Dividing value for the granularity [', this.graphRange.granularity, ']')
 				recv = recv / this.graphRange.granularity
 				sent = sent / this.graphRange.granularity
 			}
@@ -240,7 +240,7 @@ export default {
 				// If we're not yet done with the fetching, but done with filling the disks buffer
 			} else if (!this.fetchingDone && this.bufferDataWs.length === this.intNumber) {
 				// Add the value to the wsBuffer
-				console.log('[iocounters] >> Adding values to the wsBuffer (WS opened but fetching not done yet)')
+				console.log('[ionets] >> Adding values to the wsBuffer (WS opened but fetching not done yet)')
 				this.wsBuffer.push(this.bufferDataWs)
 				// Clear the array
 				this.bufferDataWs = []

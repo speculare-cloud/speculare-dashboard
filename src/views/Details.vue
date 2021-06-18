@@ -51,7 +51,7 @@
 			<p class="text-sm text-gray-200">
 				Total Disk I/O for all physical disks. Physical are disks present in <code>/sys/block</code> but don't have a <code>{}/device</code> in it.
 			</p>
-			<DisksIoOverall :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<IoBlocksOverall :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">
@@ -78,7 +78,7 @@
 			<p class="text-sm text-gray-200">
 				Total bandwidth of all physical network interfaces. Physical are all the network interfaces that are listed in <code>/proc/net/dev</code>, but do not exist in <code>/sys/devices/virtual/net</code>.
 			</p>
-			<IoCounters :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<IoNetsOverall :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 
 		<button class="p-3 bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none fixed bottom-8 right-8" @click="open = !open">
@@ -192,8 +192,8 @@ export default {
 			loader: () => import('@/components/Graphs/LoadAvg.vue'),
 			loadingComponent: Skeleton
 		}),
-		DisksIoOverall: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/DisksIoOverall'),
+		IoBlocksOverall: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/IoBlocksOverall'),
 			loadingComponent: Skeleton
 		}),
 		Ram: defineAsyncComponent({
@@ -204,8 +204,8 @@ export default {
 			loader: () => import('@/components/Graphs/Swap'),
 			loadingComponent: Skeleton
 		}),
-		IoCounters: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/IoCounters'),
+		IoNetsOverall: defineAsyncComponent({
+			loader: () => import('@/components/Graphs/IoNetsOverall'),
 			loadingComponent: Skeleton
 		})
 	},
