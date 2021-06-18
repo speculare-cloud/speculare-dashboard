@@ -13,11 +13,11 @@
         "core-js": "^3.13.1",
         "moment": "^2.29.1",
         "pluralize": "^8.0.0",
-        "uplot": "^1.6.11",
+        "uplot": "^1.6.13",
         "v-calendar": "^3.0.0-alpha.4",
         "vue": "^3.1.1",
-        "vue-router": "^4.0.8",
-        "vuex": "^4.0.1"
+        "vue-router": "^4.0.9",
+        "vuex": "^4.0.2"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.5.12",
@@ -35,7 +35,7 @@
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-promise": "^4.2.1",
         "eslint-plugin-standard": "^4.0.0",
-        "eslint-plugin-vue": "^7.10.0",
+        "eslint-plugin-vue": "^7.11.1",
         "moment-locales-webpack-plugin": "^1.2.0",
         "postcss": "^7.0.35",
         "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.4",
