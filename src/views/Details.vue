@@ -185,27 +185,27 @@ export default {
 	components: {
 		DatePicker,
 		CpuTimes: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/CpuTimes'),
+			loader: () => import('@/components/Graphs/cpu/CpuTimes'),
 			loadingComponent: Skeleton
 		}),
 		LoadAvg: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/LoadAvg.vue'),
+			loader: () => import('@/components/Graphs/cpu/LoadAvg.vue'),
 			loadingComponent: Skeleton
 		}),
 		IoBlocksOverall: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/IoBlocksOverall'),
+			loader: () => import('@/components/Graphs/disks/IoBlocksOverall'),
 			loadingComponent: Skeleton
 		}),
 		Ram: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/Ram'),
+			loader: () => import('@/components/Graphs/ram/Ram'),
 			loadingComponent: Skeleton
 		}),
 		Swap: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/Swap'),
+			loader: () => import('@/components/Graphs/swap/Swap'),
 			loadingComponent: Skeleton
 		}),
 		IoNetsOverall: defineAsyncComponent({
-			loader: () => import('@/components/Graphs/IoNetsOverall'),
+			loader: () => import('@/components/Graphs/net/IoNetsOverall'),
 			loadingComponent: Skeleton
 		})
 	},
