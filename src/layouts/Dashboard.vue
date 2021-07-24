@@ -1,7 +1,7 @@
 <template>
 	<div id="dashvue" class="antialiased bg-gray-900">
 		<div class="md:flex flex-col md:flex-row md:min-h-screen w-full">
-			<div class="flex flex-col w-full md:w-48 text-gray-200 bg-gray-800 flex-shrink-0">
+			<div class="flex flex-col md:fixed md:h-screen w-full md:w-48 text-gray-200 bg-gray-800 flex-shrink-0">
 				<div class="flex-shrink-0 px-8 md:px-0 py-4 flex flex-row items-center justify-between md:justify-center">
 					<router-link to="/" class="text-lg font-semibold tracking-widest uppercase rounded-lg text-white focus:outline-none focus:shadow-outline">
 						Speculare
@@ -32,6 +32,15 @@
 							<div>Alarms</div>
 						</a>
 					</router-link>
+					<router-link v-slot="{ href, navigate, isExactActive }" to="/incidents" custom>
+						<a :href="href" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100"
+							:class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']" @click="navigate">
+							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
+								<use xlink:href="@/assets/imgs/incidents.svg#incidents" />
+							</svg>
+							<div>Incidents</div>
+						</a>
+					</router-link>
 					<router-link v-slot="{ href, navigate, isExactActive }" to="/settings" custom>
 						<a :href="href" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100"
 							:class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']" @click="navigate">
@@ -44,7 +53,7 @@
 				</nav>
 			</div>
 
-			<div class="w-full px-4 pt-4 md:px-12 md:pt-12 overflow-x-auto">
+			<div class="w-full md:ml-48 px-4 pt-4 md:px-12 md:pt-12 overflow-x-auto">
 				<router-view />
 			</div>
 		</div>
