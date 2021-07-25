@@ -16,9 +16,9 @@ app.config.globalProperties.$apiBaseUrl = (process.env.VUE_APP_HTTPS === 'NO' ? 
 app.config.globalProperties.$wsBaseUrl = (process.env.VUE_APP_WS_SECURITY === 'NO' ? 'ws' : 'wss') + '://' + process.env.VUE_APP_WS_DOMAIN
 
 app.config.globalProperties.$filters = {
-	pluralize (value, number) {
-		return pluralize(value, number)
-	}
+    pluralize(value, number) {
+        return pluralize(value, number)
+    }
 }
 
 app.mount('#app')

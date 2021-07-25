@@ -16,8 +16,6 @@ import graphWebSocket from '@/mixins/graphWebSocket'
 import axios from 'axios'
 import moment from 'moment'
 
-const KB_TO_MB = 1000
-
 export default {
 	name: 'Ram',
 	components: {
@@ -38,7 +36,7 @@ export default {
 	data () {
 		return {
 			defaultScale: 300,
-			unit: 'MiB',
+			unit: 'MB',
 			connection: null,
 			fetchingDone: false,
 			datacollection: null,
@@ -239,10 +237,10 @@ export default {
 		// Add values (Labels and data) to the arrays
 		pushValue: function (date, free, used, cached, buffers) {
 			this.chartLabels.push(date)
-			this.chartDataObjFree.push(free / KB_TO_MB)
-			this.chartDataObjUsed.push(used / KB_TO_MB)
-			this.chartDataObjCached.push(cached / KB_TO_MB)
-			this.chartDataObjBuffers.push(buffers / KB_TO_MB)
+			this.chartDataObjFree.push(free)
+			this.chartDataObjUsed.push(used)
+			this.chartDataObjCached.push(cached)
+			this.chartDataObjBuffers.push(buffers)
 		},
 		wsMessageHandle: function (event) {
 			// Parse the data and extract newValue

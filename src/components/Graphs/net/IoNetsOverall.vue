@@ -39,7 +39,7 @@ export default {
 		return {
 			defaultScale: 300,
 			intNumber: 0,
-			unit: 'MiB/s',
+			unit: 'MB/s',
 			connection: null,
 			fetchingDone: false,
 			datacollection: null,
