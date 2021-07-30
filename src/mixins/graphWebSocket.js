@@ -1,7 +1,7 @@
 const ws = {
 	methods: {
 		initWS (table, vm) {
-			if (vm.getScale(vm) === 300) {
+			if (vm.graphRange.scale === 300) {
 				console.log('[' + table + '] %cStarting %cconnection to WebSocket Server', 'color:green;', 'color:white;')
 				if (vm.connection == null) {
 					console.log('[' + table + '] > Setting a new webSocket')

@@ -6,22 +6,19 @@ const _spline = uPlot.paths.spline()
 const graphHelper = {
 	methods: {
 		updateGraph: function (vm, updateValues) {
-			const scale = vm.getScale(vm)
 			// Sanitize the Data in case of gap
 			// but also remove too old element
+			// TODO - Check the threshold value
 			vm.sanitizeGraphData(
 				vm.chartLabels.length,
-				scale,
+				vm.graphRange.scale,
 				vm.chartLabels,
-				scale / 60 + 5,
+				vm.graphRange.scale / 60 + 5,
 				vm.spliceData,
 				vm.nullData
 			)
 			// Update the datacollection so that uPlot update the chart
 			updateValues()
-		},
-		getScale: function (vm) {
-			return vm.graphRange.scale != null ? vm.graphRange.scale : vm.defaultScale
 		},
 		handleGraphRangeChange: function (newVal, oldVal, cleaning, fetching, handleWebSocket, isConnectionNull) {
 			if (newVal.start != null) {

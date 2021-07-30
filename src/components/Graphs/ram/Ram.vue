@@ -35,7 +35,6 @@ export default {
 
 	data () {
 		return {
-			defaultScale: 300,
 			unit: 'MB',
 			connection: null,
 			fetchingDone: false,
@@ -155,12 +154,12 @@ export default {
 			if (vm.graphRange.start != null) {
 				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end)
 			} else {
-				rangeParams = vm.getMinMaxNowString(vm.getScale(vm))
+				rangeParams = vm.getMinMaxNowString(vm.graphRange.scale)
 			}
 
 			// Fetching old data with the API
 			axios
-				.get(vm.getBaseUrl('memory', vm.uuid) + '&size=' + vm.getScale(vm) + rangeParams)
+				.get(vm.getBaseUrl('memory', vm.uuid) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -169,7 +168,7 @@ export default {
 					}
 
 					if (dataLenght > 0) {
-						// If there is data is wsBuffer we merge the data
+						// If there is data in wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
 							console.log('[memory] >>> Merging wsBuffer with already added data')

@@ -35,7 +35,6 @@ export default {
 
 	data () {
 		return {
-			defaultScale: 300,
 			unit: 'MB',
 			connection: null,
 			fetchingDone: false,
@@ -121,12 +120,12 @@ export default {
 			if (vm.graphRange.start != null) {
 				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end)
 			} else {
-				rangeParams = vm.getMinMaxNowString(vm.getScale(vm))
+				rangeParams = vm.getMinMaxNowString(vm.graphRange.scale)
 			}
 
 			// Fetching old data with the API
 			axios
-				.get(vm.getBaseUrl('swap', vm.uuid) + '&size=' + vm.getScale(vm) + rangeParams)
+				.get(vm.getBaseUrl('swap', vm.uuid) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent

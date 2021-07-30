@@ -37,7 +37,6 @@ export default {
 
 	data () {
 		return {
-			defaultScale: 300,
 			disksNumber: 0,
 			unit: 'MB/s',
 			connection: null,
@@ -122,11 +121,11 @@ export default {
 			if (vm.graphRange.start != null) {
 				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end)
 			} else {
-				rangeParams = vm.getMinMaxNowString(vm.getScale(vm))
+				rangeParams = vm.getMinMaxNowString(vm.graphRange.scale)
 			}
 
 			axios
-				.get(vm.getBaseUrl('ioblocks', vm.uuid) + '&size=' + (vm.getScale(vm) * vm.disksNumber) + rangeParams)
+				.get(vm.getBaseUrl('ioblocks', vm.uuid) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -144,7 +143,7 @@ export default {
 					}
 
 					if (dataLenght > 0) {
-						// If there is data is wsBuffer we merge the data
+						// If there is data in wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
 							console.log('[ioblocks] >>> Merging wsBuffer with already added data')
@@ -215,7 +214,8 @@ export default {
 		pushValue: function (date, read, write, histRead, histWrite) {
 			this.chartLabels.push(date)
 			// If scale != default, should divide the values by granularity (at least for the graph)
-			if (this.getScale(this) !== this.defaultScale) {
+			// That is because if we don't do it, we get MB/granularity, so to get MB/s we devide by the granularity
+			if (this.graphRange.scale !== 300) {
 				console.log('[ioblocks] Dividing value for the granularity [', this.graphRange.granularity, ']')
 				read = read / this.graphRange.granularity
 				write = write / this.graphRange.granularity

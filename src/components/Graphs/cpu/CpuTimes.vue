@@ -35,7 +35,6 @@ export default {
 
 	data () {
 		return {
-			defaultScale: 300,
 			unit: 'percentage',
 			connection: null,
 			fetchingDone: false,
@@ -100,12 +99,12 @@ export default {
 			if (vm.graphRange.start != null) {
 				rangeParams = vm.getMinMaxString(vm.graphRange.start, vm.graphRange.end)
 			} else {
-				rangeParams = vm.getMinMaxNowString(vm.getScale(vm))
+				rangeParams = vm.getMinMaxNowString(vm.graphRange.scale)
 			}
 
 			// Fetching old data with the API
 			axios
-				.get(vm.getBaseUrl('cputimes', vm.uuid) + '&size=' + vm.getScale(vm) + rangeParams)
+				.get(vm.getBaseUrl('cputimes', vm.uuid) + rangeParams)
 				.then(resp => {
 					const dataLenght = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
@@ -114,10 +113,10 @@ export default {
 					}
 
 					if (dataLenght > 0) {
-						// If there is data is wsBuffer we merge the data
+						// If there is data in wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
-							console.log('[CPUTIMES] >>> Merging wsBuffer with already added data')
+							console.log('[cputimes] >>> Merging wsBuffer with already added data')
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const date = moment.utc(currItem[12]).unix()
@@ -129,7 +128,7 @@ export default {
 									const idle = currItem[4] + currItem[5]
 									// Get the usage in % computed from busy and idle + prev values
 									const usage = this.getUsageFrom(busy, idle)
-									console.log('[CPUTIMES] >>>> Adding value to the end of the buffer')
+									console.log('[cputimes] >>>> Adding value to the end of the buffer')
 									// Add the new value to the Array
 									vm.pushValue(date, usage, busy, idle)
 								}
