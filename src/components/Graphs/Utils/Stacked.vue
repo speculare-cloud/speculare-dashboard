@@ -222,7 +222,11 @@ export default {
 					y: this.yscale && this.yscale.length ? {
 						auto: false,
 						range: this.yscale
-					} : { auto: true }
+					} : {
+						range (_u, _dmin, dmax) {
+							return uPlot.rangeNum(0, dmax, 0.1, true)
+						}
+					}
 				}
 			}
 			this.chart = new uPlot(opts, stacked.data, this.$refs.uniqueName)
