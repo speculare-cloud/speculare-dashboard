@@ -2,7 +2,7 @@
 	<div id="dashvue" class="antialiased bg-gray-900">
 		<div class="md:flex flex-col md:flex-row md:min-h-screen w-full">
 			<div class="flex flex-col md:fixed md:h-screen w-full md:w-48 text-gray-200 bg-gray-800 flex-shrink-0">
-				<div class="flex-shrink-0 px-8 md:px-0 py-4 flex flex-row items-center justify-between md:justify-center">
+				<div class="flex-shrink-0 px-8 md:px-3 py-3 flex flex-row items-center justify-between">
 					<router-link to="/" class="text-lg font-semibold tracking-widest uppercase rounded-lg text-white focus:outline-none focus:shadow-outline">
 						Speculare
 					</router-link>
