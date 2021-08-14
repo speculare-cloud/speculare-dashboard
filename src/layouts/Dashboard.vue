@@ -1,10 +1,10 @@
 <template>
-	<div id="dashvue" class="antialiased bg-gray-900">
+	<div id="dashvue" class="antialiased bg-core">
 		<div class="md:flex flex-col md:flex-row md:min-h-screen w-full">
-			<div class="flex flex-col md:fixed md:h-screen w-full md:w-48 text-gray-200 bg-gray-800 flex-shrink-0">
-				<div class="flex-shrink-0 px-8 md:px-3 py-3 flex flex-row items-center justify-between">
-					<router-link to="/" class="text-lg font-semibold tracking-widest uppercase rounded-lg text-white focus:outline-none focus:shadow-outline">
-						Speculare
+			<div class="flex flex-col md:fixed md:h-screen w-full md:w-56 text-gray-200 bg-side flex-shrink-0">
+				<div class="flex-shrink-0 px-8 md:px-4 py-4 flex flex-row items-center justify-between">
+					<router-link to="/" class="text-xl font-normal tracking-widest rounded-lg text-white focus:outline-none focus:shadow-outline">
+						SPECULARE
 					</router-link>
 					<button class="rounded-lg md:hidden focus:outline-none focus:shadow-outline" aria-label="menu" @click="open = !open">
 						<svg fill="currentColor" viewBox="0 0 20 20" class="w-6 h-6">
@@ -13,47 +13,25 @@
 						</svg>
 					</button>
 				</div>
-				<nav :class="{'block': open, 'hidden': !open}" class="flex-grow md:block pl-4 pr-4 md:pr-0 pb-4 md:pb-0 md:overflow-y-auto">
-					<router-link v-slot="{ href, navigate, isExactActive }" to="/hosts" custom>
-						<a :href="href" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100"
-							:class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']" @click="navigate">
-							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
-								<use xlink:href="@/assets/imgs/list.svg#list" />
-							</svg>
-							<div>Hosts list</div>
-						</a>
-					</router-link>
-					<router-link v-slot="{ href, navigate, isExactActive }" to="/alarms" custom>
-						<a :href="href" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100"
-							:class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']" @click="navigate">
-							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
-								<use xlink:href="@/assets/imgs/notifications.svg#notifications" />
-							</svg>
-							<div>Alarms</div>
-						</a>
-					</router-link>
-					<router-link v-slot="{ href, navigate, isExactActive }" to="/incidents" custom>
-						<a :href="href" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100"
-							:class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']" @click="navigate">
-							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
-								<use xlink:href="@/assets/imgs/incidents.svg#incidents" />
-							</svg>
-							<div>Incidents</div>
-						</a>
-					</router-link>
-					<router-link v-slot="{ href, navigate, isExactActive }" to="/settings" custom>
-						<a :href="href" class="flex items-center pl-2 pr-2 md:pr-0 py-2 mt-2 text-sm font-semibold rounded-l-lg rounded-r-lg md:rounded-r-none hover:bg-gray-600 hover:text-gray-100"
-							:class="[isExactActive ? 'bg-gray-600 text-gray-100' : 'text-gray-400']" @click="navigate">
-							<svg class="h-6 w-6 mr-3" :class="[isExactActive ? 'text-green-300' : '']">
-								<use xlink:href="@/assets/imgs/settings.svg#settings" />
-							</svg>
-							<div>Settings</div>
-						</a>
+				<div class="px-8 md:px-4 pt-3 pb-7 flex flex-row justify-start align-middle">
+					<img src="https://eu.ui-avatars.com/api/?name=W+O&size=24&background=random">
+					<div class="ml-2 text-sm" style="line-height:24px">
+						Workspace One
+					</div>
+				</div>
+				<nav id="main-sidenav" :class="{'block': open, 'hidden': !open}" class="flex-grow md:block pl-4 pr-4 md:pr-0 pb-4 md:pb-0 md:overflow-y-auto">
+					<p class="text-green-400 text-sm font-medium mb-4">
+						SERVERS <span class="ml-1 text-green-200 font-normal">{{ $store.state.hosts_values.length }}</span>
+					</p>
+
+					<router-link class="text-gray-400 flex items-center pr-2 py-2 mt-2 font-medium text-xsm uppercase hover:text-gray-100"
+						v-for="item in $store.state.hosts_values" :key="item.uuid" :to="{ name: 'hosts_details', params: { hostname: item.hostname, uuid: item.uuid} }">
+						<div>{{ item.hostname }}</div>
 					</router-link>
 				</nav>
 			</div>
 
-			<div class="w-full md:ml-48 px-4 pt-4 md:px-12 md:pt-12 overflow-x-auto">
+			<div class="w-full md:ml-56 px-4 md:px-12 pt-8 md:pt-18 overflow-x-auto">
 				<router-view />
 			</div>
 		</div>

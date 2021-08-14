@@ -1,11 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap'); */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;600;700;800;900&display=swap');
 html,
 body,
 #app,
 #dashvue {
     min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.bg-side {
+    background-color: #1d2125;
+}
+
+.bg-core {
+    background-color: #0c141b;
+}
+
+.text-xsm {
+    font-size: 0.8475rem;
+    line-height: 1.1rem;
 }
 
 ::-webkit-scrollbar {
@@ -89,4 +107,26 @@ code {
     box-shadow: var(--ring-offset-shadow), var(--ring-shadow), 0 0 #0000;
     box-shadow: var(--ring-offset-shadow), var(--ring-shadow), var(--box-shadow, 0 0 #0000);
     border-color: #10b981;
+}
+
+#main-sidenav a::before {
+    content: '├';
+    color: rgb(253, 230, 138);
+    margin-right: 0.5rem;
+}
+
+#main-sidenav a:last-child::before {
+    content: '└';
+    color: rgb(253, 230, 138);
+    margin-right: 0.5rem;
+}
+
+#main-sidenav .router-link-active {
+    color: rgb(243, 244, 246);
+}
+
+@media (min-width: 768px) {
+    .md\:pt-18 {
+        padding-top: 4.75rem;
+    }
 }

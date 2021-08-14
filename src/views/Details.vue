@@ -1,31 +1,22 @@
 <template>
 	<div class="details">
-		<nav class="text-sm font-medium leading-normal mb-4 text-gray-200" aria-label="Breadcrumb">
-			<ul class="flex text-sm lg:text-base">
-				<li class="inline-flex items-center">
-					<router-link to="/">
-						<svg class="h-6 w-6">
-							<use xlink:href="@/assets/imgs/home.svg#home" />
-						</svg>
-					</router-link>
-					<svg class="h-5 w-auto" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-					</svg>
+		<nav class="font-medium leading-normal mb-4 text-gray-400" aria-label="Breadcrumb">
+			<ul class="flex text-xsm">
+				<li class="text-green-400 mr-2" style="font-size:0.65rem;">
+					&#x25C0;
 				</li>
-				<li class="inline-flex items-center" v-for="(breadcrumb, idx) in this.$route.meta.breadcrumb" :key="idx">
-					<router-link :to="'/' + breadcrumb.link">
-						{{ breadcrumb.name }}
-					</router-link>
-					<svg class="h-5 w-auto" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-					</svg>
+				<li>WORKSPACE ONE</li>
+				<li class="px-2">
+					/
 				</li>
-				<li class="inline-flex items-center">
-					<p href="#" class="text-gray-400" aria-current="page">
-						{{ this.$route.params.hostname }}
-					</p>
-				</li>
+				<li>SERVERS</li>
 			</ul>
+			<div class="flex mt-8 text-green-400 text-2xl font-normal">
+				<img src="@/assets/imgs/up_right.svg" class="w-6 h-3">
+				<p class="ml-2" style="margin-top:-6px">
+					{{ this.$route.params.hostname }}
+				</p>
+			</div>
 		</nav>
 
 		<div role="section" class="mt-4 md:mt-8">
@@ -35,14 +26,14 @@
 			<p class="text-sm text-gray-200">
 				Total CPU utilization. 100% here means there is no CPU idle time at all.
 			</p>
-			<CpuTimes :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<CpuTimes :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 			<h3 class="text-2xl text-gray-100 mb-4 mt-4">
 				load
 			</h3>
 			<p class="text-sm text-gray-200">
 				System load. The 3 metrics refer to 1, 5 and 15 minutes averages. Computed once every 5 seconds.
 			</p>
-			<LoadAvg :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<LoadAvg :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">
@@ -51,7 +42,7 @@
 			<p class="text-sm text-gray-200">
 				Total Disk I/O for all physical disks. Physical are disks present in <code>/sys/block</code> but don't have a <code>{}/device</code> in it.
 			</p>
-			<IoBlocksOverall :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<IoBlocksOverall :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">
@@ -60,7 +51,7 @@
 			<p class="text-sm text-gray-200">
 				System Random Access Memory (i.e. physical memory) usage.
 			</p>
-			<Ram :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<Ram :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">
@@ -69,7 +60,7 @@
 			<p class="text-sm text-gray-200">
 				System swap memory usage. Swap space is used when the RAM if full.
 			</p>
-			<Swap :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<Swap :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 		<div role="section" class="mt-4 mb-12">
 			<h3 class="text-2xl text-gray-100 mb-4">
@@ -78,7 +69,7 @@
 			<p class="text-sm text-gray-200">
 				Total bandwidth of all physical network interfaces. Physical are all the network interfaces that are listed in <code>/proc/net/dev</code>, but do not exist in <code>/sys/devices/virtual/net</code>.
 			</p>
-			<IoNetsOverall :uuid="this.$route.params.uuid" :graph-range="graphRange" />
+			<IoNetsOverall :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 
 		<button class="p-3 bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none fixed bottom-8 right-8" @click="open = !open">
@@ -227,6 +218,16 @@ export default {
 				type: 'string',
 				mask: 'YYYY-MM-DD'
 			}
+		}
+	},
+
+	beforeRouteUpdate (to, from, next) {
+		next()
+		this.graphRange = {
+			granularity: 1,
+			scale: 300,
+			start: null,
+			end: null
 		}
 	},
 
