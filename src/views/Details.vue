@@ -17,7 +17,35 @@
 					{{ this.$route.params.hostname }}
 				</p>
 			</div>
+			<div class="flex justify-around gap-6 items-center text-xsm mt-12 text-center text-gray-500">
+				<a href="#" class="flex-1 border-b-2 border-green-600 pb-3 text-green-600">
+					OVERVIEW
+				</a>
+				<a href="#" class="flex-1 border-b-2 border-gray-600 pb-3">
+					DETAILS
+				</a>
+				<a href="#" class="flex-1 border-b-2 border-gray-600 pb-3">
+					ALERTS
+				</a>
+				<a href="#" class="flex-1 border-b-2 border-gray-600 pb-3">
+					INCIDENTS
+				</a>
+			</div>
 		</nav>
+
+		<!-- Incidents display: max 2 -->
+		<div class="md:mt-8">
+			<!-- Level: critical -->
+			<a class="block mt-4 px-4 py-4 uppercase text-xsm font-medium" style="background-color: #f46565; color: #520303;"
+				href="#">
+				<span class="font-semibold mr-2">/ / <span class="ml-2">Incidents:</span></span> alert_name is ongoing since 10 minutes.
+			</a>
+			<!-- Level: warning -->
+			<!-- <a class="block mt-4 px-4 py-4 uppercase text-xsm font-medium" style="background-color: #f4cf65; color: #382a03;"
+				href="#">
+				<span class="font-semibold mr-2">/ / <span class="ml-2">Incidents:</span></span> alert_name is ongoing since 5 minutes.
+			</a> -->
+		</div>
 
 		<div role="section" class="mt-4 md:mt-8">
 			<h3 class="text-2xl text-gray-100 mb-4">

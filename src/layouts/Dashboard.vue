@@ -31,7 +31,7 @@
 				</nav>
 			</div>
 
-			<div class="w-full md:ml-56 px-4 md:px-12 pt-8 md:pt-18 overflow-x-auto">
+			<div class="w-full md:ml-52 px-4 md:px-12 md:pr-6 pt-8 md:pt-18 overflow-x-auto">
 				<router-view />
 			</div>
 		</div>
