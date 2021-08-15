@@ -122,8 +122,13 @@ code {
     color: rgb(243, 244, 246);
 }
 
+#details_nav .router-link-active {
+    border-color: rgb(5, 150, 105);
+    color: rgb(5, 150, 105);
+}
+
 @media (min-width: 768px) {
     .md\:pt-18 {
-        padding-top: 4.75rem;
+        padding-top: 4.80rem;
     }
 }

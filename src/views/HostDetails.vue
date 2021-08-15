@@ -1,42 +1,9 @@
 <template>
 	<div class="details">
-		<nav class="font-medium leading-normal mb-4 text-gray-400" aria-label="Breadcrumb">
-			<ul class="flex text-xsm">
-				<li class="text-green-400 mr-2" style="font-size:0.65rem;">
-					&#x25C0;
-				</li>
-				<li>WORKSPACE ONE</li>
-				<li class="px-2">
-					/
-				</li>
-				<li>SERVERS</li>
-			</ul>
-			<div class="flex mt-8 text-green-400 text-2xl font-normal">
-				<img src="@/assets/imgs/up_right.svg" class="w-6 h-3">
-				<p class="ml-2" style="margin-top:-6px">
-					{{ this.$route.params.hostname }}
-				</p>
-			</div>
-			<div class="flex justify-around gap-6 items-center text-xsm mt-12 text-center text-gray-500">
-				<a href="#" class="flex-1 border-b-2 border-green-600 pb-3 text-green-600">
-					OVERVIEW
-				</a>
-				<a href="#" class="flex-1 border-b-2 border-gray-600 pb-3">
-					DETAILS
-				</a>
-				<a href="#" class="flex-1 border-b-2 border-gray-600 pb-3">
-					ALERTS
-				</a>
-				<a href="#" class="flex-1 border-b-2 border-gray-600 pb-3">
-					INCIDENTS
-				</a>
-			</div>
-		</nav>
-
 		<!-- Incidents display: max 2 -->
 		<div class="md:mt-8">
 			<!-- Level: critical -->
-			<a class="block mt-4 px-4 py-4 uppercase text-xsm font-medium" style="background-color: #f46565; color: #520303;"
+			<a class="block mt-4 px-4 py-3 uppercase text-xsm font-medium" style="background-color: #f46565; color: #520303;"
 				href="#">
 				<span class="font-semibold mr-2">/ / <span class="ml-2">Incidents:</span></span> alert_name is ongoing since 10 minutes.
 			</a>
@@ -200,7 +167,7 @@ import { defineAsyncComponent } from 'vue'
 
 const scaleIdxArr = [5, 15, 30, 60, 180, 360]
 export default {
-	name: 'Details',
+	name: 'DetailsD',
 	components: {
 		DatePicker,
 		CpuTimes: defineAsyncComponent({
