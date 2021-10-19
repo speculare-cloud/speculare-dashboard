@@ -81,16 +81,17 @@
 import { nextTick } from '@vue/runtime-core'
 import axios from 'axios'
 import moment from 'moment'
+import { reactive } from 'vue'
 
 export default {
 	name: 'DetailsI',
 
 	data () {
 		return {
-			incidentsList: [],
+			incidentsList: reactive([]),
 			fetchingDone: false,
-			connection: null
-			// wsBuffer: [],
+			connection: null,
+			wsBuffer: []
 		}
 	},
 
@@ -112,13 +113,59 @@ export default {
 							vm.incidentsList.push(resp.data[i])
 						}
 
+						const wsBuffSize = vm.wsBuffer.length
+						if (wsBuffSize > 0) {
+							console.log('[cputimes] >>> Merging wsBuffer with already added data')
+							for (let i = 0; i <= wsBuffSize - 1; i++) {
+								const currItem = vm.wsBuffer[i]
+								const idx = vm.incidentsList.findIndex((e) => e.id === currItem.id)
+								// Basic check if we found an occur
+								if (idx === -1) { vm.incidentsList.push(currItem) } else { vm.incidentsList[idx] = currItem }
+							}
+						}
+
 						// Define the fetching as done
 						vm.fetchingDone = true
+						// Clear the wsBuffer
+						this.wsBuffer = []
 					})
 			})
 			// Setup onmessage listener
 			vm.connection.addEventListener('message', function (event) {
-				console.log('[incidents] >> new message', event)
+				const json = JSON.parse(event.data)
+				const val = json.columnvalues
+				// Convert it to a easy usable object
+				const newValues = {
+					id: val[0],
+					result: val[1],
+					started_at: val[2],
+					updated_at: val[3],
+					resolved_at: val[4],
+					host_uuid: val[5],
+					hostname: val[6],
+					status: val[7],
+					severity: val[8],
+					alerts_id: val[9],
+					alerts_name: val[10],
+					alerts_table: val[11],
+					alerts_lookup: val[12],
+					alerts_warn: val[13],
+					alerts_crit: val[14],
+					alerts_info: val[15],
+					alerts_where_clause: val[16]
+				}
+
+				console.log('[incidents] >> new message', newValues)
+				if (vm.fetchingDone) {
+					// Add normally (push) but check if we already have it
+					const idx = vm.incidentsList.findIndex((e) => e.id === newValues.id)
+					// Basic check if we found an occur
+					if (idx === -1) { vm.incidentsList.push(newValues) } else { vm.incidentsList[idx] = newValues }
+				} else {
+					// Add to WsBuffer and merge after the inital fetch
+					console.log('[incidents] >> Adding value to the wsBuffer (WS opened but fetching not done yet)')
+					vm.wsBuffer.push(newValues)
+				}
 			})
 		})
 	},
