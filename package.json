@@ -14,7 +14,7 @@
         "moment": "^2.29.1",
         "pluralize": "^8.0.0",
         "uplot": "^1.6.16",
-        "v-calendar": "^3.0.0-alpha.5",
+        "v-calendar": "^3.0.0-alpha.6",
         "vue": "^3.2.19",
         "vue-router": "^4.0.11",
         "vuex": "^4.0.2"
