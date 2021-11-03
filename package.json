@@ -3,8 +3,8 @@
     "version": "0.0.4",
     "private": true,
     "scripts": {
-        "serve": "vue-cli-service serve",
-        "build": "vue-cli-service build",
+        "serve": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve",
+        "build": "NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build",
         "lint": "vue-cli-service lint"
     },
     "dependencies": {
@@ -13,7 +13,7 @@
         "core-js": "^3.18.1",
         "moment": "^2.29.1",
         "pluralize": "^8.0.0",
-        "uplot": "^1.6.16",
+        "uplot": "1.6.15",
         "v-calendar": "^3.0.0-alpha.5",
         "vue": "^3.2.19",
         "vue-router": "^4.0.11",
