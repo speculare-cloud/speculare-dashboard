@@ -1,72 +1,59 @@
 <template>
 	<div class="details">
 		<div role="section" class="mt-4 md:mt-8">
-			<h3 class="text-2xl text-gray-100 mb-4">
-				Incidents
-			</h3>
 			<div class="shadow overflow-hidden border-gray-200 rounded-lg mb-8">
-				<div class="overflow-x-auto">
-					<table class="w-full divide-y divide-gray-200">
-						<thead class="bg-gray-50">
+				<div class="overflow-x-auto overflow-y-hidden">
+					<table class="w-full divide-y divide-gray-700">
+						<thead class="bg-side">
 							<tr>
-								<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Alert ID - Name
+								<th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+									Incident
 								</th>
-								<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Query - Result - Trigger
+								<th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+									Started
 								</th>
-								<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Severity
-								</th>
-								<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Status
+								<th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+									Length
 								</th>
 							</tr>
 						</thead>
-						<tbody class="bg-white divide-y divide-gray-200">
+						<tbody class="bg-side divide-y divide-gray-700">
 							<tr v-for="item in incidentsList" :key="item.id">
-								<td class="px-6 py-4 whitespace-nowrap">
+								<td class="px-4 py-4 whitespace-nowrap">
 									<div class="flex items-center">
-										<div>
-											<div class="text-sm font-medium text-gray-900">
+										<div class="relative flex flex-col items-center group mr-4">
+											<span class="leading-none block">
+												<div class="status-indicator status-indicator--sm" :class="item.resolved_at ? 'status-indicator--success' : item.severity == 0 ? 'status-indicator--warning' : 'status-indicator--danger'">
+													<div class="circle circle--animated circle-main" />
+													<div class="circle circle--animated circle-secondary" />
+													<div class="circle circle--animated circle-tertiary" />
+												</div>
+											</span>
+											<div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
+												<span class="relative z-50 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg" style="margin-left: calc(100% + 1.5rem); margin-bottom: -15px;">
+													{{ item.resolved_at ? 'Resolved' : item.severity == 0 ? 'Warning' : 'Critical' }}
+												</span>
+											</div>
+										</div>
+										<div class="text-sm">
+											<div class="font-medium text-gray-300">
 												#{{ item.id }} - {{ item.alerts_name }}
 											</div>
-											<div class="text-sm text-gray-500">
-												{{ item.alerts_info || item.alerts_lookup }}
+											<div class="text-gray-400 mt-1">
+												{{ item.alerts_lookup }}
 											</div>
 										</div>
 									</div>
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap">
-									<div class="text-sm text-gray-900">
-										{{ item.alerts_lookup }}
-									</div>
-									<div class="text-sm text-gray-500">
-										The query returned:
-										<span v-if="item.severity == 0" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-											{{ formatFloat(item.result) }}
-										</span>
-										<span v-if="item.severity == 1" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-											{{ formatFloat(item.result) }}
-										</span>
-										with trigger points of <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ item.alerts_warn }}</span> and <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{{ item.alerts_crit }}</span>
+									<div class="text-sm text-gray-400">
+										{{ formatDate(item.started_at) }}
 									</div>
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap">
-									<span v-if="item.severity == 0" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-										Warning
-									</span>
-									<span v-if="item.severity == 1" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-										Critical
-									</span>
-								</td>
-								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-									<span v-if="item.resolved_at" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-										Resolved
-									</span>
-									<span v-if="!item.resolved_at" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-										Ongoing
-									</span>
+									<div class="text-sm text-gray-400">
+										{{ lasted(item.started_at, item.resolved_at) }}
+									</div>
 								</td>
 							</tr>
 						</tbody>
@@ -115,7 +102,7 @@ export default {
 
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {
-							console.log('[cputimes] >>> Merging wsBuffer with already added data')
+							console.log('[incidents] >>> Merging wsBuffer with already added data')
 							for (let i = 0; i <= wsBuffSize - 1; i++) {
 								const currItem = vm.wsBuffer[i]
 								const idx = vm.incidentsList.findIndex((e) => e.id === currItem.id)
@@ -184,11 +171,20 @@ export default {
 	methods: {
 		formatDate: function (date) {
 			const prev = moment(date)
-
-			return prev.fromNow()
+			const howMany = moment.duration(moment().diff(prev)).asHours()
+			if (howMany < 24) {
+				return prev.fromNow()
+			}
+			return prev.format('D MMM [at] hh:mma')
 		},
 		formatFloat: function (floating) {
 			return parseFloat(floating).toFixed(2)
+		},
+		lasted: function (started, resolved) {
+			if (resolved) {
+				return moment(resolved).from(started, true)
+			}
+			return 'Ongoing'
 		}
 	}
 }

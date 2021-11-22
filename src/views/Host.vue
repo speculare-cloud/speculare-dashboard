@@ -17,19 +17,25 @@
 					{{ this.$route.params.hostname }}
 				</p>
 			</div>
-			<div id="details_nav" class="flex justify-around gap-6 items-center text-xsm mt-12 text-center text-gray-500">
-				<router-link class="flex-1 border-b-2 border-gray-600 pb-3" key="hosts_details" :to="{ name: 'hosts_details_o' }">
-					OVERVIEW
-				</router-link>
-				<router-link class="flex-1 border-b-2 border-gray-600 pb-3" key="hosts_details_d" :to="{ name: 'hosts_details_d' }">
-					DETAILS
-				</router-link>
-				<router-link class="flex-1 border-b-2 border-gray-600 pb-3" key="hosts_details_a" :to="{ name: 'hosts_details_a' }">
-					ALERTS
-				</router-link>
-				<router-link class="flex-1 border-b-2 border-gray-600 pb-3" key="hosts_details_i" :to="{ name: 'hosts_details_i' }">
-					INCIDENTS
-				</router-link>
+			<div id="details_nav" class="flex-grow overflow-y-auto border-b border-gray-800">
+				<div class="sm:pt-8 pt-4 flex flex-col w-full text-white">
+					<div class="flex items-center space-x-3">
+						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hosts_details" :to="{ name: 'hosts_details_o' }">
+							Overview
+						</router-link>
+						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hosts_details_d" :to="{ name: 'hosts_details_d' }">
+							Details
+						</router-link>
+						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hosts_details_a" :to="{ name: 'hosts_details_a' }">
+							Alerts
+						</router-link>
+						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hosts_details_i" :to="{ name: 'hosts_details_i' }">
+							Incidents
+						</router-link>
+						<!-- TODO -->
+						<a href="#" class="px-3 border-b-2 border-transparent text-gray-400 pb-1.5">Settings</a>
+					</div>
+				</div>
 			</div>
 		</nav>
 
