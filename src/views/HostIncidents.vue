@@ -94,8 +94,8 @@ export default {
 				console.log('[incidents] >> webSocket opened')
 				axios.get(vm.$apiAlertsUrl + '/api/incidents?uuid=' + vm.$route.params.uuid)
 					.then(resp => {
-						const dataLenght = resp.data.length
-						for (let i = 0; i <= dataLenght - 1; i++) {
+						const dataLength = resp.data.length
+						for (let i = 0; i <= dataLength - 1; i++) {
 							console.log(resp.data[i])
 							vm.incidentsList.push(resp.data[i])
 						}
@@ -149,7 +149,7 @@ export default {
 					// Basic check if we found an occur
 					if (idx === -1) { vm.incidentsList.push(newValues) } else { vm.incidentsList[idx] = newValues }
 				} else {
-					// Add to WsBuffer and merge after the inital fetch
+					// Add to WsBuffer and merge after the initial fetch
 					console.log('[incidents] >> Adding value to the wsBuffer (WS opened but fetching not done yet)')
 					vm.wsBuffer.push(newValues)
 				}

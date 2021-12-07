@@ -127,10 +127,10 @@ export default {
 			axios
 				.get(vm.getBaseUrl('ionets', vm.uuid) + rangeParams)
 				.then(resp => {
-					const dataLenght = resp.data.length
+					const dataLength = resp.data.length
 					// Add data in reverse order (push_back) and uPlot use last as most recent
 					// And skip intNumber by intNumber
-					for (let i = dataLenght - 1; i >= 0; i -= vm.intNumber) {
+					for (let i = dataLength - 1; i >= 0; i -= vm.intNumber) {
 						if (vm.intNumber > 1) {
 							const currentData = []
 							for (let y = 0; y < vm.intNumber; y++) {
@@ -142,7 +142,7 @@ export default {
 						}
 					}
 
-					if (dataLenght > 0) {
+					if (dataLength > 0) {
 						// If there is data in wsBuffer we merge the data
 						const wsBuffSize = vm.wsBuffer.length
 						if (wsBuffSize > 0) {

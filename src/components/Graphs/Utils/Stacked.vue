@@ -120,9 +120,9 @@ export default {
 			})
 		},
 		stack: function (data, omit) {
-			const d0lenght = data[0].length
-			const accum = Array(d0lenght)
-			for (let i = 0; i < d0lenght; ++i) accum[i] = 0
+			const d0Length = data[0].length
+			const accum = Array(d0Length)
+			for (let i = 0; i < d0Length; ++i) accum[i] = 0
 			const stacked_data = [data[0]]
 			const length = data.length
 			const bands = []
