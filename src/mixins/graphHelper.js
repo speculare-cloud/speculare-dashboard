@@ -27,11 +27,6 @@ const graphHelper = {
 				// Refetch the data
 				fetching()
 			} else {
-				// TODO - Optimize: (can be tricky to optimize as we'll have a diff granularity).
-				// We could only fetch the new data, since the oldest data to the targeted time of the scale.
-				// That way we can avoid cleaning and refetching everything (which is time consuming).
-				// Also we can introduce something like "take 1 value every 10" on the server side if the scale is big enough.
-
 				if (newVal.scale != null) {
 					// Clear the data and close the websocket if needed
 					cleaning(newVal.scale !== 300)

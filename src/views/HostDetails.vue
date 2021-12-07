@@ -115,11 +115,6 @@
 								</template>
 							</DatePicker>
 						</div>
-						<!-- NOTE - Assume the data is collected every seconds at first as this influence the scale -->
-						<!-- TODO - Fetch dynamically the scale (the every seconds part of the above), it depends on the config -->
-						<!-- TODO - Add selection for "Last 5/15/30 minutes/hours + custom scale" -->
-						<!-- TODO - Add selection for begin at -->
-						<!-- TODO - Add selection for end at -->
 					</div>
 
 					<!-- Footer -->

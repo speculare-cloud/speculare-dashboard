@@ -32,7 +32,7 @@
 						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hosts_details_i" :to="{ name: 'hosts_details_i' }">
 							Incidents
 						</router-link>
-						<!-- TODO -->
+						<!-- TODO: Setup the page -->
 						<a href="#" class="px-3 border-b-2 border-transparent text-gray-400 pb-1.5">Settings</a>
 					</div>
 				</div>
