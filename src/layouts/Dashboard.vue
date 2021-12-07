@@ -15,7 +15,7 @@
 				</div>
 				<div class="px-8 md:px-4 pt-3 pb-7 flex flex-row justify-start align-middle">
 					<img src="https://eu.ui-avatars.com/api/?name=W+O&size=24&background=random">
-					<router-link :key="this.$route.params.slug" :to="{ name: 'workspace', params: { slug: this.$route.params.slug } }">
+					<router-link :key="this.$route.params.slug" :to="{ name: 'workspace', params: { slug: this.$route.params.slug } }" @click="open = false">
 						<div class="ml-2 text-sm" style="line-height:24px">
 							Workspace {{ this.$route.params.slug }}
 						</div>
@@ -27,7 +27,8 @@
 					</p>
 
 					<router-link class="text-gray-400 flex items-center pr-2 py-1 mt-2 font-medium text-xsm uppercase hover:text-gray-100"
-						v-for="item in $store.state.hosts_values" :key="item.uuid" :to="{ name: 'hosts_details', params: { hostname: item.hostname, uuid: item.uuid} }">
+						v-for="item in $store.state.hosts_values" :key="item.uuid" :to="{ name: 'hosts_details',
+							params: { hostname: item.hostname, uuid: item.uuid} }" @click="open = !open">
 						<div>{{ item.hostname }}</div>
 					</router-link>
 				</nav>
@@ -47,6 +48,12 @@ export default {
 	data () {
 		return {
 			open: false
+		}
+	},
+
+	methods: {
+		test () {
+			console.log('test')
 		}
 	}
 }

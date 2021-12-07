@@ -53,12 +53,12 @@
 			<IoNetsOverall :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
 
-		<button class="p-3 bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none fixed bottom-8 right-8" @click="open = !open">
+		<button class="p-3 bg-side rounded-md hover:bg-gray-800 focus:outline-none fixed bottom-8 right-8" @click="open = !open">
 			<img src="@/assets/imgs/graph_custom.svg" class="w-6 h-6 inline-block">
 		</button>
 
 		<div class="modal fixed w-full h-full top-0 left-0 items-center justify-center p-4" :class="{'flex': open, 'hidden': !open}">
-			<div class="modal-container bg-gray-700 mx-auto rounded shadow-lg z-50 overflow-y-auto">
+			<div class="modal-container bg-side mx-auto rounded shadow-xl z-50 overflow-y-auto border-white" style="border-width: 1px;">
 				<div class="modal-content py-4 text-left px-6">
 					<!-- Body -->
 					<div class="">
