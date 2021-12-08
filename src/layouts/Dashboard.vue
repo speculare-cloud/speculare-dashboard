@@ -14,7 +14,7 @@
 					</button>
 				</div>
 				<div class="px-8 md:px-4 pt-3 pb-7 flex flex-row justify-start align-middle">
-					<img src="https://eu.ui-avatars.com/api/?name=W+O&size=24&background=random">
+					<img :src="'https://eu.ui-avatars.com/api/?name=' + this.$route.params.slug + '&size=24&background=random'">
 					<router-link :key="this.$route.params.slug" :to="{ name: 'workspace', params: { slug: this.$route.params.slug } }" @click="open = false">
 						<div class="ml-2 text-sm" style="line-height:24px">
 							Workspace {{ this.$route.params.slug }}

@@ -36,7 +36,7 @@
 						</div>
 						<div class="py-1 ml-4">
 							<h3 class="font-medium">
-								Workspace Test
+								Workspace Two
 							</h3>
 							<p class="text-sm text-gray-400">
 								2 SERVERS
