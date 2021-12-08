@@ -71,7 +71,7 @@ import moment from 'moment'
 import { reactive } from 'vue'
 
 export default {
-	name: 'DetailsI',
+	name: 'Incidents',
 
 	data () {
 		return {
@@ -96,7 +96,6 @@ export default {
 					.then(resp => {
 						const dataLength = resp.data.length
 						for (let i = 0; i <= dataLength - 1; i++) {
-							console.log(resp.data[i])
 							vm.incidentsList.push(resp.data[i])
 						}
 

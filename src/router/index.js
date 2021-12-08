@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Dashboard from '@/layouts/Dashboard.vue'
-import Workspaces from '@/views/Workspaces.vue'
+import Workspaces from '@/views/workspaces/Workspaces.vue'
 
 const routes = [{
 	path: '/:pathMatch(.*)*',
@@ -23,37 +23,37 @@ const routes = [{
 		path: 'home',
 		name: 'workspace_overview',
 		component: () =>
-			import('@/views/WorkspaceOverview.vue')
+			import('@/views/workspaces/Overview.vue')
 	},
 	{
 		path: 'h/:hostname/:uuid',
 		name: 'hosts_details',
 		component: () =>
-			import('@/views/Host.vue'),
-		redirect: ({ name: 'hosts_details_o' }),
+			import('@/views/hosts/Base.vue'),
+		redirect: ({ name: 'hd_overview' }),
 		children: [{
-			path: 'o',
-			name: 'hosts_details_o',
+			path: 'overview',
+			name: 'hd_overview',
 			component: () =>
-				import('@/views/HostOverview.vue')
+				import('@/views/hosts/Overview.vue')
 		},
 		{
-			path: 'd',
-			name: 'hosts_details_d',
+			path: 'details',
+			name: 'hd_details',
 			component: () =>
-				import('@/views/HostDetails.vue')
+				import('@/views/hosts/Details.vue')
 		},
 		{
-			path: 'a',
-			name: 'hosts_details_a',
+			path: 'alerts',
+			name: 'hd_alerts',
 			component: () =>
-				import('@/views/HostAlerts.vue')
+				import('@/views/hosts/Alerts.vue')
 		},
 		{
-			path: 'i',
-			name: 'hosts_details_i',
+			path: 'incidents',
+			name: 'hd_incidents',
 			component: () =>
-				import('@/views/HostIncidents.vue')
+				import('@/views/hosts/Incidents.vue')
 		}
 		]
 	}

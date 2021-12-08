@@ -18,6 +18,6 @@
 
 <script>
 export default {
-	name: 'DetailsO'
+	name: 'Overview'
 }
 </script>

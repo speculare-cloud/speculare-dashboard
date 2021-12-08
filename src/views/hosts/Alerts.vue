@@ -45,7 +45,7 @@ import axios from 'axios'
 import { reactive } from 'vue'
 
 export default {
-	name: 'DetailsO',
+	name: 'Alerts',
 
 	data () {
 		return {
@@ -70,7 +70,6 @@ export default {
 					.then(resp => {
 						const dataLength = resp.data.length
 						for (let i = 0; i <= dataLength - 1; i++) {
-							console.log(resp.data[i])
 							vm.alertsList.push(resp.data[i])
 						}
 

@@ -144,11 +144,10 @@
 import Skeleton from '@/components/Graphs/Utils/Skeleton'
 import { DatePicker } from 'v-calendar'
 import { defineAsyncComponent } from 'vue'
-// import moment from 'moment';
 
 const scaleIdxArr = [5, 15, 30, 60, 180, 360]
 export default {
-	name: 'DetailsD',
+	name: 'Details',
 	components: {
 		DatePicker,
 		CpuTimes: defineAsyncComponent({
@@ -197,7 +196,7 @@ export default {
 		}
 	},
 
-	beforeRouteUpdate (to, from, next) {
+	beforeRouteUpdate (_to, _from, next) {
 		next()
 		this.graphRange = {
 			granularity: 1,
@@ -225,6 +224,7 @@ export default {
 		},
 		applySelection: function () {
 			if (this.range.start != null) {
+				// TODO:
 				// Define the trueRange in the format of YYYY-MM-DDTHH:mm:ss.SSS
 				// let start = moment(this.range.start);
 				// let end = moment(this.range.end)
