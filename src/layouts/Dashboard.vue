@@ -49,12 +49,6 @@ export default {
 		return {
 			open: false
 		}
-	},
-
-	methods: {
-		test () {
-			console.log('test')
-		}
 	}
 }
 </script>
