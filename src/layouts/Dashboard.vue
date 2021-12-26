@@ -26,7 +26,7 @@
 						SERVERS <span class="ml-1 text-green-200 font-normal">{{ $store.state.hosts_values.length }}</span>
 					</p>
 
-					<router-link class="text-gray-400 flex items-center pr-2 py-1 mt-2 font-medium text-xsm uppercase hover:text-gray-100"
+					<router-link class="text-gray-400 flex items-center pr-2 py-1 mt-2 font-medium text-xsm uppercase hover:text-gray-100 transition ease-in-out duration-150"
 						v-for="item in $store.state.hosts_values" :key="item.uuid" :to="{ name: 'hosts_details',
 							params: { hostname: item.hostname, uuid: item.uuid} }" @click="open = !open">
 						<div>{{ item.hostname }}</div>

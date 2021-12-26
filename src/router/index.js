@@ -30,7 +30,7 @@ const routes = [{
 		name: 'hosts_details',
 		component: () =>
 			import('@/views/hosts/Base.vue'),
-		redirect: ({ name: 'hd_overview' }),
+		redirect: ({ name: 'hd_details' }),
 		children: [{
 			path: 'overview',
 			name: 'hd_overview',

@@ -18,7 +18,8 @@
 									</span>
 									<div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
 										<!-- TODO: Change the orientation if we're on mobile -->
-										<span class="relative z-50 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg" style="margin-left: calc(100% + 6rem); margin-bottom: -10rem; max-width: 10rem; min-width: calc(100% + 4rem);">
+										<span class="relative z-50 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg"
+											style="margin-left: calc(100% + 6rem); margin-bottom: -10rem; max-width: 10rem; min-width: calc(100% + 4rem);">
 											{{ item.info }}
 										</span>
 									</div>
@@ -41,8 +42,8 @@
 
 <script>
 import { nextTick } from '@vue/runtime-core'
-import axios from 'axios'
 import { reactive } from 'vue'
+import axios from 'axios'
 
 export default {
 	name: 'Alerts',
