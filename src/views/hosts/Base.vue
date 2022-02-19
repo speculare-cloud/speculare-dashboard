@@ -30,7 +30,7 @@
 							Incidents
 						</router-link>
 						<!-- TODO: Setup the page -->
-						<a href="#" class="px-3 border-b-2 border-transparent text-gray-400 pb-1.5">Settings</a>
+						<!-- <a href="#" class="px-3 border-b-2 border-transparent text-gray-400 pb-1.5">Settings</a> -->
 					</div>
 				</div>
 			</div>

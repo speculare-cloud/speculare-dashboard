@@ -7,7 +7,7 @@ const graphScrollObs = {
 					fetching()
 				} else {
 					cleaning()
-				};
+				}
 			}, {
 				// Trigger 100px before and after
 				rootMargin: '258px 0px 258px 0px',

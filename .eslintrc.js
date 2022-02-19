@@ -3,36 +3,35 @@ module.exports = {
 		'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 		'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
 		'vue/max-attributes-per-line': ['error', {
-			singleline: {
-				max: 4,
-				allowFirstLine: true
+			'singleline': {
+				'max': 4,
 			},
-			multiline: {
-				max: 4,
-				allowFirstLine: true
+			'multiline': {
+				'max': 4,
 			}
 		}],
 		'vue/html-closing-bracket-newline': ['error', {
-			singleline: 'never',
-			multiline: 'never'
+			'singleline': 'never',
+			'multiline': 'never'
 		}],
 		'new-cap': 'off',
-		camelcase: 'off',
+		'camelcase': 'off',
 		'no-tabs': 0,
-		indent: [2, 'tab'],
+		'indent': [2, 'tab'],
 		'vue/script-indent': ['error', 'tab', {
-			baseIndent: 0,
-			switchCase: 0,
-			ignores: []
+			'baseIndent': 0,
+			'switchCase': 0,
+			'ignores': []
 		}],
 		'vue/html-indent': ['error', 'tab', {
-			attribute: 1,
-			baseIndent: 1,
-			closeBracket: 0,
-			alignAttributesVertically: true,
-			ignores: []
+			'attribute': 1,
+			'baseIndent': 1,
+			'closeBracket': 0,
+			'alignAttributesVertically': true,
+			'ignores': []
 		}],
-		'vue/no-multi-spaces': 'off'
+		'vue/no-multi-spaces': 'off',
+		'vue/multi-word-component-names': 'off',
 	},
 
 	root: true,
@@ -45,10 +44,8 @@ module.exports = {
 		'plugin:vue/base',
 		'plugin:vue/vue3-essential',
 		'plugin:vue/vue3-strongly-recommended',
-		'@vue/standard'
+		'eslint:recommended'
 	],
 
-	parserOptions: {
-		parser: 'babel-eslint'
-	}
+	parser: "vue-eslint-parser"
 }

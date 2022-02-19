@@ -82,17 +82,20 @@
 							<p class="text-lg text-gray-100 mb-4">
 								Range selector
 							</p>
-							<DatePicker v-model="range" :max-date="new Date()" :model-config="modelConfig" color="teal"
+							<DatePicker
+								v-model="range" :max-date="new Date()" :model-config="modelConfig" color="teal"
 								is-range is-dark>
 								<template #default="{ inputValue, isDragging, togglePopover }">
 									<div class="flex flex-col sm:flex-row justify-start items-center">
 										<div class="relative flex-grow">
-											<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
+											<svg
+												class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
 												fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 												viewBox="0 0 24 24" stroke="currentColor">
 												<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 											</svg>
-											<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full"
+											<input
+												class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full"
 												:class="isDragging ? 'text-gray-600' : 'text-gray-900'"
 												:value="inputValue.start" @click="togglePopover()" placeholder="Click to select">
 										</div>
@@ -102,12 +105,14 @@
 											</svg>
 										</span>
 										<div class="relative flex-grow">
-											<svg class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
+											<svg
+												class="text-gray-600 w-4 h-full mx-2 absolute pointer-events-none"
 												fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 												viewBox="0 0 24 24" stroke="currentColor">
 												<path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 											</svg>
-											<input class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full"
+											<input
+												class="flex-grow pl-8 pr-2 py-1 bg-gray-100 border rounded w-full"
 												:class="isDragging ? 'text-gray-600' : 'text-gray-900'"
 												:value="inputValue.end" @click="togglePopover()" placeholder="Click to select">
 										</div>
@@ -120,7 +125,8 @@
 					<!-- Footer -->
 					<div class="flex justify-between mt-4">
 						<button @click="open = false">
-							<svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+							<svg
+								class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
 								viewBox="0 0 18 18">
 								<path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z" />
 							</svg>

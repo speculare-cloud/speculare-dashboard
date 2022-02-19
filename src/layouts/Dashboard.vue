@@ -14,7 +14,7 @@
 					</button>
 				</div>
 				<div class="px-8 md:px-4 pt-3 pb-7 flex flex-row justify-start align-middle">
-					<img :src="'https://eu.ui-avatars.com/api/?name=' + this.$route.params.slug + '&size=24&background=random'">
+					<img :src="'https://eu.ui-avatars.com/api/?name=' + this.$route.params.slug + '&size=24'">
 					<router-link :key="this.$route.params.slug" :to="{ name: 'workspace', params: { slug: this.$route.params.slug } }" @click="open = false">
 						<div class="ml-2 text-sm" style="line-height:24px">
 							Workspace {{ this.$route.params.slug }}
@@ -26,7 +26,8 @@
 						SERVERS <span class="ml-1 text-green-200 font-normal">{{ $store.state.hosts_values.length }}</span>
 					</p>
 
-					<router-link class="text-gray-400 flex items-center pr-2 py-1 mt-2 font-medium text-xsm uppercase hover:text-gray-100 transition ease-in-out duration-150"
+					<router-link
+						class="text-gray-400 flex items-center pr-2 py-1 mt-2 font-medium text-xsm uppercase hover:text-gray-100 transition ease-in-out duration-150"
 						v-for="item in $store.state.hosts_values" :key="item.uuid" :to="{ name: 'hosts_details',
 							params: { hostname: item.hostname, uuid: item.uuid} }" @click="open = !open">
 						<div>{{ item.hostname }}</div>

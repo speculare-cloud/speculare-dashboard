@@ -3,7 +3,8 @@
 		<div role="section" class="mt-4 md:mt-8">
 			<div class="w-100 text-gray-100">
 				<div class="flex mt-4 w-100 space-x-4">
-					<div v-for="item in alertsList" :key="item.id"
+					<div
+						v-for="item in alertsList" :key="item.id"
 						class="w-full md:w-max bg-side rounded-lg shadow-lg p-4">
 						<div class="flex justify-between">
 							<h4 class="text-base self-center">
@@ -18,7 +19,8 @@
 									</span>
 									<div class="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
 										<!-- TODO: Change the orientation if we're on mobile -->
-										<span class="relative z-50 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg"
+										<span
+											class="relative z-50 p-2 text-xs leading-none text-white whitespace-no-wrap bg-black shadow-lg"
 											style="margin-left: calc(100% + 6rem); margin-bottom: -10rem; max-width: 10rem; min-width: calc(100% + 4rem);">
 											{{ item.info }}
 										</span>

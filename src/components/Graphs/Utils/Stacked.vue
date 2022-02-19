@@ -64,7 +64,7 @@ export default {
 		customLegend: function () {
 			const vm = this
 
-			function init (u, _) {
+			function init (u, ) {
 				const legendEl = u.root.querySelector('.u-legend')
 				// Get the u-series corresponding to the Timestamp
 				const time = legendEl.getElementsByClassName('u-series')[0]
@@ -159,7 +159,7 @@ export default {
 			}
 		},
 		createChart: function (data) {
-			const stacked = this.stack(data, i => false)
+			const stacked = this.stack(data, () => false)
 			const opts = {
 				...this.getSize(),
 				plugins: [
@@ -176,7 +176,7 @@ export default {
 				},
 				hooks: {
 					setSeries: [
-						(u, i) => {
+						(u, ) => {
 							const stacked = this.stack(data, i => !u.series[i].show)
 							u.delBand(null)
 							stacked.bands.forEach(b => u.addBand(b))
@@ -240,7 +240,7 @@ export default {
 				height: 200
 			}
 		},
-		setChartSize: function (_event) {
+		setChartSize: function () {
 			if (this.chart) {
 				this.chart.setSize(this.getSize())
 			}

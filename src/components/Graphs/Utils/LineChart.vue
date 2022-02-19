@@ -63,7 +63,7 @@ export default {
 		customLegend: function () {
 			const vm = this
 
-			function init (u, _) {
+			function init (u, ) {
 				const legendEl = u.root.querySelector('.u-legend')
 				// Get the u-series corresponding to the Timestamp
 				const time = legendEl.getElementsByClassName('u-series')[0]
@@ -184,7 +184,7 @@ export default {
 				height: 200
 			}
 		},
-		setChartSize: function (_event) {
+		setChartSize: function () {
 			if (this.chart) {
 				this.chart.setSize(this.getSize())
 			}
