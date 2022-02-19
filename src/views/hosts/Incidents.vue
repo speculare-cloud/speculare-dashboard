@@ -174,7 +174,7 @@ export default {
 			if (howMany < 24) {
 				return prev.fromNow()
 			}
-			return prev.format('D MMM [at] hh:mma')
+			return prev.format('D MMM YY [at] hh:mma')
 		},
 		formatFloat: function (floating) {
 			return parseFloat(floating).toFixed(2)
