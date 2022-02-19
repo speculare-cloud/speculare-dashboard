@@ -28,7 +28,7 @@
 					</div>
 				</router-link>
 			</div>
-			<p class="absolute bottom-4 text-sm text-gray-400 italic">
+			<p class="text-center absolute bottom-4 right-4 left-4 text-sm text-gray-400 italic p-4">
 				The ability to create custom workspaces will come later.
 			</p>
 		</div>
