@@ -169,7 +169,7 @@ export default {
 
 	methods: {
 		formatDate: function (date) {
-			const prev = moment(date)
+			const prev = moment.utc(date)
 			const howMany = moment.duration(moment().diff(prev)).asHours()
 			if (howMany < 24) {
 				return prev.fromNow()
