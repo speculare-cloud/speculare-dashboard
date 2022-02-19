@@ -32,12 +32,6 @@ const routes = [{
 			import('@/views/hosts/Base.vue'),
 		redirect: ({ name: 'hd_details' }),
 		children: [{
-			path: 'overview',
-			name: 'hd_overview',
-			component: () =>
-				import('@/views/hosts/Overview.vue')
-		},
-		{
 			path: 'details',
 			name: 'hd_details',
 			component: () =>

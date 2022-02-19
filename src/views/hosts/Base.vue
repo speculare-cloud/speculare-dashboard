@@ -20,9 +20,6 @@
 			<div id="details_nav" class="flex-grow overflow-y-auto border-b border-gray-800">
 				<div class="sm:pt-8 pt-4 flex flex-col w-full text-white">
 					<div class="flex items-center space-x-3">
-						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hd_overview" :to="{ name: 'hd_overview' }">
-							Overview
-						</router-link>
 						<router-link class="px-3 border-b-2 pb-1.5 border-transparent text-gray-400" key="hd_details" :to="{ name: 'hd_details' }">
 							Details
 						</router-link>
