@@ -67,13 +67,13 @@ const graphHelper = {
 		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
 			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip)
 		},
-		sanitizeGraphData(dataSize, scaleTime, chartLabels, throttleshot, spliceData, nullData) {
+		sanitizeGraphData(dataSize, scaleTime, chartLabels, threshold, spliceData, nullData) {
 			// Be sure the date are following in order (by 1s for now)
 			const now = moment().utc().unix()
 			const min = moment.utc().subtract(scaleTime, 'seconds').unix()
 			for (let i = dataSize - 1; i >= 0; i--) {
 				// Iterate in the reverse order, and find if any missing data from the latest we have
-				// Also compare start against current time, if over throttleshot, might be some missing data
+				// Also compare start against current time, if over threshold, might be some missing data
 
 				// If the current data is too old, get rid of it
 				if (chartLabels[i] < min) {
@@ -83,13 +83,13 @@ const graphHelper = {
 
 				if (i === dataSize - 1) {
 					// Check against now to see if we're missing starting data
-					if (!(now - throttleshot <= chartLabels[i] && chartLabels[i] <= now + throttleshot)) {
+					if (!(now - threshold <= chartLabels[i] && chartLabels[i] <= now + threshold)) {
 						// Change last labels by now to ensure gap if no previous data
 						chartLabels[i] = now
 						nullData(i)
 					}
 				} else {
-					if (chartLabels[i + 1] > chartLabels[i] + throttleshot) {
+					if (chartLabels[i + 1] > chartLabels[i] + threshold) {
 						// Don't need to change the Labels, uPlot already handle this
 						nullData(i)
 					}
