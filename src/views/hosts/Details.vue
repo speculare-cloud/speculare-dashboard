@@ -1,6 +1,6 @@
 <template>
 	<div class="details">
-		<div role="section" class="mt-4 md:mt-8">
+		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">
 				cpu
 			</h3>
@@ -34,7 +34,7 @@
 			</p>
 			<Ram :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
-		<div role="section" class="mt-4 mb-12">
+		<div role="section" class="mt-4">
 			<h3 class="text-2xl text-gray-100 mb-4">
 				swap
 			</h3>
@@ -43,7 +43,7 @@
 			</p>
 			<Swap :key="this.$route.params.uuid" :uuid="this.$route.params.uuid" :graph-range="graphRange" />
 		</div>
-		<div role="section" class="mt-4 mb-12">
+		<div role="section" class="mt-4 mb-16">
 			<h3 class="text-2xl text-gray-100 mb-4">
 				network
 			</h3>
