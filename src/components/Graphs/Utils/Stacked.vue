@@ -134,7 +134,11 @@ export default {
 				} else {
 					const dilength = data[i].length
 					for (let j = 0; j < dilength; j++) {
-						accum[j] += data[i][j]
+						if (data[i][j] == null) {
+							accum[j] = null;
+						} else {
+							accum[j] += data[i][j]
+						}
 					}
 					const arrCopy = Array(dilength)
 					for (let j = 0; j < dilength; j++) {

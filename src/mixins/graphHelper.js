@@ -5,7 +5,7 @@ const _spline = uPlot.paths.spline()
 
 const graphHelper = {
 	methods: {
-		updateGraph: function (vm, updateValues) {
+		updateGraph: function(vm, updateValues) {
 			// Sanitize the Data in case of gap
 			// but also remove too old element
 			// TODO - Check the threshold value
@@ -15,12 +15,12 @@ const graphHelper = {
 				vm.chartLabels,
 				vm.graphRange.scale / 60 + 5,
 				vm.spliceData,
-				vm.nullData
+				vm.nullData,
 			)
 			// Update the datacollection so that uPlot update the chart
 			updateValues()
 		},
-		handleGraphRangeChange: function (newVal, oldVal, cleaning, fetching, handleWebSocket, isConnectionNull) {
+		handleGraphRangeChange: function(newVal, oldVal, cleaning, fetching, handleWebSocket, isConnectionNull) {
 			if (newVal.start != null) {
 				// Clear the data and close the websocket
 				cleaning()
@@ -48,26 +48,26 @@ const graphHelper = {
 				}
 			}
 		},
-		intValueOrTilde: function (val, dec) {
+		intValueOrTilde: function(val, dec) {
 			return val == null ? '-' : val.toFixed(dec)
 		},
-		getBaseUrl: function (table, uuid) {
+		getBaseUrl: function(table, uuid) {
 			return this.$apiBaseUrl + '/api/' + table + '?uuid=' + uuid
 		},
-		getMinMaxString: function (start, end) {
+		getMinMaxString: function(start, end) {
 			return '&min_date=' + start + '&max_date=' + end
 		},
-		getMinMaxNowString: function (scaleTime) {
+		getMinMaxNowString: function(scaleTime) {
 			// Substract vm.scaleTime seconds as this is pretty much the minimum time for the graph
 			const min = moment().utc().subtract(scaleTime + 5, 'seconds').format('YYYY-MM-DDTHH:mm:ss.SSS')
 			// Add 5 seconds to minimize the risks of missing data
 			const max = moment().utc().add(5, 'seconds').format('YYYY-MM-DDTHH:mm:ss.SSS')
 			return '&min_date=' + min + '&max_date=' + max
 		},
-		splineGraph: function (u, seriesIdx, idx0, idx1, extendGap, buildClip) {
+		splineGraph: function(u, seriesIdx, idx0, idx1, extendGap, buildClip) {
 			return _spline(u, seriesIdx, idx0, idx1, extendGap, buildClip)
 		},
-		sanitizeGraphData (dataSize, scaleTime, chartLabels, throttleshot, spliceData, nullData) {
+		sanitizeGraphData(dataSize, scaleTime, chartLabels, throttleshot, spliceData, nullData) {
 			// Be sure the date are following in order (by 1s for now)
 			const now = moment().utc().unix()
 			const min = moment.utc().subtract(scaleTime, 'seconds').unix()
