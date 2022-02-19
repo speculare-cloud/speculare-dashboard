@@ -70,6 +70,7 @@ export default {
 			chartLabels: [],
 			chartDataObjRead: [],
 			chartDataObjWrite: [],
+			historyDataDate: [],
 			historyDataRead: [],
 			historyDataWrite: [],
 			bufferDataWs: [],
@@ -188,6 +189,7 @@ export default {
 			this.chartLabels = []
 			this.chartDataObjRead = []
 			this.chartDataObjWrite = []
+			this.historyDataDate = []
 			this.historyDataRead = []
 			this.historyDataWrite = []
 			this.wsBuffer = []
@@ -199,6 +201,7 @@ export default {
 		nullData: function (i) {
 			this.chartDataObjRead[i] = null
 			this.chartDataObjWrite[i] = null
+			this.historyDataDate[i] = null
 			this.historyDataRead[i] = null
 			this.historyDataWrite[i] = null
 		},
@@ -207,6 +210,7 @@ export default {
 			this.chartLabels.splice(start, nb)
 			this.chartDataObjRead.splice(start, nb)
 			this.chartDataObjWrite.splice(start, nb)
+			this.historyDataDate.splice(start, nb)
 			this.historyDataRead.splice(start, nb)
 			this.historyDataWrite.splice(start, nb)
 		},
@@ -216,12 +220,12 @@ export default {
 			// If scale != default, should divide the values by granularity (at least for the graph)
 			// That is because if we don't do it, we get MB/granularity, so to get MB/s we devide by the granularity
 			if (this.graphRange.scale !== 300) {
-				console.log('[ioblocks] Dividing value for the granularity [', this.graphRange.granularity, ']')
-				read = read / this.graphRange.granularity
-				write = write / this.graphRange.granularity
+				if (read != null) read = read / this.graphRange.granularity
+				if (write != null) write = write / this.graphRange.granularity
 			}
 			this.chartDataObjRead.push(read)
 			this.chartDataObjWrite.push(write)
+			this.historyDataDate.push(date)
 			this.historyDataRead.push(histRead)
 			this.historyDataWrite.push(histWrite)
 		},
@@ -246,12 +250,13 @@ export default {
 				this.bufferDataWs = []
 			}
 		},
-		getReadWriteFrom: function (total_read, total_write) {
+		getReadWriteFrom: function (currDate, total_read, total_write) {
 			let read = null
 			let write = null
 			// If the previous does not exist, we can't compute the percent
 			const prevIndex = this.chartLabels.length - 1
-			if (!(this.historyDataRead[prevIndex] == null)) {
+			if (!(this.historyDataRead[prevIndex] == null) &&
+				!(this.historyDataDate[prevIndex] < currDate - (this.graphRange.scale / 60 + 5))) {
 				// Get the previous values
 				const prevRead = this.historyDataRead[prevIndex]
 				const prevWrite = this.historyDataWrite[prevIndex]
@@ -271,11 +276,12 @@ export default {
 				total_read += elem[i].read_bytes
 				total_write += elem[i].write_bytes
 			}
-
-			const { read, write } = this.getReadWriteFrom(total_read, total_write)
+			
+			const currDate = moment.utc(elem[0].created_at).unix();
+			const { read, write } = this.getReadWriteFrom(currDate, total_read, total_write)
 
 			// Add the new value to the Array
-			this.pushValue(moment.utc(elem[0].created_at).unix(), read, write, total_read, total_write)
+			this.pushValue(currDate, read, write, total_read, total_write)
 		},
 		addNewData: function () {
 			const vm = this
@@ -287,10 +293,11 @@ export default {
 				total_write += vm.bufferDataWs[i][5]
 			}
 
-			const { read, write } = vm.getReadWriteFrom(total_read, total_write)
+			const currDate = moment.utc(vm.bufferDataWs[0][8]).unix()
+			const { read, write } = vm.getReadWriteFrom(currDate, total_read, total_write)
 
 			// Add the new value to the Array
-			vm.pushValue(moment.utc(vm.bufferDataWs[0][8]).unix(), read, write, total_read, total_write)
+			vm.pushValue(currDate, read, write, total_read, total_write)
 
 			// Update onscreen values
 			vm.updateGraph(vm, function () { vm.datacollection = [vm.chartLabels, vm.chartDataObjRead, vm.chartDataObjWrite] })
