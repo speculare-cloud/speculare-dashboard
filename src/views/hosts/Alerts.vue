@@ -2,10 +2,10 @@
 	<div class="details">
 		<div role="section" class="mt-4 md:mt-8">
 			<div class="w-100 text-gray-100">
-				<div class="flex mt-4 w-100 space-x-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4 mb-4 gap-4">
 					<div
 						v-for="item in alertsList" :key="item.id"
-						class="w-full md:w-max bg-side rounded-lg shadow-lg p-4">
+						class="bg-side rounded-lg shadow-lg p-4">
 						<div class="flex justify-between">
 							<h4 class="text-base self-center">
 								{{ item.name }}
@@ -29,11 +29,21 @@
 							</div>
 						</div>
 						<div class="mt-4 space-y-2">
-							<code class="w-full block px-2">$table = {{ item.table }}</code>
-							<code class="w-full block px-2">$this = {{ item.lookup }}</code>
-							<code class="w-full block px-2" v-if="item.where_clause">$where = {{ item.where_clause }}</code>
-							<code class="w-full block p-2"><span class="bg-yellow-600 rounded-lg p-1">$warn</span> = {{ item.warn }}</code>
-							<code class="w-full block p-2"><span class="bg-red-600 rounded-lg p-1">$crit</span> = {{ item.crit }}</code>
+							<code class="w-full block px-2 whitespace-nowrap overflow-x-auto no-scrollbar">
+								$table = {{ item.table }}
+							</code>
+							<code class="w-full block px-2 whitespace-nowrap overflow-x-auto no-scrollbar">
+								$this = {{ item.lookup }}
+							</code>
+							<code class="w-full block px-2 whitespace-nowrap overflow-x-auto no-scrollbar" v-if="item.where_clause">
+								$where = {{ item.where_clause }}
+							</code>
+							<code class="w-full block p-2 whitespace-nowrap overflow-x-auto no-scrollbar">
+								<span class="bg-yellow-600 rounded-lg p-1">$warn</span> = {{ item.warn }}
+							</code>
+							<code class="w-full block p-2 whitespace-nowrap overflow-x-auto no-scrollbar">
+								<span class="bg-red-600 rounded-lg p-1">$crit</span> = {{ item.crit }}
+							</code>
 						</div>
 					</div>
 				</div>
