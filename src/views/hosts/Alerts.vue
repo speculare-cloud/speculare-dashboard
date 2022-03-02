@@ -54,7 +54,6 @@
 
 <script>
 import { nextTick } from '@vue/runtime-core'
-import { reactive } from 'vue'
 import axios from 'axios'
 
 export default {
@@ -62,10 +61,7 @@ export default {
 
 	data () {
 		return {
-			alertsList: reactive([]),
-			fetchingDone: false,
-			connection: null,
-			wsBuffer: []
+			alertsList: [],
 		}
 	},
 
@@ -73,79 +69,15 @@ export default {
 		const vm = this
 
 		nextTick(() => {
-			if (vm.connection === null) {
-				console.log('[alerts] > Setting a new websocket')
-				vm.connection = new WebSocket(vm.$wsBaseUrl + '/ws?query=*:alerts:host_uuid.eq.' + vm.$route.params.uuid)
-			}
-			vm.connection.addEventListener('open', function () {
-				console.log('[alerts] >> webSocket opened')
-				axios.get(vm.$apiAlertsUrl + '/api/alerts?uuid=' + vm.$route.params.uuid)
-					.then(resp => {
-						const dataLength = resp.data.length
-						for (let i = 0; i <= dataLength - 1; i++) {
-							vm.alertsList.push(resp.data[i])
-						}
-
-						const wsBuffSize = vm.wsBuffer.length
-						if (wsBuffSize > 0) {
-							console.log('[alerts] >>> Merging wsBuffer with already added data')
-							for (let i = 0; i <= wsBuffSize - 1; i++) {
-								const currItem = vm.wsBuffer[i]
-								const idx = vm.alertsList.findIndex((e) => e.id === currItem.id)
-								// Basic check if we found an occur
-								if (idx === -1) { vm.alertsList.push(currItem) } else { vm.alertsList[idx] = currItem }
-							}
-						}
-
-						// Define the fetching as done
-						vm.fetchingDone = true
-						// Clear the wsBuffer
-						this.wsBuffer = []
-					})
-			})
-			// Setup onmessage listener
-			vm.connection.addEventListener('message', function (event) {
-				const json = JSON.parse(event.data)
-				const val = json.columnvalues
-				// Convert it to a easy usable object
-				const newValues = {
-					id: val[0],
-					name: val[1],
-					table: val[2],
-					lookup: val[3],
-					timing: val[4],
-					warn: val[5],
-					crit: val[6],
-					info: val[7],
-					host_uuid: val[8],
-					hostname: val[9],
-					where_clause: val[10]
-				}
-
-				console.log('[alerts] >> new message', newValues)
-				if (vm.fetchingDone) {
-					// Add normally (push) but check if we already have it
-					const idx = vm.alertsList.findIndex((e) => e.id === newValues.id)
-					// Basic check if we found an occur
-					if (idx === -1) { vm.alertsList.push(newValues) } else { vm.alertsList[idx] = newValues }
-				} else {
-					// Add to WsBuffer and merge after the initial fetch
-					console.log('[alerts] >> Adding value to the wsBuffer (WS opened but fetching not done yet)')
-					vm.wsBuffer.push(newValues)
-				}
-			})
+			// This does not auto-refresh, implement a polling (every minute ?)
+			axios.get(vm.$apiAlertsUrl + '/api/alerts?uuid=' + vm.$route.params.uuid)
+				.then(resp => {
+					const dataLength = resp.data.length
+					for (let i = 0; i <= dataLength - 1; i++) {
+						vm.alertsList.push(resp.data[i])
+					}
+				})
 		})
 	},
-
-	beforeUnmount: function () {
-		// Close the webSocket connection
-		this.wsBuffer = []
-		this.alertsList = []
-		if (this.connection != null) {
-			console.log('[alerts] > Closing the websocket')
-			this.connection.close()
-			this.connection = null
-		}
-	}
 }
 </script>
